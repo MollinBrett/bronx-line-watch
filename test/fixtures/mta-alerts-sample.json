@@ -1,0 +1,3513 @@
+{
+ "header": {
+  "gtfs_realtime_version": "2.0",
+  "incrementality": "FULL_DATASET",
+  "timestamp": 1793539447,
+  "transit_realtime.mercury_feed_header": {
+   "mercury_version": "1.0"
+  }
+ },
+ "entity": [
+  {
+   "id": "lmm:alert:274447:26",
+   "alert": {
+    "active_period": [
+     {
+      "start": 1793534851
+     }
+    ],
+    "informed_entity": [
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "6",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:6:26"
+      }
+     }
+    ],
+    "header_text": {
+     "translation": [
+      {
+       "text": "[6] trains are running with delays in both directions after NYPD responded to an unauthorized person on the track at E 149 St.",
+       "language": "en"
+      },
+      {
+       "text": "<p>[6] trains are running with delays in both directions after NYPD responded to an unauthorized person on the track at <strong>E 149 St</strong>.</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "transit_realtime.mercury_alert": {
+     "created_at": 1793534851,
+     "updated_at": 1793539446,
+     "alert_type": "Delays",
+     "display_before_active": 0
+    }
+   }
+  },
+  {
+   "id": "lmm:planned_work:36265",
+   "alert": {
+    "active_period": [
+     {
+      "start": 1794031200,
+      "end": 1794214800
+     }
+    ],
+    "informed_entity": [
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "SI",
+      "stop_id": "S18",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:SI:10"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "SI",
+      "stop_id": "S17",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:SI:10"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "SI",
+      "stop_id": "S16",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:SI:10"
+      }
+     }
+    ],
+    "header_text": {
+     "translation": [
+      {
+       "text": "All [SIR] trains from Eltingville to Huguenot board from the St George-bound platform",
+       "language": "en"
+      },
+      {
+       "text": "<p>All [SIR] trains from \u200c\u200c<strong>Eltingville</strong> to \u200c\u200c<strong>Huguenot</strong> board from the St George-bound platform</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "description_text": {
+     "translation": [
+      {
+       "text": "Boarding change includes Eltingville, Annadale, and Huguenot stations.\nWhat's happening?\nScheduled maintenance",
+       "language": "en"
+      },
+      {
+       "text": "<ul><li><p>Boarding change includes <strong>Eltingville</strong>, <strong>Annadale</strong>, and <strong>Huguenot</strong> stations.</p></li></ul><p><strong>What's happening?</strong></p><p>Scheduled maintenance</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "transit_realtime.mercury_alert": {
+     "created_at": 1793372716,
+     "updated_at": 1793372716,
+     "alert_type": "Boarding Change",
+     "display_before_active": 3600,
+     "human_readable_active_period": {
+      "translation": [
+       {
+        "text": "Nov 7 - 9, Sat 1:00 AM to Mon 4:00 AM",
+        "language": "en"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "lmm:planned_work:36264",
+   "alert": {
+    "active_period": [
+     {
+      "start": 1793977200,
+      "end": 1793995200
+     }
+    ],
+    "informed_entity": [
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "SI",
+      "stop_id": "S16",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:SI:10"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "SI",
+      "stop_id": "S17",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:SI:10"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "SI",
+      "stop_id": "S18",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:SI:10"
+      }
+     }
+    ],
+    "header_text": {
+     "translation": [
+      {
+       "text": "All [SIR] trains from Huguenot to Eltingville board from the Tottenville-bound platform",
+       "language": "en"
+      },
+      {
+       "text": "<p>All [SIR] trains from <strong>Huguenot</strong> to <strong>Eltingville</strong> board from the Tottenville-bound platform</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "description_text": {
+     "translation": [
+      {
+       "text": "Boarding change includes Huguenot, Annadale, and Eltingville stations.\nWhat's happening?\nScheduled maintenance",
+       "language": "en"
+      },
+      {
+       "text": "<ul><li><p>Boarding change includes <strong>Huguenot</strong>, <strong>Annadale</strong>, and <strong>Eltingville</strong> stations.</p></li></ul><p><strong>What's happening?</strong></p><p>Scheduled maintenance</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "transit_realtime.mercury_alert": {
+     "created_at": 1793372596,
+     "updated_at": 1793372596,
+     "alert_type": "Boarding Change",
+     "display_before_active": 3600,
+     "human_readable_active_period": {
+      "translation": [
+       {
+        "text": "Nov 6, Friday, 10:00 AM to 3:00 PM",
+        "language": "en"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "lmm:planned_work:36263",
+   "alert": {
+    "active_period": [
+     {
+      "start": 1793630700,
+      "end": 1793649600
+     }
+    ],
+    "informed_entity": [
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "SI",
+      "stop_id": "S15",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:SI:10"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "SI",
+      "stop_id": "S14",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:SI:10"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "SI",
+      "stop_id": "S13",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:SI:10"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "SI",
+      "stop_id": "S11",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:SI:10"
+      }
+     }
+    ],
+    "header_text": {
+     "translation": [
+      {
+       "text": "All [SIR] trains from Prince's Bay to Arthur Kill board from the St George-bound platform",
+       "language": "en"
+      },
+      {
+       "text": "<p>All [SIR] trains from <strong>Prince's Bay</strong> to <strong>Arthur Kill</strong> board from the <strong>St George</strong>-bound platform</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "description_text": {
+     "translation": [
+      {
+       "text": "Boarding change affects Prince's Bay, Pleasant Plains, Richmond Valley and Arthur Kill stations.\nWhat's happening?\nScheduled maintenance",
+       "language": "en"
+      },
+      {
+       "text": "<ul><li><p>Boarding change affects <strong>Prince's Bay</strong>, <strong>Pleasant Plains</strong>, <strong>Richmond Valley</strong> and <strong>Arthur Kill</strong> stations.</p></li></ul><p><strong>What's happening?</strong></p><p>Scheduled maintenance</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "transit_realtime.mercury_alert": {
+     "created_at": 1793372507,
+     "updated_at": 1793372507,
+     "alert_type": "Boarding Change",
+     "display_before_active": 3600,
+     "human_readable_active_period": {
+      "translation": [
+       {
+        "text": "Nov 2, Monday, 9:45 AM to 3:00 PM",
+        "language": "en"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "lmm:planned_work:36262",
+   "alert": {
+    "active_period": [
+     {
+      "start": 1793717100,
+      "end": 1793736000
+     },
+     {
+      "start": 1793803500,
+      "end": 1793822400
+     },
+     {
+      "start": 1793889900,
+      "end": 1793908800
+     }
+    ],
+    "informed_entity": [
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "SI",
+      "stop_id": "S18",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:SI:10"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "SI",
+      "stop_id": "S17",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:SI:10"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "SI",
+      "stop_id": "S16",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:SI:10"
+      }
+     }
+    ],
+    "header_text": {
+     "translation": [
+      {
+       "text": "All [SIR] trains from Eltingville to Huguenot board from the St George-bound platform",
+       "language": "en"
+      },
+      {
+       "text": "<p>All [SIR] trains from \u200c\u200c<strong>Eltingville</strong> to \u200c\u200c<strong>Huguenot</strong> board from the St George-bound platform</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "description_text": {
+     "translation": [
+      {
+       "text": "Boarding change includes Eltingville, Annadale, and Huguenot stations.\nWhat's happening?\nScheduled maintenance",
+       "language": "en"
+      },
+      {
+       "text": "<ul><li><p>Boarding change includes <strong>Eltingville</strong>, <strong>Annadale</strong>, and <strong>Huguenot</strong> stations.</p></li></ul><p><strong>What's happening?</strong></p><p>Scheduled maintenance</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "transit_realtime.mercury_alert": {
+     "created_at": 1793372315,
+     "updated_at": 1793372315,
+     "alert_type": "Boarding Change",
+     "display_before_active": 3600,
+     "human_readable_active_period": {
+      "translation": [
+       {
+        "text": "Nov 3 - 5, Tue to Thu, 9:45 AM to 3:00 PM",
+        "language": "en"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "lmm:planned_work:36216",
+   "alert": {
+    "active_period": [
+     {
+      "start": 1793530800,
+      "end": 1793583030
+     }
+    ],
+    "informed_entity": [
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "1",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:1:3"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "A",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:A:3"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "C",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:C:3"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "D",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:D:3"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "G",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:G:3"
+      }
+     }
+    ],
+    "header_text": {
+     "translation": [
+      {
+       "text": "Some stairways at Fulton St [G], 59 St-Columbus Circle [1][A][C][D], 66 St [1], 72 St [C] and 81 St [C] Stations may be closed during the TCS New York City Marathon",
+       "language": "en"
+      },
+      {
+       "text": "<p>Some stairways at <strong>Fulton St</strong> [G], <strong>59 St-Columbus Circle</strong> [1][A][C][D], <strong>66 St</strong> [1], <strong>72 St</strong> [C] and <strong>81 St</strong> [C] Stations may be closed during the TCS New York City Marathon</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "description_text": {
+     "translation": [
+      {
+       "text": "",
+       "language": "en"
+      },
+      {
+       "text": "<p></p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "transit_realtime.mercury_alert": {
+     "created_at": 1793303756,
+     "updated_at": 1793383387,
+     "alert_type": "Station Notice",
+     "display_before_active": 3600,
+     "human_readable_active_period": {
+      "translation": [
+       {
+        "text": "Nov 1, Sunday, 6:00 AM to 8:30 PM",
+        "language": "en"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "lmm:planned_work:36103",
+   "alert": {
+    "active_period": [
+     {
+      "start": 1794019500,
+      "end": 1794193200
+     }
+    ],
+    "informed_entity": [
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "413",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:16"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "412",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:16"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "411",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:16"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "410",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:16"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "409",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:16"
+      }
+     }
+    ],
+    "header_text": {
+     "translation": [
+      {
+       "text": "In the Bronx, Woodlawn-bound [4] skips 170 St, Mt Eden Av and 176 St and runs every 16 minutes (days/evenings)",
+       "language": "en"
+      },
+      {
+       "text": "<p>In the Bronx, Woodlawn-bound [4] skips <strong>170 St</strong>, <strong>Mt Eden Av</strong> and <strong>176 St</strong> and runs every 16 minutes (days/evenings)</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "description_text": {
+     "translation": [
+      {
+       "text": "For service to these stations, take the [4] to Burnside Av and transfer to a Manhattan-bound train.\n\nFor service from these stations, take the [4] to 167 St and transfer to a Woodlawn-bound [4].\nAll trains board from the Manhattan-bound platform at Burnside Av during this time.\nTravel tip:\nFor service from 176 St, take the Bx32 bus days and evenings and transfer to the [4] at Burnside Av.\n\nNotes: The last stop for some Woodlawn-bound trains is 149 St-Hostos. Transfer at 149 St-Hostos [accessibility icon] to a Woodlawn-bound [4] to continue your trip.\nThrough December 2026, Woodlawn-bound [4] skips Burnside Av, except Nov 6 - 8, Fri 9:45 PM to Sun 10:00 PM.\n\nWhat's happening?\nWe're replacing tracks\n\n[accessibility icon] This service change affects one or more ADA accessible stations and these travel alternatives may not be fully accessible. Please contact 511 to plan your trip.",
+       "language": "en"
+      },
+      {
+       "text": "<p>For service to these stations, take the [4] to <strong>Burnside Av</strong> and transfer to a Manhattan-bound train.</p><p style=\"min-height:10px\"></p><p>For service from these stations, take the [4] to <strong>167 St</strong> and transfer to a Woodlawn-bound [4].</p><ul><li><p>All trains board from the Manhattan-bound platform at <strong>Burnside Av</strong> during this time.</p></li></ul><p><strong>Travel tip:</strong></p><p>For service from <strong>176 St</strong>, take the<a title=\"\" href=\"https://bustime.mta.info/#102130%20Bx32\" rel=\"noopener noreferrer nofollow\" target=\"_blank\"> <strong>Bx32</strong></a> bus days and evenings and transfer to the [4] at <strong>Burnside Av</strong>.</p><p style=\"min-height:10px\"></p><p><strong>Notes: </strong>The last stop for some Woodlawn-bound trains is <strong>149 St-Hostos</strong>. Transfer at <strong>149 St-Hostos</strong> [accessibility icon] to a Woodlawn-bound [4] to continue your trip.</p><p>Through December 2026, Woodlawn-bound [4] skips <strong>Burnside Av</strong>, except Nov 6 - 8, Fri 9:45 PM to Sun 10:00 PM.</p><p style=\"min-height:10px\"></p><p><strong>What's happening?</strong></p><p>We're replacing tracks</p><p style=\"min-height:10px\"></p><p>[accessibility icon] This service change affects one or more ADA accessible stations and these travel alternatives may not be fully accessible. Please contact 511 to plan your trip.</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "transit_realtime.mercury_alert": {
+     "created_at": 1793114307,
+     "updated_at": 1793114516,
+     "alert_type": "Planned - Stops Skipped",
+     "display_before_active": 3600,
+     "human_readable_active_period": {
+      "translation": [
+       {
+        "text": "Nov 6 - 8, Fri 9:45 PM to Sun 10:00 PM",
+        "language": "en"
+       }
+      ]
+     },
+     "affected_stations": [
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "416",
+       "direction_id": 0,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "415",
+       "direction_id": 0,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "414",
+       "direction_id": 0,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lmm:planned_work:36012",
+   "alert": {
+    "active_period": [
+     {
+      "start": 1794019500,
+      "end": 1794218400
+     },
+     {
+      "start": 1794624300,
+      "end": 1794823200
+     },
+     {
+      "start": 1795229100,
+      "end": 1795428000
+     },
+     {
+      "start": 1795833900,
+      "end": 1796032800
+     }
+    ],
+    "informed_entity": [
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "626",
+      "direction_id": 1,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:16"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "626",
+      "direction_id": 1,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:16"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "6",
+      "stop_id": "626",
+      "direction_id": 1,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:6:16"
+      }
+     }
+    ],
+    "header_text": {
+     "translation": [
+      {
+       "text": "In Manhattan, downtown [4][5][6] skip 86 St",
+       "language": "en"
+      },
+      {
+       "text": "<p>In Manhattan, downtown [4][5][6] skip <strong>86 St</strong></p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "description_text": {
+     "translation": [
+      {
+       "text": "Travel alternatives:\nFor service to this station, take the [4][5] or [6] to 59 St and transfer to an uptown [4][5] or [6].\n\nFor service from this station, take the [4] local or [6] to 96 St and transfer to a downtown [4] or [6], or take the [4] or [5] to 125 St and transfer to a downtown train.\n\nConsider the M101 or M103 bus making stops along Lexington Ave.\n\nSchedule reminder: Overnight [5] service operates only in the Bronx between Dyre Av and E 180 St.\n\nNote: Downtown [4] local and [6] skip 116 St, 110 St, 103 St, 96 St, 77 St, 68 St and 51 St, Nov 6 - 9, Nov 13 - 16, Nov 20 - 23, and Nov 27 - 30, Fri 9:45 PM to Mon 5:00 AM.\n\nWhat's happening?\nWe're replacing tracks",
+       "language": "en"
+      },
+      {
+       "text": "<p><strong>Travel alternatives:</strong></p><p>For service to this station, take the [4][5] or [6] to <strong>59 St</strong> and transfer to an uptown [4][5] or [6].</p><p style=\"min-height:10px\"></p><p>For service from this station, take the [4] local or [6] to <strong>96 St</strong> and transfer to a downtown [4] or [6], or take the [4] or [5] to <strong>125 St</strong> and transfer to a downtown train.</p><p style=\"min-height:10px\"></p><p>Consider the<strong> M101 </strong>or <strong>M103</strong> bus <a title=\"\" href=\"https://bt.mta.info/#403422\" rel=\"noopener noreferrer nofollow\" data-link-auto=\"\" target=\"_blank\">making stops along Lexington Ave</a>.</p><p style=\"min-height:10px\"></p><p><strong>Schedule reminder: </strong>Overnight [5] service operates only in the Bronx between <strong>Dyre Av\u200c</strong> and <strong>E 180 St</strong>.</p><p style=\"min-height:10px\"></p><p><strong>Note:</strong> Downtown [4] local and [6] skip <strong>116 St</strong>, <strong>110 St</strong>, <strong>103 St</strong>, <strong>96 St</strong>, <strong>77 St</strong>, <strong>68 St </strong>and <strong>51 St</strong>, Nov 6 - 9, Nov 13 - 16, Nov 20 - 23, and Nov 27 - 30, Fri 9:45 PM to Mon 5:00 AM.</p><p style=\"min-height:10px\"></p><p><strong>What's happening?</strong></p><p>We're replacing tracks </p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "transit_realtime.mercury_alert": {
+     "created_at": 1792763022,
+     "updated_at": 1793287180,
+     "alert_type": "Planned - Stops Skipped",
+     "display_before_active": 3600,
+     "human_readable_active_period": {
+      "translation": [
+       {
+        "text": "Nov 6 - 9, Nov 13 - 16, Nov 20 - 23, and Nov 27 - 30, Fri 9:45 PM to Mon 5:00 AM",
+        "language": "en"
+       }
+      ]
+     },
+     "affected_stations": [
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "621",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "622",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "623",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "624",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "625",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "401",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "402",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "405",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "406",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "407",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "408",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "409",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "410",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "411",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "412",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "413",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "414",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "415",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "416",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "501",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "502",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "503",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "504",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "505",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "213",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "214",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "215",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "216",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "217",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "218",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "219",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "220",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "221",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "222",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "601",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "602",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "603",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "604",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "606",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "607",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "608",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "609",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "610",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "611",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "612",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "613",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "614",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "615",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "616",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "617",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "618",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "4",
+       "stop_id": "619",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:4:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "621",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "622",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "623",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "624",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "625",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "401",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "402",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "405",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "406",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "407",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "408",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "409",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "410",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "411",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "412",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "413",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "414",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "415",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "416",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "501",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "502",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "503",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "504",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "505",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "213",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "214",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "215",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "216",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "217",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "218",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "219",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "220",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "221",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "222",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "601",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "602",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "603",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "604",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "606",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "607",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "608",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "609",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "610",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "611",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "612",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "613",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "614",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "615",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "616",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "617",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "618",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "619",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "621",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "622",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "623",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "624",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "625",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "401",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "402",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "405",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "406",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "407",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "408",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "409",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "410",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "411",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "412",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "413",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "414",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "415",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "416",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "501",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "502",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "503",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "504",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "505",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "213",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "214",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "215",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "216",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "217",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "218",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "219",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "220",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "221",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "222",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "601",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "602",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "603",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "604",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "606",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "607",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "608",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "609",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "610",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "611",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "612",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "613",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "614",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "615",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "616",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "617",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "618",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "6",
+       "stop_id": "619",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:6:16"
+       }
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lmm:planned_work:36008",
+   "alert": {
+    "active_period": [
+     {
+      "start": 1795862700,
+      "end": 1795923900
+     },
+     {
+      "start": 1795964400,
+      "end": 1796010300
+     },
+     {
+      "start": 1796467500,
+      "end": 1796528700
+     },
+     {
+      "start": 1796569200,
+      "end": 1796615100
+     }
+    ],
+    "informed_entity": [
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:13"
+      }
+     }
+    ],
+    "header_text": {
+     "translation": [
+      {
+       "text": "[5] runs every 20 minutes",
+       "language": "en"
+      },
+      {
+       "text": "<p>[5] runs every 20 minutes</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "description_text": {
+     "translation": [
+      {
+       "text": "[5] service operates on a modified schedule because [4][5] and [6] trains are sharing a track in Manhattan.\n\nWhat's happening?\nWe're replacing tracks",
+       "language": "en"
+      },
+      {
+       "text": "<p>[5] service operates on a modified schedule because [4][5] and [6] trains are sharing a track in Manhattan.</p><p></p><p><strong>What's happening?</strong></p><p>We're replacing tracks</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "transit_realtime.mercury_alert": {
+     "created_at": 1792760803,
+     "updated_at": 1793373049,
+     "alert_type": "Reduced Service",
+     "display_before_active": 3600,
+     "human_readable_active_period": {
+      "translation": [
+       {
+        "text": "Nov 28 - 29 and Dec 5 - 6, Sat and Sun, days and evenings",
+        "language": "en"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "lmm:planned_work:35982",
+   "alert": {
+    "active_period": [
+     {
+      "start": 1795956300,
+      "end": 1795964400
+     },
+     {
+      "start": 1796561100,
+      "end": 1796569200
+     }
+    ],
+    "informed_entity": [
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "213",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:20"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "214",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:20"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "215",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:20"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "216",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:20"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "217",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:20"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "218",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:20"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "219",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:20"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "220",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:20"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "221",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:20"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "222",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:20"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "416",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:20"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "621",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:20"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "626",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:20"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "629",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:20"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "631",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:20"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "635",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:20"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "640",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:20"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "418",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:20"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "419",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:20"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "420",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:20"
+      }
+     }
+    ],
+    "header_text": {
+     "translation": [
+      {
+       "text": "No [5] between E 180 St, Bronx and Bowling Green, Manhattan",
+       "language": "en"
+      },
+      {
+       "text": "<p>No [5] between <strong>E 180 St</strong>, Bronx and <strong>Bowling Green</strong>, Manhattan</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "description_text": {
+     "translation": [
+      {
+       "text": "[5] service runs between Eastchester-Dyre Av and E 180 St.\n\nFor service between E 180 St and 149 St-Hostos, take the [2].\nFor service between 149 St-Hostos and Bowling Green, take the [4].\nTransfer between trains at E 180 St [accessibility icon] | [2][5] and/or 149 St-Hostos [accessibility icon] | [2][4].\nNote: Bronx-bound [5] service from Bowling Green begins at approximately 11 AM.\n\nWhat's happening?\nTrack maintenance",
+       "language": "en"
+      },
+      {
+       "text": "<p>[5] service runs between <strong>Eastchester-Dyre Av</strong> and <strong>E 180 St</strong>.</p><p style=\"min-height:10px\"></p><p>For service between <strong>E 180 St</strong> and <strong>149 St-Hostos</strong>, take the [2].</p><p>For service between \u200c<strong>149 St-Hostos</strong> and <strong>Bowling Green</strong>, take the [4].</p><ul><li><p>Transfer between trains at <strong>E 180 St</strong> [accessibility icon] | [2][5] and/or \u200c<strong>149 St-Hostos</strong> [accessibility icon] | [2][4].</p></li></ul><p><strong>Note: </strong>Bronx-bound \u200c[5] service from <strong>Bowling Green</strong> begins at approximately 11 AM.</p><p style=\"min-height:10px\"></p><p><strong>What's happening?</strong></p><p>Track maintenance</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "transit_realtime.mercury_alert": {
+     "created_at": 1792694983,
+     "updated_at": 1793364977,
+     "alert_type": "Planned - Part Suspended",
+     "display_before_active": 3600,
+     "human_readable_active_period": {
+      "translation": [
+       {
+        "text": "Nov 29 and Dec 6, Sun, 7:45 AM to 10:00 AM",
+        "language": "en"
+       }
+      ]
+     },
+     "affected_stations": [
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "501",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:20"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "502",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:20"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "503",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:20"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "504",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:20"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "505",
+       "direction_id": 1,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:20"
+       }
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lmm:planned_work:35952",
+   "alert": {
+    "active_period": [
+     {
+      "start": 1795495500,
+      "end": 1795514400
+     },
+     {
+      "start": 1795581900,
+      "end": 1795600800
+     }
+    ],
+    "informed_entity": [
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "501",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:21"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "502",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:21"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "503",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:21"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "504",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:21"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "505",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:21"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "5",
+      "stop_id": "213",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:5:21"
+      }
+     }
+    ],
+    "header_text": {
+     "translation": [
+      {
+       "text": "In the Bronx, no overnight [5] between Dyre Av and E 180 St",
+       "language": "en"
+      },
+      {
+       "text": "<p>In the Bronx, no overnight [5] between <strong>Dyre Av</strong> and <strong>E 180 St</strong></p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "description_text": {
+     "translation": [
+      {
+       "text": "[shuttle bus icon] Free T113 shuttle buses make stops between Dyre Av and E 180 St.\nTransfer between [2] and [shuttle bus icon] at E 180 St [accessibility icon].\nWhat's happening?\nSignal maintenance",
+       "language": "en"
+      },
+      {
+       "text": "<p>[shuttle bus icon]Free <a title=\"\" href=\"https://bt.mta.info/?search=T113&amp;uuid=df4e15b0-3fbe-4abc-9e59-deacdde1faa8\" rel=\"noopener noreferrer nofollow\" data-link-auto=\"\" target=\"_blank\"><strong>T113</strong></a> shuttle buses make stops between <strong>Dyre Av</strong> and <strong>E 180 St</strong>.</p><ul><li><p>Transfer between [2] and [shuttle bus icon]at <strong>E 180 St</strong> [accessibility icon].</p></li></ul><p><strong>What's happening?</strong></p><p>Signal maintenance</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "transit_realtime.mercury_alert": {
+     "created_at": 1792682214,
+     "updated_at": 1793104878,
+     "alert_type": "Planned - Suspended",
+     "station_alternative": [
+      {
+       "affected_entity": {
+        "agency_id": "MTASBWY",
+        "stop_id": "213"
+       },
+       "notes": {
+        "translation": [
+         {
+          "text": "[accessibility icon] | [2]\n[shuttle bus icon] Morris Park Av at E 180 St",
+          "language": "en"
+         },
+         {
+          "text": "<p>[accessibility icon] | [2]</p><p>[shuttle bus icon]Morris Park Av at E 180 St</p>",
+          "language": "en-html"
+         }
+        ]
+       }
+      },
+      {
+       "affected_entity": {
+        "agency_id": "MTASBWY",
+        "stop_id": "505"
+       },
+       "notes": {
+        "translation": [
+         {
+          "text": "[shuttle bus icon] Morris Park Av at Hone Av (to E 180 St)\n[shuttle bus icon] Williamsbridge Rd at Neill Av (to Dyre Av)",
+          "language": "en"
+         },
+         {
+          "text": "<p>[shuttle bus icon]Morris Park Av at Hone Av (to E 180 St)</p><p>[shuttle bus icon]Williamsbridge Rd at Neill Av (to Dyre Av)</p>",
+          "language": "en-html"
+         }
+        ]
+       }
+      },
+      {
+       "affected_entity": {
+        "agency_id": "MTASBWY",
+        "stop_id": "504"
+       },
+       "notes": {
+        "translation": [
+         {
+          "text": "[shuttle bus icon] Williamsbridge Rd at Pelham Pkwy South\n[shuttle bus icon] Williamsbridge Rd at Pelham Pkwy North",
+          "language": "en"
+         },
+         {
+          "text": "<p>[shuttle bus icon]Williamsbridge Rd at Pelham Pkwy South</p><p>[shuttle bus icon]Williamsbridge Rd at Pelham Pkwy North</p>",
+          "language": "en-html"
+         }
+        ]
+       }
+      },
+      {
+       "affected_entity": {
+        "agency_id": "MTASBWY",
+        "stop_id": "503"
+       },
+       "notes": {
+        "translation": [
+         {
+          "text": "[shuttle bus icon] Gun Hill Rd at DeWitt Pl (to E 180 St)\n[shuttle bus icon] Gun Hill Rd at Knapp St (to Dyre Av)",
+          "language": "en"
+         },
+         {
+          "text": "<p>[shuttle bus icon]Gun Hill Rd at DeWitt Pl (to E 180 St)</p><p>[shuttle bus icon]Gun Hill Rd at Knapp St (to Dyre Av)</p>",
+          "language": "en-html"
+         }
+        ]
+       }
+      },
+      {
+       "affected_entity": {
+        "agency_id": "MTASBWY",
+        "stop_id": "502"
+       },
+       "notes": {
+        "translation": [
+         {
+          "text": "[shuttle bus icon] Boston Rd at Baychester Av",
+          "language": "en"
+         },
+         {
+          "text": "<p>[shuttle bus icon]Boston Rd at Baychester Av</p>",
+          "language": "en-html"
+         }
+        ]
+       }
+      },
+      {
+       "affected_entity": {
+        "agency_id": "MTASBWY",
+        "stop_id": "501"
+       },
+       "notes": {
+        "translation": [
+         {
+          "text": "[shuttle bus icon] Dyre Av at Light St",
+          "language": "en"
+         },
+         {
+          "text": "<p>[shuttle bus icon]Dyre Av at Light St</p>",
+          "language": "en-html"
+         }
+        ]
+       }
+      }
+     ],
+     "display_before_active": 3600,
+     "human_readable_active_period": {
+      "translation": [
+       {
+        "text": "Nov 23 - 25, Mon to Wed, 11:45 PM to 5:00 AM",
+        "language": "en"
+       }
+      ]
+     },
+     "affected_stations": [
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "214",
+       "direction_id": 0,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:21"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "215",
+       "direction_id": 0,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:21"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "216",
+       "direction_id": 0,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:21"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "217",
+       "direction_id": 0,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:21"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "218",
+       "direction_id": 0,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:21"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "219",
+       "direction_id": 0,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:21"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "220",
+       "direction_id": 0,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:21"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "221",
+       "direction_id": 0,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:21"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "5",
+       "stop_id": "222",
+       "direction_id": 0,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:5:21"
+       }
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "lmm:planned_work:35951",
+   "alert": {
+    "active_period": [
+     {
+      "start": 1795495500,
+      "end": 1795514400
+     }
+    ],
+    "informed_entity": [
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "2",
+      "stop_id": "213",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:2:10"
+      }
+     }
+    ],
+    "header_text": {
+     "translation": [
+      {
+       "text": "In the Bronx, all [2] trains at E 180 St board from the downtown platform",
+       "language": "en"
+      },
+      {
+       "text": "<p>In the Bronx, all [2] trains at <strong>E 180 St</strong> board from the downtown platform</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "description_text": {
+     "translation": [
+      {
+       "text": "Please listen carefully to announcements and check the destination displayed on the train before boarding.\n\nWhat's happening?\nSignal maintenance",
+       "language": "en"
+      },
+      {
+       "text": "<p>Please listen carefully to announcements and check the destination displayed on the train before boarding.</p><p></p><p><strong>What's happening?</strong></p><p>Signal maintenance</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "transit_realtime.mercury_alert": {
+     "created_at": 1792682069,
+     "updated_at": 1793104809,
+     "alert_type": "Boarding Change",
+     "display_before_active": 3600,
+     "human_readable_active_period": {
+      "translation": [
+       {
+        "text": "Nov 23 - 24, Mon 11:45 PM to Tue 5:00 AM",
+        "language": "en"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "lmm:planned_work:35787",
+   "alert": {
+    "active_period": [
+     {
+      "start": 1794938400,
+      "end": 1794947400
+     },
+     {
+      "start": 1795024800,
+      "end": 1795033800
+     },
+     {
+      "start": 1795111200,
+      "end": 1795120200
+     },
+     {
+      "start": 1795197600,
+      "end": 1795206600
+     }
+    ],
+    "informed_entity": [
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "6X",
+      "stop_id": "619",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:6X:14"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "6X",
+      "stop_id": "618",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:6X:14"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "6X",
+      "stop_id": "617",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:6X:14"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "6X",
+      "stop_id": "616",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:6X:14"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "6X",
+      "stop_id": "615",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:6X:14"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "6X",
+      "stop_id": "614",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:6X:14"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "6X",
+      "stop_id": "613",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:6X:14"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "6",
+      "stop_id": "619",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:6:14"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "6",
+      "stop_id": "618",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:6:14"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "6",
+      "stop_id": "617",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:6:14"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "6",
+      "stop_id": "616",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:6:14"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "6",
+      "stop_id": "615",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:6:14"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "6",
+      "stop_id": "614",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:6:14"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "6",
+      "stop_id": "613",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:6:14"
+      }
+     }
+    ],
+    "header_text": {
+     "translation": [
+      {
+       "text": "In the Bronx, Pelham Bay Park-bound express [6X] runs local from 3 Av-138 St to Hunts Point Av",
+       "language": "en"
+      },
+      {
+       "text": "<p>In the Bronx, Pelham Bay Park-bound express [6X] runs local from <strong>3 Av-138 St</strong> to <strong>Hunts Point Av</strong></p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "description_text": {
+     "translation": [
+      {
+       "text": "What's happening?\nTrack maintenance",
+       "language": "en"
+      },
+      {
+       "text": "<p><strong>What's happening?</strong></p><p>Track maintenance</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "transit_realtime.mercury_alert": {
+     "created_at": 1792162375,
+     "updated_at": 1792525062,
+     "alert_type": "Planned - Express to Local",
+     "display_before_active": 3600,
+     "human_readable_active_period": {
+      "translation": [
+       {
+        "text": "Nov 17 - 20, Tue to Fri, 1:00 PM to 3:30 PM",
+        "language": "en"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "lmm:planned_work:35758",
+   "alert": {
+    "active_period": [
+     {
+      "start": 1794891660,
+      "end": 1794909600
+     },
+     {
+      "start": 1794978060,
+      "end": 1794996000
+     },
+     {
+      "start": 1795064460,
+      "end": 1795082400
+     },
+     {
+      "start": 1795150860,
+      "end": 1795168800
+     }
+    ],
+    "informed_entity": [
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "401",
+      "direction_id": 1,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "402",
+      "direction_id": 1,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "405",
+      "direction_id": 1,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "406",
+      "direction_id": 1,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "407",
+      "direction_id": 1,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "408",
+      "direction_id": 1,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "409",
+      "direction_id": 1,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "410",
+      "direction_id": 1,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "411",
+      "direction_id": 1,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "412",
+      "direction_id": 1,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "413",
+      "direction_id": 1,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "414",
+      "direction_id": 1,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "415",
+      "direction_id": 1,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "416",
+      "direction_id": 1,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "621",
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "622",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "623",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "624",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "625",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "626",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "627",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "628",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "629",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "630",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "631",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "632",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "633",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "634",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "635",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "636",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "637",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "638",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "639",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "640",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "418",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "419",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "4",
+      "stop_id": "420",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:4:15"
+      }
+     }
+    ],
+    "header_text": {
+     "translation": [
+      {
+       "text": "[4] service operates in two sections\n1. Between Woodlawn and 125 St\n2. Between 125 St and New Lots Av",
+       "language": "en"
+      },
+      {
+       "text": "<p>[4] service operates in two sections</p><p>1. Between <strong>Woodlawn</strong> and <strong>125 St</strong></p><p>2. Between <strong>125 St</strong> and <strong>New Lots Av</strong></p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "description_text": {
+     "translation": [
+      {
+       "text": "Transfer at 125 St [accessibility icon] to continue your trip.\nWhat's happening?\nTrack maintenance",
+       "language": "en"
+      },
+      {
+       "text": "<ul><li><p>Transfer at <strong>125 St</strong> [accessibility icon] to continue your trip.</p></li></ul><p><strong>What's happening?</strong></p><p>Track maintenance</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "transit_realtime.mercury_alert": {
+     "created_at": 1792093587,
+     "updated_at": 1792524904,
+     "alert_type": "Planned - Extra Transfer",
+     "display_before_active": 3600,
+     "human_readable_active_period": {
+      "translation": [
+       {
+        "text": "Nov 17 - 20, Tue to Fri, 12:01 AM to 5:00 AM",
+        "language": "en"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "lmm:planned_work:35567",
+   "alert": {
+    "active_period": [
+     {
+      "start": 1794645900,
+      "end": 1794798000
+     }
+    ],
+    "informed_entity": [
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "D",
+      "stop_id": "B23",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:D:18"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "D",
+      "stop_id": "B22",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:D:18"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "D",
+      "stop_id": "B21",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:D:18"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "D",
+      "stop_id": "B20",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:D:18"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "D",
+      "stop_id": "B19",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:D:18"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "D",
+      "stop_id": "B18",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:D:18"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "D",
+      "stop_id": "B17",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:D:18"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "D",
+      "stop_id": "B15",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:D:18"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "D",
+      "stop_id": "B14",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:D:18"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "D",
+      "stop_id": "B13",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:D:18"
+      }
+     },
+     {
+      "agency_id": "MTASBWY",
+      "route_id": "D",
+      "stop_id": "B12",
+      "direction_id": 0,
+      "transit_realtime.mercury_entity_selector": {
+       "sort_order": "MTASBWY:D:18"
+      }
+     }
+    ],
+    "header_text": {
+     "translation": [
+      {
+       "text": "In Brooklyn, Manhattan-bound [D] runs via the [N] from Coney Island-Stillwell Av to 36 St",
+       "language": "en"
+      },
+      {
+       "text": "<p>In Brooklyn, Manhattan-bound [D] runs via the [N] from <strong>Coney Island-Stillwell Av</strong> to <strong>36 St</strong></p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "description_text": {
+     "translation": [
+      {
+       "text": "Trains stop at 62 St/New Utrecht Av.\n\nFor service to Bay 50 St, 25 Av, Bay Pkwy, 20 Av, 18 Av, 79 St and 71 St, take the [D] to 62 St/New Utrecht Av [accessibility icon] and transfer to a Coney Island-bound [D].\n\nFor service to 55 St, 50 St, Fort Hamilton Pkwy and 9 Av, take the [D] to 36 St and transfer to a Coney Island-bound [D].\n\nFor service from these stations, take the [D] to 62 St/New Utrecht Av [accessibility icon] or Coney Island-Stillwell Av and transfer to a Manhattan-bound [D] or [N].\n\nNote: Manhattan-bound [D] skips 53 St and 45 St [N] stations.\n\nWhat's happening?\nStructural maintenance\n\n[accessibility icon] This service change affects one or more ADA accessible stations and these travel alternatives may not be fully accessible. Please contact 511 to plan your trip.",
+       "language": "en"
+      },
+      {
+       "text": "<p>Trains stop at <strong>62 St</strong>/<strong>New Utrecht Av</strong>.</p><p style=\"min-height:10px\"></p><p>For service to <strong>Bay 50 St</strong>, <strong>25 Av</strong>, <strong>Bay Pkwy</strong>, <strong>20 Av</strong>, <strong>18 Av</strong>, <strong>79 St</strong> and <strong>71 St</strong>, take the [D] to \u200c<strong>62 St</strong>/<strong>New Utrecht Av</strong> [accessibility icon] and transfer to a Coney Island-bound [D].</p><p style=\"min-height:10px\"></p><p>For service to <strong>55 St</strong>, <strong>50 St</strong>, <strong>Fort Hamilton Pkwy</strong> and <strong>9 Av</strong>, take the [D] to <strong>36 St</strong> and transfer to a Coney Island-bound [D].</p><p style=\"min-height:10px\"></p><p>For service from these stations, take the [D] to \u200c<strong>62 St</strong>/<strong>New Utrecht Av</strong> [accessibility icon] or <strong>Coney Island-Stillwell Av</strong> and transfer to a Manhattan-bound [D] or [N].</p><p style=\"min-height:10px\"></p><p><strong>Note: </strong>Manhattan-bound [D] skips <strong>53 St</strong> and <strong>45 St</strong> [N] stations.</p><p style=\"min-height:10px\"></p><p><strong>What's happening?</strong></p><p>Structural maintenance</p><p style=\"min-height:10px\"></p><p>[accessibility icon] This service change affects one or more ADA accessible stations and these travel alternatives may not be fully accessible. Please contact 511 to plan your trip.</p>",
+       "language": "en-html"
+      }
+     ]
+    },
+    "transit_realtime.mercury_alert": {
+     "created_at": 1791484271,
+     "updated_at": 1791986579,
+     "alert_type": "Planned - Reroute",
+     "display_before_active": 3600,
+     "human_readable_active_period": {
+      "translation": [
+       {
+        "text": "Nov 14 - 15, Sat 3:45 AM to Sun 10:00 PM",
+        "language": "en"
+       }
+      ]
+     },
+     "affected_stations": [
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "D",
+       "stop_id": "B16",
+       "direction_id": 0,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:D:18"
+       }
+      },
+      {
+       "agency_id": "MTASBWY",
+       "route_id": "D",
+       "stop_id": "D43",
+       "direction_id": 0,
+       "transit_realtime.mercury_entity_selector": {
+        "sort_order": "MTASBWY:D:18"
+       }
+      }
+     ]
+    }
+   }
+  }
+ ]
+}

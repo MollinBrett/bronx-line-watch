@@ -1,0 +1,4 @@
+# The vault is only a container. The GitHub token is added separately
+# (see docs/agents.md) and is never stored in this repo.
+type: vault
+display_name: bronx-line-watch-github
