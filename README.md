@@ -74,4 +74,4 @@ npm run eval
 - Only text people who opted in. Twilio handles STOP replies automatically.
 
 ## What's next
-See [docs/starter-issues.md](docs/starter-issues.md).
+New here? Start with [docs/ONBOARDING.md](docs/ONBOARDING.md). Open work: [docs/starter-issues.md](docs/starter-issues.md).
