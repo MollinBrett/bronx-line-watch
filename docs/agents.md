@@ -29,49 +29,43 @@ GitHub -> Settings -> Developer settings -> Fine-grained tokens -> new token:
 - Permissions: Contents (read/write), Pull requests (read/write), Issues (read/write). Nothing else - no Workflows, no Administration.
 - Expiration: 90 days (put a reminder on your calendar).
 
-### 3. Install the CLI and create the resources
-Install `ant` 1.34.0 or later (https://github.com/anthropics/anthropic-cli/releases) and run `ant auth login`. Then, from the repo root:
+### 3. Create the agents, sandbox, and vault
+Already done (IDs are in `claude-lock.json`). To change an agent later, edit its file and run,
+from the repo root, with the `ant` CLI logged in to the bronx-line-watch workspace:
 
 ```bash
 ant apply --dry-run -v agents/maintainer/agent.md agents/security-guard/agent.md environments/agent-sandbox.yaml vaults/github.yaml
 ```
 
-Check that the plan shows exactly two agents, one environment and one vault, then run it for real:
-
 ```bash
 ant apply agents/maintainer/agent.md agents/security-guard/agent.md environments/agent-sandbox.yaml vaults/github.yaml
 ```
 
-### 4. Put the token in the vault
-The agents reach GitHub's MCP server with this token. Anthropic stores it and injects it outside the sandbox, so the agents can use it but never read it. Run these one block at a time; paste the token at the silent prompt.
-
-```bash
-read -rs CMA_GITHUB_REPO_TOKEN && export CMA_GITHUB_REPO_TOKEN
-```
-
-```bash
-VAULT_ID=$(jq -r '.resources["./vaults/github.yaml"].id' claude-lock.json)
-jq -n -f /dev/stdin <<'JQ' | ant beta:vaults:credentials create --vault-id "$VAULT_ID"
-{
-  display_name: "GitHub MCP",
-  auth: {
-    type: "static_bearer",
-    mcp_server_url: "https://api.githubcopilot.com/mcp/",
-    token: (env.CMA_GITHUB_REPO_TOKEN // error("CMA_GITHUB_REPO_TOKEN is not set"))
-  }
-}
-JQ
-```
-
-### 5. Create the schedules (paused), test, then start them
-In the same terminal (the token is still in `CMA_GITHUB_REPO_TOKEN`):
+Then **point the schedules at the new version** - each schedule is pinned to the agent version
+that existed when it was created or last updated:
 
 ```bash
 npm run schedule-agents
 ```
 
+Commit the updated `claude-lock.json` in a pull request.
+
+### 4. Put the GitHub token in the vault (Console, no terminal)
+The agents reach GitHub only through GitHub's MCP server, using the token from step 2. Anthropic
+stores it and adds it to requests outside the sandbox, so the agents can use it but never read it.
+The repo itself is public, so each agent clones it at the start of a run without a token.
+
+In the Claude Console (bronx-line-watch workspace) -> **Managed Agents -> Vaults ->
+bronx-line-watch-github -> Add credential**:
+- Type: **MCP server**, static bearer token
+- MCP server URL: `https://api.githubcopilot.com/mcp/` (exactly, with the trailing slash)
+- Token: the fine-grained GitHub token
+
+### 5. Create the schedules (paused), test, then start them
+From the repo root, logged in with `ant` (or with `ANTHROPIC_API_KEY` for this workspace):
+
 ```bash
-unset CMA_GITHUB_REPO_TOKEN
+npm run schedule-agents
 ```
 
 Try one run by hand and watch it in the Console (the command prints the link):
@@ -90,8 +84,14 @@ npm run schedule-agents -- --unpause
 - Every run is a session in the Console (platform.claude.com -> Managed Agents -> Sessions).
 - Their work shows up as PRs from `maintainer/*` and `security/*` branches and issues labeled `security`.
 
+## Permissions
+- **Shell commands (`bash`) are always allowed.** The sandbox holds no secrets (the GitHub token
+  lives in the vault and is added outside the sandbox) and its network only reaches npm, GitHub,
+  and the MTA feed. Under `auto`, the server refused `npm ci`, so the maintainer couldn't run tests.
+- **Everything else, including all GitHub actions, is `auto`:** the server runs what it judges safe
+  and blocks what it judges high-risk. Branch protection means nothing reaches `main` unreviewed.
+
 ## Known gap: approvals nobody answers
-Tool calls run under the `auto` permission policy: the server runs what it judges safe and
-blocks what it judges high-risk. When it can't decide, the session **pauses for a human**, and
+Under `auto`, some calls can't be judged either way. When it can't decide, the session **pauses for a human**, and
 since nobody is watching a scheduled run, it waits until the next day's run replaces it.
 Fixing that (a webhook that notifies you or answers the pause) is a starter issue.

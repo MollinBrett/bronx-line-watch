@@ -2,17 +2,17 @@
  * Creates (or updates) the scheduled deployments that run the maintenance agents.
  * Run after `ant apply` has created the agents, environment, and vault (see docs/agents.md).
  *
- *   CMA_GITHUB_REPO_TOKEN=... npm run schedule-agents            # create/update, left PAUSED
+ *   npm run schedule-agents                                         # create/update, left PAUSED
  *   npm run schedule-agents -- --run maintainer                    # one manual test run now
  *   npm run schedule-agents -- --unpause                           # start the schedules
  *
- * Deployments live here instead of in an ant-apply file because each one carries the
- * GitHub token used to clone the repo, and secrets never go in files.
+ * No repo is mounted: the repo is public, so each agent clones it itself at the start of a
+ * run. All GitHub writes (branches, PRs, issues) go through the GitHub MCP server,
+ * authenticated by the token in the vault - the only place that token lives.
  */
 import Anthropic from "@anthropic-ai/sdk";
 import { readFile } from "node:fs/promises";
 
-const REPO_URL = "https://github.com/MollinBrett/bronx-line-watch";
 const TIMEZONE = "America/New_York";
 
 const SCHEDULES = {
@@ -63,8 +63,6 @@ if (args[0] === "--run") {
     if (id) console.log(`${name}: ${(await client.beta.deployments.unpause(id)).status}`);
   }
 } else {
-  const token = process.env.CMA_GITHUB_REPO_TOKEN;
-  if (!token) throw new Error("Set CMA_GITHUB_REPO_TOKEN (fine-grained token for this repo only - see docs/agents.md)");
   const environment_id = idFor("./environments/agent-sandbox.yaml");
   const vault_id = idFor("./vaults/github.yaml");
 
@@ -73,14 +71,6 @@ if (args[0] === "--run") {
       agent: idFor(s.agentFile),
       environment_id,
       vault_ids: [vault_id],
-      resources: [
-        {
-          type: "github_repository" as const,
-          url: REPO_URL,
-          authorization_token: token,
-          checkout: { type: "branch" as const, name: "main" },
-        },
-      ],
       schedule: { type: "cron" as const, expression: s.cron, timezone: TIMEZONE },
       budget: { type: "limit" as const, max_list_cost: { amount: s.budgetCents, currency: "USD" as const } },
       initial_events: [
