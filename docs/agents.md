@@ -29,49 +29,36 @@ GitHub -> Settings -> Developer settings -> Fine-grained tokens -> new token:
 - Permissions: Contents (read/write), Pull requests (read/write), Issues (read/write). Nothing else - no Workflows, no Administration.
 - Expiration: 90 days (put a reminder on your calendar).
 
-### 3. Install the CLI and create the resources
-Install `ant` 1.34.0 or later (https://github.com/anthropics/anthropic-cli/releases) and run `ant auth login`. Then, from the repo root:
+### 3. Create the agents, sandbox, and vault
+Already done (IDs are in `claude-lock.json`). To change an agent later, edit its file and run,
+from the repo root, with the `ant` CLI logged in to the bronx-line-watch workspace:
 
 ```bash
 ant apply --dry-run -v agents/maintainer/agent.md agents/security-guard/agent.md environments/agent-sandbox.yaml vaults/github.yaml
 ```
 
-Check that the plan shows exactly two agents, one environment and one vault, then run it for real:
-
 ```bash
 ant apply agents/maintainer/agent.md agents/security-guard/agent.md environments/agent-sandbox.yaml vaults/github.yaml
 ```
 
-### 4. Put the token in the vault
-The agents reach GitHub's MCP server with this token. Anthropic stores it and injects it outside the sandbox, so the agents can use it but never read it. Run these one block at a time; paste the token at the silent prompt.
+Then commit the updated `claude-lock.json` in a pull request.
 
-```bash
-read -rs CMA_GITHUB_REPO_TOKEN && export CMA_GITHUB_REPO_TOKEN
-```
+### 4. Put the GitHub token in the vault (Console, no terminal)
+The agents reach GitHub only through GitHub's MCP server, using the token from step 2. Anthropic
+stores it and adds it to requests outside the sandbox, so the agents can use it but never read it.
+The repo itself is public, so it's cloned without a token.
 
-```bash
-VAULT_ID=$(jq -r '.resources["./vaults/github.yaml"].id' claude-lock.json)
-jq -n -f /dev/stdin <<'JQ' | ant beta:vaults:credentials create --vault-id "$VAULT_ID"
-{
-  display_name: "GitHub MCP",
-  auth: {
-    type: "static_bearer",
-    mcp_server_url: "https://api.githubcopilot.com/mcp/",
-    token: (env.CMA_GITHUB_REPO_TOKEN // error("CMA_GITHUB_REPO_TOKEN is not set"))
-  }
-}
-JQ
-```
+In the Claude Console (bronx-line-watch workspace) -> **Managed Agents -> Vaults ->
+bronx-line-watch-github -> Add credential**:
+- Type: **MCP server**, static bearer token
+- MCP server URL: `https://api.githubcopilot.com/mcp/` (exactly, with the trailing slash)
+- Token: the fine-grained GitHub token
 
 ### 5. Create the schedules (paused), test, then start them
-In the same terminal (the token is still in `CMA_GITHUB_REPO_TOKEN`):
+From the repo root, logged in with `ant` (or with `ANTHROPIC_API_KEY` for this workspace):
 
 ```bash
 npm run schedule-agents
-```
-
-```bash
-unset CMA_GITHUB_REPO_TOKEN
 ```
 
 Try one run by hand and watch it in the Console (the command prints the link):

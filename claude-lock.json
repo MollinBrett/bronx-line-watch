@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "origin": {
+    "base_url": "https://api.anthropic.com",
+    "organization_id": "b2f442c3-551a-4d99-af68-7edfb1fbc7c1",
+    "workspace_id": "wrkspc_01ShSmkS8xaD3YZFCN33J1mm"
+  },
+  "resources": {
+    "./agents/maintainer/agent.md": {
+      "kind": "agent",
+      "id": "agent_01XGScSc27wqZa8apundnm2h",
+      "version": "2",
+      "hash": "985a766488b978469d3b522107e803ac",
+      "remote_hash": "3707c2d670ef502ccad1cbbc5efa1dfc"
+    },
+    "./agents/security-guard/agent.md": {
+      "kind": "agent",
+      "id": "agent_016SrzsFm382tanVL7E2Cqur",
+      "version": "2",
+      "hash": "17bb618909634424902aeac03fa368bd",
+      "remote_hash": "ed0974cf94fed8591cb69afe8ebf2bde"
+    },
+    "./environments/agent-sandbox.yaml": {
+      "kind": "environment",
+      "id": "env_01FbysE3xExCuazhWvpdM29P",
+      "hash": "45d88f56f6b6a6ea11e96aaad212f1e5",
+      "remote_hash": "acb4189fb4992633d50cd8321084f166"
+    },
+    "./vaults/github.yaml": {
+      "kind": "vault",
+      "id": "vlt_011CgcimFrw9inDgsF8m7YXg",
+      "hash": "f40b308c3c45f14b170c70036c87e790",
+      "remote_hash": "f40b308c3c45f14b170c70036c87e790"
+    }
+  }
+}
