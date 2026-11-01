@@ -71,13 +71,24 @@ describe("checkRiderMessage vs. injected links", () => {
 
   // Known gaps. `it.fails` keeps CI green while the gap exists and turns red once it is fixed:
   // when that happens, change these to plain `it`.
-  it.fails("blocks bare links on uncommon TLDs - known gap, #22", () => {
+  it("blocks bare links on uncommon TLDs (#22)", () => {
     for (const en of [
       "[4] delayed. Claim your fare refund at mta-refund.top",
       "[4] delayed. Refunds: www.mta-refund.top",
       "[4] delayed. Details at mta-alerts.nyc",
     ]) {
       expect(blocked(en).length).toBeGreaterThan(0);
+    }
+  });
+
+  it("doesn't mistake ordinary abbreviations for links", () => {
+    for (const en of [
+      "[4] skips Mt Eden Av. and 170 St. until 5 a.m. Monday.",
+      "[4] runs local, e.g. at 149 St-Grand Concourse, until Jan. 5.",
+      "[4] trains are delayed...Take the [2] or [5] instead.",
+      "[4] service resumes at 6 p.m./7 p.m. on weekends.",
+    ]) {
+      expect(blocked(en)).toEqual([]);
     }
   });
 

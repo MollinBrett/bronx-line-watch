@@ -18,8 +18,9 @@ export function checkRiderMessage(msg: RiderMessage, alert: Alert): string[] {
 
     for (const match of text.matchAll(/\b(?:https?:\/\/)?((?:[a-z0-9-]+\.)+[a-z]{2,})(?:\/\S*)?/gi)) {
       const host = match[1]!.toLowerCase();
-      // Skip things like "St." or "Av." that look like hosts only by accident.
-      if (!match[0].includes("/") && !/\.(com|net|org|info|io|ly|co|me|app|xyz|gov)$/.test(host)) continue;
+      // Any word.word is treated as a link: phones and Telegram make bare domains tappable on
+      // every ending (.top, .nyc, ...), so there is no safe list of endings to skip (#22).
+      // Station abbreviations ("Av.", "St.") don't match because a space follows the dot.
       if (!ALLOWED_LINK_HOSTS.includes(host)) problems.push(`${lang}: link to ${host}`);
     }
 
