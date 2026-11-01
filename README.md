@@ -63,6 +63,13 @@ Run continuously and send alerts: set the Telegram and/or Twilio variables from 
 npm start
 ```
 
+Develop against your own test Telegram channel, with settings in a local `.env` file. It never
+sends SMS. See [docs/ONBOARDING.md](docs/ONBOARDING.md#your-own-test-channel-see-real-posts-without-touching-production):
+
+```bash
+npm run dev
+```
+
 Check message quality after changing the prompt or model (calls Claude, costs a few cents):
 
 ```bash

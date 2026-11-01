@@ -8,7 +8,8 @@
     "once": "tsx src/main.ts --once --dry-run",
     "typecheck": "tsc --noEmit",
     "eval": "tsx evals/run.ts",
-    "schedule-agents": "tsx scripts/schedule-agents.ts"
+    "schedule-agents": "tsx scripts/schedule-agents.ts",
+    "dev": "tsx --env-file=.env src/main.ts --no-sms --announce-existing"
   },
   "license": "MIT",
   "dependencies": {

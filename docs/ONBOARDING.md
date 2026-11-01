@@ -65,6 +65,56 @@ against `evals/rubric.md`. It costs a few cents per run.
 npm run eval
 ```
 
+## Your own test channel: see real posts without touching production
+
+Branch protection only controls what merges into `main` (what goes live). Everything before
+that is yours: run it locally, push branches as often as you like (CI tests every push), and
+open draft pull requests while you work. To see exactly what riders would see, give yourself
+a private Telegram channel to post to:
+
+1. **Make your own bot.** In Telegram, message **@BotFather** → `/newbot` → any name → a
+   username ending in `bot` (e.g. `angel_blw_test_bot`). Keep the token it gives you private.
+2. **Make a test channel.** New Channel → e.g. "BLW Test". Making it public with an obscure
+   link (e.g. `t.me/blw_angel_test`) is easiest, because then its name works as the channel ID.
+   For a private channel, open it at web.telegram.org: the number in the address bar
+   (starting with `-100`) is the ID.
+3. **Add your bot as an admin** of the channel, with only **Post Messages** turned on.
+4. **Create your `.env` file** (git ignores it, so it never gets committed):
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Fill in your own values (Twilio can stay blank):
+
+   ```
+   ANTHROPIC_API_KEY=sk-ant-...       # your key from the bronx-line-watch workspace
+   TELEGRAM_BOT_TOKEN=...             # your bot, not the production one
+   TELEGRAM_CHANNEL_EN=@blw_angel_test
+   STATE_FILE=data/dev-state.json
+   ```
+
+5. **Run it:**
+
+   ```bash
+   npm run dev
+   ```
+
+On its first run, `npm run dev` posts **every alert that's active right now**, so you see
+output right away (a few Claude calls, a few cents). After that it posts only new ones,
+checking every 60 seconds until you press Ctrl-C. To see them all again (after changing the
+prompt, for example), delete your state file and rerun:
+
+```bash
+rm data/dev-state.json && npm run dev
+```
+
+Two guardrails: `npm run dev` **never sends text messages**, even if Twilio settings are in
+your `.env`. And never put the production channels (`@bronxlinewatch`, `@bronxlinewatch_es`)
+in your `.env`. Only the Render deployment posts there.
+
+## Agents
+
 Optional, for when you build agents: install the `ant` CLI (`brew install anthropics/tap/ant`)
 and run `ant auth login`, choosing the **bronx-line-watch** workspace.
 
