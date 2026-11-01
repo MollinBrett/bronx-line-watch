@@ -5,7 +5,8 @@ Humans and agents follow the same rules here.
 ## Workflow
 - Branch from `main`, open a pull request, get one approving review, merge. Nobody pushes to `main` directly - not people, not agents.
 - Agent branches are prefixed: `maintainer/...`, `security/...`.
-- `npm run typecheck` and `npm test` must pass (CI checks both).
+- CI must pass: the security gate, type check and tests. Run it all locally with `npm run check`.
+- Read [SECURITY.md](SECURITY.md) before changing dependencies, prompts, the safety check, agents, or CI.
 
 ## Code
 - TypeScript, ES modules, Node 22+. Keep dependencies to a minimum - every package is someone else's code running with our secrets.
