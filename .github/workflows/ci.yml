@@ -1,19 +1,62 @@
+# CI and security gate. Every rule maps to SECURITY.md section 2.
+# A pull request can't merge until this passes (branch protection requires "test").
+#
+# Design notes (don't "simplify" these away):
+# - Triggers are push/pull_request only. Never pull_request_target or
+#   workflow_run: those run untrusted branch code with repository privileges.
+# - Token is read-only and no secrets are used. Nothing here can deploy or spend credit.
+# - Actions are pinned to full commit SHAs; the tag is in the comment.
+# - npm ci --ignore-scripts: no dependency code runs at install time.
+# - No dependency cache: a poisoned cache would outlive the PR that made it.
+
 name: CI
+
 on:
-  pull_request:
   push:
     branches: [main]
+  pull_request:
+  schedule:
+    - cron: "23 10 * * 1" # Mondays: catch advisories published since the last change
+  workflow_dispatch:
+
 permissions:
   contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
-    runs-on: ubuntu-latest
+    name: test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm run typecheck
-      - run: npm test
+          persist-credentials: false
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Install from lockfile, no install scripts
+        run: npm ci --ignore-scripts
+
+      - name: Known vulnerabilities (all severities)
+        run: npm audit --audit-level=low
+
+      - name: Registry signatures and provenance
+        run: npm audit signatures
+
+      - name: No package newer than 7 days
+        run: node scripts/freshness-check.mjs
+
+      - name: Static rules (supply chain, egress, secrets, hidden text, rider safety, agents, CI)
+        run: node scripts/security-check.mjs
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Tests (including prompt-injection tests)
+        run: npm test
