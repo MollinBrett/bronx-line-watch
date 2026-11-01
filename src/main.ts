@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { textworthy } from "./filter.js";
 import { fetchAlerts } from "./mta.js";
+import { checkClaude } from "./preflight.js";
 import { rewriteAlert, type RewriteOptions } from "./rewrite.js";
 import { checkRiderMessage } from "./safety.js";
 import { parseSubscribers, sendSms, smsSegments, twilioConfigFromEnv } from "./sms.js";
@@ -71,6 +72,13 @@ async function tick(): Promise<void> {
 }
 
 async function main(): Promise<void> {
+  const preflight = await checkClaude(claude, rewriteOpts.model!);
+  if (preflight.ok) console.log(`[startup] ${preflight.message}`);
+  else if (preflight.fatal) {
+    console.error(`[startup] ${preflight.message}`);
+    process.exit(1); // fail the deploy loudly instead of running without working rewrites
+  } else console.warn(`[startup] ${preflight.message}`);
+
   console.log(
     `[watch] polling every ${pollSeconds}s; ${twilio ? `texting ${subscribers.length} subscriber(s)` : "dry run (printing only)"}`,
   );
