@@ -9,9 +9,9 @@
     "./agents/maintainer/agent.md": {
       "kind": "agent",
       "id": "agent_01XGScSc27wqZa8apundnm2h",
-      "version": "4",
-      "hash": "04bda63c84388359ca1c7cdd6d08c813",
-      "remote_hash": "ee179f7ef0cb4789d3017b52f6023ac9"
+      "version": "5",
+      "hash": "983efdf051c9bf20c87c050890867d06",
+      "remote_hash": "1666a3322b7530e6b9f4c27981d677c2"
     },
     "./agents/security-guard/agent.md": {
       "kind": "agent",

@@ -11,7 +11,8 @@ import { postToTelegram, telegramConfigFromEnv, telegramPosts } from "./telegram
 const args = new Set(process.argv.slice(2));
 const once = args.has("--once");
 const dryRun = args.has("--dry-run");
-const twilio = dryRun ? null : twilioConfigFromEnv();
+// --no-sms: local development never texts real phones, even if Twilio settings are present.
+const twilio = dryRun || args.has("--no-sms") ? null : twilioConfigFromEnv();
 const telegram = dryRun ? null : telegramConfigFromEnv();
 const subscribers = parseSubscribers(process.env.SMS_SUBSCRIBERS);
 const pollSeconds = Number(process.env.POLL_SECONDS ?? 60);
