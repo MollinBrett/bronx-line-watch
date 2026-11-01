@@ -1,0 +1,67 @@
+:root {
+  --ink: #16181d;
+  --muted: #5a606b;
+  --bg: #ffffff;
+  --panel: #f4f5f7;
+  --line: #dfe2e7;
+  --accent: #0b5cad;
+  --red: #ee352e;
+  --green: #00933c;
+  --orange: #ff6319;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #eceef2;
+    --muted: #a3a9b4;
+    --bg: #121418;
+    --panel: #1c1f25;
+    --line: #2c3038;
+    --accent: #6cb0ff;
+  }
+}
+* { box-sizing: border-box; }
+html { font-size: 17px; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--bg);
+}
+main, header, footer { max-width: 44rem; margin: 0 auto; padding: 0 1.25rem; }
+header { padding-top: 2.5rem; }
+h1 { font-size: 2rem; line-height: 1.15; margin: 0 0 0.5rem; letter-spacing: -0.01em; }
+h2 { font-size: 1.25rem; margin: 2.25rem 0 0.5rem; }
+h3 { font-size: 1rem; margin: 1.5rem 0 0.25rem; }
+p, li { color: var(--ink); }
+.lede { font-size: 1.15rem; color: var(--muted); margin: 0 0 1.5rem; }
+a { color: var(--accent); }
+.lines { display: flex; gap: 0.4rem; margin: 1rem 0 1.5rem; flex-wrap: wrap; }
+.bullet {
+  width: 2.1rem; height: 2.1rem; border-radius: 50%;
+  display: inline-grid; place-items: center;
+  color: #fff; font-weight: 700; font-size: 1.1rem;
+}
+.r { background: var(--red); } .g { background: var(--green); } .o { background: var(--orange); }
+.signup {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+.signup .cta { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.25rem; }
+.keyword {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: var(--bg); border: 1px solid var(--line);
+  padding: 0.05rem 0.45rem; border-radius: 6px;
+}
+.fine { font-size: 0.9rem; color: var(--muted); margin: 0.75rem 0 0; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+@media (max-width: 640px) { .cols { grid-template-columns: 1fr; } }
+footer {
+  margin-top: 3rem; padding-top: 1.25rem; padding-bottom: 2.5rem;
+  border-top: 1px solid var(--line); font-size: 0.9rem; color: var(--muted);
+}
+footer a { color: var(--muted); }
+nav { margin-bottom: 1.5rem; font-size: 0.95rem; }
