@@ -1,7 +1,7 @@
 # Bronx Line Watch
 
-Plain-language subway alerts for Bronx riders, in **English and Spanish**, by text message,
-kept running by a small team of Claude agents.
+Plain-language subway alerts for Bronx riders, in **English and Spanish**, by text message
+and Telegram, kept running by a small team of Claude agents.
 
 The MTA publishes alerts like:
 
@@ -56,7 +56,8 @@ run only remembers current alerts; the next run shows anything new.
 npm run once
 ```
 
-Run continuously and text subscribers: set the Twilio variables from `.env.example`, then:
+Run continuously and send alerts: set the Telegram and/or Twilio variables from `.env.example`
+(either one works alone; without both, it only prints), then:
 
 ```bash
 npm start

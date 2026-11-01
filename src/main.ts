@@ -6,10 +6,13 @@ import { rewriteAlert, type RewriteOptions } from "./rewrite.js";
 import { checkRiderMessage } from "./safety.js";
 import { parseSubscribers, sendSms, smsSegments, twilioConfigFromEnv } from "./sms.js";
 import { loadState, planAnnouncements, saveState } from "./state.js";
+import { postToTelegram, telegramConfigFromEnv, telegramPosts } from "./telegram.js";
 
 const args = new Set(process.argv.slice(2));
 const once = args.has("--once");
-const twilio = args.has("--dry-run") ? null : twilioConfigFromEnv();
+const dryRun = args.has("--dry-run");
+const twilio = dryRun ? null : twilioConfigFromEnv();
+const telegram = dryRun ? null : telegramConfigFromEnv();
 const subscribers = parseSubscribers(process.env.SMS_SUBSCRIBERS);
 const pollSeconds = Number(process.env.POLL_SECONDS ?? 60);
 const stateFile = process.env.STATE_FILE ?? "data/state.json";
@@ -58,12 +61,23 @@ async function tick(): Promise<void> {
       console.log(`  ${lang}: ${segments} segment(s), ${encoding}`);
     }
 
-    if (!twilio) continue;
-    for (const sub of subscribers) {
-      try {
-        await sendSms(twilio, sub.phone, msg[sub.lang]);
-      } catch (err) {
-        console.error(`[sms] failed to text ${sub.phone.slice(0, -4)}XXXX:`, err);
+    // Each channel is independent: a failure in one never blocks the other.
+    if (telegram) {
+      for (const post of telegramPosts(telegram, msg)) {
+        try {
+          await postToTelegram(telegram, post.chatId, post.text);
+        } catch (err) {
+          console.error(`[telegram] failed to post to ${post.chatId}:`, err);
+        }
+      }
+    }
+    if (twilio) {
+      for (const sub of subscribers) {
+        try {
+          await sendSms(twilio, sub.phone, msg[sub.lang]);
+        } catch (err) {
+          console.error(`[sms] failed to text ${sub.phone.slice(0, -4)}XXXX:`, err);
+        }
       }
     }
   }
@@ -79,9 +93,11 @@ async function main(): Promise<void> {
     process.exit(1); // fail the deploy loudly instead of running without working rewrites
   } else console.warn(`[startup] ${preflight.message}`);
 
-  console.log(
-    `[watch] polling every ${pollSeconds}s; ${twilio ? `texting ${subscribers.length} subscriber(s)` : "dry run (printing only)"}`,
-  );
+  const outputs = [
+    telegram && `Telegram (${[...new Set([telegram.channelEn, telegram.channelEs])].join(", ")})`,
+    twilio && `SMS to ${subscribers.length} subscriber(s)`,
+  ].filter(Boolean);
+  console.log(`[watch] polling every ${pollSeconds}s; sending to: ${outputs.join(" + ") || "nothing - dry run (printing only)"}`);
   do {
     try {
       await tick();
