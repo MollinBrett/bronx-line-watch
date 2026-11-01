@@ -12,6 +12,7 @@ agent may pick them up.
 - #11 Build agent #3: the Watchdog (`Angel`)
 - #12 Build agent #4: the Code reviewer (`Angel`)
 - #13 Give the security guard a grader (`Angel`)
+- #29 Build agent #5: the security fixer (`Angel`), with #23 as the hands-on warm-up
 
 ## Make the service better
 - #4 Name and wording for the Spanish Telegram channel (`Angel`)
