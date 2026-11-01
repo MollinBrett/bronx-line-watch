@@ -6,14 +6,13 @@
  *   npm run schedule-agents -- --run maintainer                    # one manual test run now
  *   npm run schedule-agents -- --unpause                           # start the schedules
  *
- * The repo is public, so it is cloned without a token. All GitHub writes (branches, PRs,
- * issues) go through the GitHub MCP server, authenticated by the token in the vault -
- * the only place that token lives.
+ * No repo is mounted: the repo is public, so each agent clones it itself at the start of a
+ * run. All GitHub writes (branches, PRs, issues) go through the GitHub MCP server,
+ * authenticated by the token in the vault - the only place that token lives.
  */
 import Anthropic from "@anthropic-ai/sdk";
 import { readFile } from "node:fs/promises";
 
-const REPO_URL = "https://github.com/MollinBrett/bronx-line-watch";
 const TIMEZONE = "America/New_York";
 
 const SCHEDULES = {
@@ -72,13 +71,6 @@ if (args[0] === "--run") {
       agent: idFor(s.agentFile),
       environment_id,
       vault_ids: [vault_id],
-      resources: [
-        {
-          type: "github_repository" as const,
-          url: REPO_URL,
-          checkout: { type: "branch" as const, name: "main" },
-        },
-      ],
       schedule: { type: "cron" as const, expression: s.cron, timezone: TIMEZONE },
       budget: { type: "limit" as const, max_list_cost: { amount: s.budgetCents, currency: "USD" as const } },
       initial_events: [

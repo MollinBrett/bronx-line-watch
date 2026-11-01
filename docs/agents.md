@@ -46,7 +46,7 @@ Then commit the updated `claude-lock.json` in a pull request.
 ### 4. Put the GitHub token in the vault (Console, no terminal)
 The agents reach GitHub only through GitHub's MCP server, using the token from step 2. Anthropic
 stores it and adds it to requests outside the sandbox, so the agents can use it but never read it.
-The repo itself is public, so it's cloned without a token.
+The repo itself is public, so each agent clones it at the start of a run without a token.
 
 In the Claude Console (bronx-line-watch workspace) -> **Managed Agents -> Vaults ->
 bronx-line-watch-github -> Add credential**:
