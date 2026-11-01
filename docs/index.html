@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bronx Line Watch - free Bronx subway alerts by text</title>
+  <meta name="description" content="Free text alerts in English or Spanish when service changes on the 2, 4, 5, 6, B and D in the Bronx.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Bronx Line Watch</h1>
+    <p class="lede">Free text alerts when something goes wrong on your Bronx subway line, in plain English or Spanish.</p>
+    <div class="lines" aria-label="Lines covered: 2, 4, 5, 6, B, D">
+      <span class="bullet r">2</span><span class="bullet g">4</span><span class="bullet g">5</span><span class="bullet g">6</span><span class="bullet o">B</span><span class="bullet o">D</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="signup" id="signup">
+      <p class="cta">Text <span class="keyword">BRONX</span> to <span class="phone">[PHONE NUMBER]</span></p>
+      <p>We'll ask you to reply <span class="keyword">YES</span> to confirm. Then you'll get a text when a delay, suspension, or other service change starts on the 2, 4, 5, 6, B or D. Reply <span class="keyword">ESPANOL</span> anytime to get alerts in Spanish.</p>
+      <p class="fine">Message frequency varies with subway conditions. Message and data rates may apply. Reply <strong>HELP</strong> for help or <strong>STOP</strong> to cancel at any time. By texting BRONX you agree to our <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>.</p>
+    </section>
+
+    <section class="signup" id="es" lang="es">
+      <p class="cta">Envía <span class="keyword">BRONX</span> al <span class="phone">[PHONE NUMBER]</span></p>
+      <p>Te pediremos que respondas <span class="keyword">YES</span> para confirmar, y luego <span class="keyword">ESPANOL</span> para recibir las alertas en español. Te avisamos cuando haya retrasos, suspensiones u otros cambios de servicio en el 2, 4, 5, 6, B o D.</p>
+      <p class="fine">La frecuencia de los mensajes varía según el servicio del metro. Pueden aplicarse tarifas de mensajes y datos. Responde <strong>HELP</strong> para ayuda o <strong>STOP</strong> para cancelar en cualquier momento. Al enviar BRONX aceptas nuestros <a href="terms.html">Términos</a> y nuestra <a href="privacy.html">Política de privacidad</a>.</p>
+    </section>
+
+    <h2>What the texts look like</h2>
+    <p class="cols">
+      <span><strong>English</strong><br>[4] trains are delayed both ways after police activity at 149 St-Grand Concourse. Allow extra time.</span>
+      <span lang="es"><strong>Español</strong><br>Los trenes [4] van con retraso en ambas direcciones por actividad policial en 149 St-Grand Concourse. Sal con tiempo.</span>
+    </p>
+
+    <h2>How it works</h2>
+    <p>We check the MTA's public service alerts every minute. When a new disruption starts on a Bronx line, an AI model (Claude, by Anthropic) rewrites the official alert into a short, plain-language text in English and Spanish, and we send it to subscribers. We text about real-time disruptions only, not ads, and never anything unrelated to subway service.</p>
+
+    <h2>Who runs this</h2>
+    <p>Bronx Line Watch is a free, non-commercial community project run by volunteers. It is <strong>not affiliated with or endorsed by the MTA</strong>. For official service information, see <a href="https://new.mta.info">new.mta.info</a>. The code is open source on <a href="https://github.com/MollinBrett/bronx-line-watch">GitHub</a>.</p>
+  </main>
+
+  <footer>
+    <a href="terms.html">Terms</a> · <a href="privacy.html">Privacy Policy</a> · <a href="https://github.com/MollinBrett/bronx-line-watch">GitHub</a>
+  </footer>
+</body>
+</html>
