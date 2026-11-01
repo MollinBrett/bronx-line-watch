@@ -10,6 +10,9 @@ tools:
   - type: agent_toolset_20260401
     default_config: {permission_policy: {type: auto}}
     configs:
+      # Shell commands run freely: the sandbox holds no secrets and only reaches npm,
+      # GitHub, and the MTA feed. Everything that leaves it (GitHub MCP) stays on auto.
+      - {name: bash, permission_policy: {type: always_allow}}
       - {name: web_fetch, enabled: false}
       - {name: web_search, enabled: false}
   - type: mcp_toolset

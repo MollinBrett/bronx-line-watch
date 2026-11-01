@@ -41,7 +41,14 @@ ant apply --dry-run -v agents/maintainer/agent.md agents/security-guard/agent.md
 ant apply agents/maintainer/agent.md agents/security-guard/agent.md environments/agent-sandbox.yaml vaults/github.yaml
 ```
 
-Then commit the updated `claude-lock.json` in a pull request.
+Then **point the schedules at the new version** - each schedule is pinned to the agent version
+that existed when it was created or last updated:
+
+```bash
+npm run schedule-agents
+```
+
+Commit the updated `claude-lock.json` in a pull request.
 
 ### 4. Put the GitHub token in the vault (Console, no terminal)
 The agents reach GitHub only through GitHub's MCP server, using the token from step 2. Anthropic
@@ -77,8 +84,14 @@ npm run schedule-agents -- --unpause
 - Every run is a session in the Console (platform.claude.com -> Managed Agents -> Sessions).
 - Their work shows up as PRs from `maintainer/*` and `security/*` branches and issues labeled `security`.
 
+## Permissions
+- **Shell commands (`bash`) are always allowed.** The sandbox holds no secrets (the GitHub token
+  lives in the vault and is added outside the sandbox) and its network only reaches npm, GitHub,
+  and the MTA feed. Under `auto`, the server refused `npm ci`, so the maintainer couldn't run tests.
+- **Everything else, including all GitHub actions, is `auto`:** the server runs what it judges safe
+  and blocks what it judges high-risk. Branch protection means nothing reaches `main` unreviewed.
+
 ## Known gap: approvals nobody answers
-Tool calls run under the `auto` permission policy: the server runs what it judges safe and
-blocks what it judges high-risk. When it can't decide, the session **pauses for a human**, and
+Under `auto`, some calls can't be judged either way. When it can't decide, the session **pauses for a human**, and
 since nobody is watching a scheduled run, it waits until the next day's run replaces it.
 Fixing that (a webhook that notifies you or answers the pause) is a starter issue.
