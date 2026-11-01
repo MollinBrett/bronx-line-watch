@@ -18,6 +18,6 @@ Humans and agents follow the same rules here.
 - `npm start` with Twilio configured texts real phones.
 
 ## Issue labels
-- `mentee` - reserved for a person to learn from. Agents skip these.
+- `Angel` - reserved for Angel to learn from. Agents skip these.
 - `agent-ok` - small and clearly specified; the maintainer agent may pick it up.
 - `security` - filed by the security guard or anyone else.
