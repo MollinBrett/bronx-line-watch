@@ -139,6 +139,11 @@ describe("checkRiderMessage vs. disguised links", () => {
     expect(blocked("[4] delayed. mta-refund\uff0ecom").length).toBeGreaterThan(0);
   });
 
+  it("blocks hosts containing combining marks (#38)", () => {
+    expect(blocked("[4] delayed. mta\u0327.info").length).toBeGreaterThan(0);
+    expect(blocked("[4] delayed. mta.info\uFE0F.top").length).toBeGreaterThan(0);
+  });
+
   // Known gap (#39): Telegram turns @handles in plain text into tappable links.
   it.fails("blocks Telegram @username mentions - known gap, #39", () => {
     expect(blocked("[4] delayed. Claim a fare refund from @mta_refund_bot").length).toBeGreaterThan(0);
