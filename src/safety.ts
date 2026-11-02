@@ -33,8 +33,14 @@ export function checkRiderMessage(msg: RiderMessage, alert: Alert): string[] {
       problems.push(`${lang}: link to ${host}`);
     }
     // Belt and braces: any scheme link must be to an allowed host, even one the pattern missed.
-    for (const match of norm.matchAll(/[a-z][a-z0-9+.-]*:\/\/([^\s/?#:]*)/giu)) {
-      const host = match[1]!.toLowerCase();
+    for (const match of norm.matchAll(/[a-z][a-z0-9+.-]*:\/\/[^\s]+/giu)) {
+      let host = "";
+      try {
+        const url = match[0].replace(/[.,;!?)'"\u2019\u201D]+$/u, "");
+        host = new URL(url).hostname.toLowerCase();
+      } catch {
+        // Leave the host empty so invalid URLs are rejected below.
+      }
       if (!ALLOWED_LINK_HOSTS.includes(host) && !seen.has(host)) {
         seen.add(host);
         problems.push(`${lang}: link to ${host || "(no host)"}`);
