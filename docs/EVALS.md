@@ -60,9 +60,10 @@ That's why the agents are forbidden from running it.
 - **7 alerts is a small sample.** One failure moves the score by several points, and two
   runs can differ a little because Claude doesn't write the same words every time. Look
   at *which* criteria fail, not just the percentage (#8, #44).
-- **Only one of the 7 is a real-time alert,** the kind riders actually get texted. The
-  planned-work alerts are still useful for checking the writing, but the live service
-  doesn't text them.
+- **Only one of the 7 is a real-time delay.** There is also a scheduled `Station Notice`
+  that the current filter accepts as real-time, three `Planned - ...` alerts that the
+  live service excludes, and two synthetic cases. Real-time disruptions are therefore
+  still underrepresented.
 
 ## Is this a standard?
 
