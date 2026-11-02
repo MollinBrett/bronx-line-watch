@@ -253,8 +253,8 @@ for (const f of tracked.filter((f) => /^\.github\/workflows\/.+\.ya?ml$/.test(f)
     if (!m) continue;
     let command = m[2];
     if (/^[|>]/.test(command)) {
-      const indent = m[1].length;
-      for (let j = i + 1; j < lines.length && (lines[j].trim() === "" || lines[j].search(/\S/) > indent + 2); j++) command += "\n" + lines[j];
+      const indent = lines[i].indexOf("run:");
+      for (let j = i + 1; j < lines.length && (lines[j].trim() === "" || lines[j].search(/\S/) > indent); j++) command += "\n" + lines[j];
     }
     if (/\$\{\{\s*github\.(event|head_ref)/.test(command)) fail("ci", `${f}: a run: command interpolates \${{ github.event... }}; pass it through env: instead`);
   }
