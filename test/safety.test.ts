@@ -123,8 +123,11 @@ describe("checkRiderMessage vs. disguised links", () => {
     expect(blocked("[4] delayed. Refunds at https://mt\u0430.info/refund").length).toBeGreaterThan(0);
   });
 
-  it.fails("blocks hosts with accented or non-Latin letters - known gap, #38", () => {
+  it.fails("blocks hosts with accented letters - known gap, #38", () => {
     expect(blocked("[4] delayed. Reembolso en mta-reembols\u00f3.com").length).toBeGreaterThan(0);
+  });
+
+  it.fails("blocks hosts with non-Latin letters - known gap, #38", () => {
     expect(blocked("[4] delayed. Info: \u043c\u0442\u0430.com").length).toBeGreaterThan(0);
   });
 
