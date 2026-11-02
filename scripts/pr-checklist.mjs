@@ -21,7 +21,8 @@ export function checkChecklist(body, changedFiles) {
   const problems = [];
   const text = String(body || "").replace(/<!--[\s\S]*?-->/g, "");
   for (const item of ITEMS) {
-    const line = text.split("\n").find((l) => l.includes(`**${item.label}`));
+    // Only checkbox lines count: a plain bullet elsewhere that starts with "**Agents:**" is not the item.
+    const line = text.split("\n").find((l) => /^\s*[-*]\s*\[[ xX]\]/.test(l) && l.includes(`**${item.label}`));
     if (!line) {
       problems.push(`"${item.label}" is missing from the checklist. Copy it from .github/pull_request_template.md`);
       continue;

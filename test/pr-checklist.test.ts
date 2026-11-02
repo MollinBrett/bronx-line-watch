@@ -37,6 +37,11 @@ describe("PR checklist", () => {
     expect(checkChecklist(undefined, []).length).toBe(6);
   });
 
+  it("reads the checklist line, not a bullet elsewhere that names the same area", () => {
+    const body = "## What and why\n- **Agents:** both get a new rule.\n\n" + tickAll(template);
+    expect(checkChecklist(body, ["agents/maintainer/agent.md"])).toEqual([]);
+  });
+
   it("ignores checkboxes hidden in HTML comments", () => {
     const sneaky = template + "\n<!-- - [x] **Watcher code (`src/`):** -->";
     expect(checkChecklist(sneaky, []).some((p) => p.includes("Watcher code"))).toBe(true);
