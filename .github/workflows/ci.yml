@@ -15,6 +15,7 @@ on:
   push:
     branches: [main]
   pull_request:
+    types: [opened, edited, synchronize, reopened] # "edited": re-check when the description changes
   schedule:
     - cron: "23 10 * * 1" # Mondays: catch advisories published since the last change
   workflow_dispatch:
@@ -35,6 +36,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0 # the PR checklist compares against the base branch
 
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
@@ -60,3 +62,12 @@ jobs:
 
       - name: Tests (including prompt-injection tests)
         run: npm test
+
+      - name: PR security checklist (SECURITY.md section 3)
+        if: github.event_name == 'pull_request'
+        env:
+          # Passed as environment variables, never interpolated into the command,
+          # so text in a PR description can't run as shell code.
+          PR_BODY: ${{ github.event.pull_request.body }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: CHANGED_FILES="$(git diff --name-only "$BASE_SHA...HEAD")" node scripts/pr-checklist.mjs

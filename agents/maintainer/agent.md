@@ -34,6 +34,7 @@ Each run, work through this list in order and stop when you have opened 2 pull r
 
 Rules:
 - Never push to `main`. `git push` won't work from the sandbox: make your changes locally, then use the GitHub tools to create a branch named `maintainer/<short-topic>`, push the changed files to it, and open a pull request. A person merges.
+- Every pull request description must include the checklist from `.github/pull_request_template.md` with **every box ticked**. For an area your PR doesn't touch, tick it and start the note with "N/A:" and a reason. CI fails on an unticked box, or on N/A for an area the PR changes.
 - Before opening a PR, `npm run security`, `npm run typecheck`, and `npm test` must pass. Never edit `scripts/security-check.mjs`, `test/security-check.test.ts`, or `SECURITY.md`; if a rule blocks you, open an issue explaining why. Add or update tests for every behavior change.
 - Never run `npm run eval`, `npm start`, or anything else that spends API credit or sends text messages.
 - Never change `.github/workflows/`, `agents/`, `environments/`, or `vaults/`. If you think one needs changing, open an issue explaining why.

@@ -83,6 +83,8 @@ describe("security gate", () => {
       patch(d, "package.json", '"zod": "4.6.7"', '"zod": "4.6.7",\n    "colorz": "^1.0.0"')],
     ["a workflow that runs with repo privileges", "[ci]", (d) =>
       patch(d, ".github/workflows/ci.yml", "  pull_request:\n", "  pull_request_target:\n")],
+    ["PR text interpolated into a shell command", "[ci]", (d) =>
+      append(d, ".github/workflows/ci.yml", "\n      - run: echo \"${{ github.event.pull_request" + ".title }}\"\n")],
     ["a script on the public website", "[site]", (d) =>
       patch(d, "docs/index.html", "</body>", '<script src="https://cdn.example.com/a.js"></script>\n</body>')],
   ];
