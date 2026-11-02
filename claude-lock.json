@@ -9,16 +9,16 @@
     "./agents/maintainer/agent.md": {
       "kind": "agent",
       "id": "agent_01XGScSc27wqZa8apundnm2h",
-      "version": "5",
-      "hash": "983efdf051c9bf20c87c050890867d06",
-      "remote_hash": "1666a3322b7530e6b9f4c27981d677c2"
+      "version": "6",
+      "hash": "a37c1c3a30f6021b937ad54c4a9da1a0",
+      "remote_hash": "82a91044302d1a8a09ad1d9271067a3c"
     },
     "./agents/security-guard/agent.md": {
       "kind": "agent",
       "id": "agent_016SrzsFm382tanVL7E2Cqur",
-      "version": "4",
-      "hash": "41774d42f4d5028421f8c00b80ec1558",
-      "remote_hash": "3ed7ffc9b1f348c39373011817044f14"
+      "version": "5",
+      "hash": "5c7256a8547876cabc429129175e00c2",
+      "remote_hash": "6f6b0c136787eda0f4224181a2b4ae1b"
     },
     "./environments/agent-sandbox.yaml": {
       "kind": "environment",

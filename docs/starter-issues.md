@@ -8,6 +8,7 @@ agent may pick them up.
 - #7 Write the real Spanish rubric (`Angel`)
 - #8 Grow the eval set from real alerts (`Angel`)
 - #9 Is Opus overkill? Measure it (`Angel`)
+- #44 Make the eval trustworthy: more real alerts, repeat runs, checking the grader (`Angel`)
 - #10 Answer the agents' paused approvals (`Angel`)
 - #11 Build agent #3: the Watchdog (`Angel`)
 - #12 Build agent #4: the Code reviewer (`Angel`)
