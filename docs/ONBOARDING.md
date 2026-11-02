@@ -65,6 +65,8 @@ against `evals/rubric.md`. It costs a few cents per run.
 npm run eval
 ```
 
+How it works, and how it compares to standard eval tools: [`docs/EVALS.md`](EVALS.md).
+
 ## Your own test channel: see real posts without touching production
 
 Branch protection only controls what merges into `main` (what goes live). Everything before
