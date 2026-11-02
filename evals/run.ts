@@ -8,13 +8,15 @@ import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { z } from "zod";
-import { alertPrompt, rewriteAlert } from "../src/rewrite.js";
+import { alertPrompt, rewriteAlert, rewriteOptionsFromEnv } from "../src/rewrite.js";
 import { checkRiderMessage } from "../src/safety.js";
 import { smsSegments } from "../src/sms.js";
 import { evalCases } from "./cases.js";
 
 const client = new Anthropic();
-const model = process.env.CLAUDE_MODEL ?? "claude-opus-5-5";
+// Same settings as the live watcher (CLAUDE_MODEL, CLAUDE_EFFORT), so the eval tests what production runs.
+const options = rewriteOptionsFromEnv();
+console.log(`Rewriting with ${options.model}, effort ${options.effort}\n`);
 const rubric = await readFile(new URL("./rubric.md", import.meta.url), "utf8");
 
 const Grade = z.object({
@@ -25,7 +27,7 @@ const Grade = z.object({
 
 const results: Array<{ id: string; error?: string; criteria?: z.infer<typeof Grade>["criteria"]; [k: string]: unknown }> = [];
 for (const alert of evalCases()) {
-  const msg = await rewriteAlert(client, alert, { model });
+  const msg = await rewriteAlert(client, alert, options);
   if (!msg) {
     results.push({ id: alert.id, error: "no message" });
     console.log(`✗ ${alert.id}: no message`);
@@ -66,5 +68,5 @@ console.log(`\nOverall: ${(passRate * 100).toFixed(1)}% of criteria passed acros
 
 await mkdir(new URL("./results/", import.meta.url), { recursive: true });
 const out = new URL(`./results/${new Date().toISOString().replace(/[:.]/g, "-")}.json`, import.meta.url);
-await writeFile(out, JSON.stringify({ model, passRate, results }, null, 2));
+await writeFile(out, JSON.stringify({ ...options, passRate, results }, null, 2));
 console.log(`Saved ${out.pathname}`);

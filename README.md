@@ -70,7 +70,7 @@ sends SMS. See [docs/ONBOARDING.md](docs/ONBOARDING.md#your-own-test-channel-see
 npm run dev
 ```
 
-Check message quality after changing the prompt or model (calls Claude, costs a few cents):
+Check message quality after changing the prompt or model (how it works: [docs/EVALS.md](docs/EVALS.md)) (calls Claude, costs a few cents):
 
 ```bash
 npm run eval
