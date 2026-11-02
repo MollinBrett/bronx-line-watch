@@ -24,7 +24,7 @@ export function checkRiderMessage(msg: RiderMessage, alert: Alert): string[] {
     // every ending (.top, .nyc, ...) and in every script (#22, #38). Unicode-aware, so a
     // Cyrillic "mta.info" or an accented host is still seen as a host, and IPv4 hosts too.
     // Station abbreviations ("Av.", "St.") don't match because a space follows the dot.
-    const HOST = /(?:https?:\/\/)?((?:[\p{L}\p{N}-]+\.)+\p{L}{2,}|\d{1,3}(?:\.\d{1,3}){3})(?=[:/\s.,;!?)]|$)/giu;
+    const HOST = /(?:https?:\/\/)?((?:[\p{L}\p{N}-]+\.)+(?:xn--[a-z0-9-]+|\p{L}{2,})|\d{1,3}(?:\.\d{1,3}){3})(?:\/\S*)?/giu;
     const seen = new Set<string>();
     for (const match of norm.matchAll(HOST)) {
       const host = match[1]!.toLowerCase();
