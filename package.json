@@ -5,7 +5,7 @@
   "scripts": {
     "test": "vitest run",
     "start": "tsx src/main.ts",
-    "once": "tsx src/main.ts --once --dry-run",
+    "once": "tsx --env-file=.env src/main.ts --once --dry-run",
     "typecheck": "tsc --noEmit",
     "eval": "tsx evals/run.ts",
     "schedule-agents": "tsx scripts/schedule-agents.ts",
