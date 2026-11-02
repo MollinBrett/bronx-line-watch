@@ -1,7 +1,9 @@
 # How `npm run eval` works, and why
 
 `npm run eval` checks whether Claude's rewrites of MTA alerts are any good, using Claude
-to grade Claude. Run it whenever you change the prompt, the model, or the effort setting.
+to grade Claude. Run it whenever you change the prompt or model. The current runner does
+not read `CLAUDE_EFFORT`: it uses `rewriteAlert()`'s default effort (`low`), so it does not
+validate effort overrides used by the live service.
 
 ```
 test alerts ──> [1] rewrite (the same code the live service uses) ──> EN + ES message
