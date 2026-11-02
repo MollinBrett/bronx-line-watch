@@ -18,7 +18,7 @@ export function checkRiderMessage(msg: RiderMessage, alert: Alert): string[] {
 
     // Normalize first, so lookalike punctuation can't hide a link: NFKC turns the fullwidth
     // and ideographic dots into ".", and invisible characters are removed (#38).
-    const norm = text.normalize("NFKC").replace(/[\u200B-\u200D\u2060\uFEFF\u00AD]/g, "");
+    const norm = text.normalize("NFKC").replace(/\u3002/g, ".").replace(/[\u200B-\u200D\u2060\uFEFF\u00AD]/g, "");
 
     // Any word.word is treated as a link: phones and Telegram make bare domains tappable on
     // every ending (.top, .nyc, ...) and in every script (#22, #38). Unicode-aware, so a
