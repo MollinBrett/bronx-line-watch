@@ -46,10 +46,16 @@ describe("parseSubscribers", () => {
   });
 
   it("rejects lines that aren't Bronx lines, without echoing the phone number", () => {
-    expect(() => parseSubscribers("+17185550100:es:4,L")).toThrow(/entry #1.*"L"/);
+    expect(() => parseSubscribers("+17185550100:es:4,L")).toThrow(/entry #1.*aren't Bronx lines/);
     expect(() => parseSubscribers("+17185550100:es:4,L")).not.toThrow(/7185550100/);
     expect(() => parseSubscribers("+17185550100:es:")).toThrow(); // empty list is a typo, not "all"
     expect(() => parseSubscribers("+17185550100:es:4:5")).toThrow(/too many/);
+  });
+
+  it("doesn't expose raw invalid tokens in errors", () => {
+    const raw = "+17185550100:es:4,13475550199";
+    expect(() => parseSubscribers(raw)).toThrow(/entry #1.*aren't Bronx lines/);
+    expect(() => parseSubscribers(raw)).not.toThrow(/13475550199/);
   });
 });
 

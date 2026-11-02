@@ -29,7 +29,7 @@ export function parseSubscribers(raw: string | undefined): Subscriber[] {
     const bad = lines.filter((l) => !BRONX_LINES.has(l));
     if (bad.length) {
       throw new Error(
-        `SMS_SUBSCRIBERS entry #${i + 1} lists line(s) that aren't Bronx lines: ${bad.map((l) => `"${l}"`).join(", ")}` +
+        `SMS_SUBSCRIBERS entry #${i + 1} lists line(s) that aren't Bronx lines` +
           ` (allowed: ${[...BRONX_LINES].join(", ")})`,
       );
     }
