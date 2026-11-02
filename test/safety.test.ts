@@ -100,3 +100,48 @@ describe("checkRiderMessage vs. injected links", () => {
     expect(blocked("[4] delayed. Reply YES with your OMNY card number to get a refund.").length).toBeGreaterThan(0);
   });
 });
+
+// Link variants that don't fit the plain-ASCII `name.tld` shape. Non-ASCII characters are
+// written as \u escapes so the file itself has no lookalike or invisible characters.
+describe("checkRiderMessage vs. disguised links", () => {
+  const blocked = (en: string) => checkRiderMessage({ ...good, en }, alert);
+
+  // Regression guards: these are caught today and must stay caught.
+  it("blocks email addresses and mailto links", () => {
+    expect(blocked("[4] delayed. Email refunds@mta-help.top")).toContainEqual(expect.stringContaining("mta-help.top"));
+    expect(blocked("[4] delayed. mailto:claims@mta-refund.top")).toContainEqual(expect.stringContaining("mta-refund.top"));
+  });
+
+  it("blocks t.me links and punycode hosts", () => {
+    expect(blocked("[4] delayed. Updates at t.me/mta_refund")).toContainEqual(expect.stringContaining("t.me"));
+    expect(blocked("[4] delayed. http://xn--mta-refund-abc.xn--p1ai/r").length).toBeGreaterThan(0);
+  });
+
+  // Known gaps (#38): hosts with non-ASCII letters, or IP addresses, never match the link
+  // pattern at all - even with https:// in front.
+  it.fails("blocks a Cyrillic lookalike of mta.info - known gap, #38", () => {
+    expect(blocked("[4] delayed. Refunds at https://mt\u0430.info/refund").length).toBeGreaterThan(0);
+  });
+
+  it.fails("blocks hosts with accented or non-Latin letters - known gap, #38", () => {
+    expect(blocked("[4] delayed. Reembolso en mta-reembols\u00f3.com").length).toBeGreaterThan(0);
+    expect(blocked("[4] delayed. Info: \u043c\u0442\u0430.com").length).toBeGreaterThan(0);
+  });
+
+  it.fails("blocks IP-address links - known gap, #38", () => {
+    expect(blocked("[4] delayed. http://203.0.113.7/r").length).toBeGreaterThan(0);
+  });
+
+  it.fails("blocks links written with a fullwidth dot - known gap, #38", () => {
+    expect(blocked("[4] delayed. mta-refund\uff0ecom").length).toBeGreaterThan(0);
+  });
+
+  // Known gap (#39): Telegram turns @handles in plain text into tappable links.
+  it.fails("blocks Telegram @username mentions - known gap, #39", () => {
+    expect(blocked("[4] delayed. Claim a fare refund from @mta_refund_bot").length).toBeGreaterThan(0);
+  });
+
+  it("doesn't flag an @ used as 'at' before a station", () => {
+    expect(blocked("[4] trains skip 138 St @ Grand Concourse.")).toEqual([]);
+  });
+});
