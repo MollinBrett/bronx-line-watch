@@ -1,6 +1,8 @@
 ## What and why
 
-## Checklist (SECURITY.md section 3, tick what applies)
+## Checklist (SECURITY.md section 3)
+<!-- Tick EVERY box. If an area doesn't apply, tick it anyway and start the note with "N/A:" and a reason.
+     CI checks that every box is ticked, and that areas this PR touches aren't marked N/A. -->
 - [ ] **Watcher code (`src/`):** every message still goes through `checkRiderMessage()`; no new network destination; safety tests not edited to pass
 - [ ] **Dependencies:** I asked for it, the name is exact, the version is at least a week old, and I read the lockfile diff
 - [ ] **Prompt or safety check:** `npm run eval` before/after results are below; the safety check got stricter, not looser

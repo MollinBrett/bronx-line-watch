@@ -246,6 +246,18 @@ for (const f of tracked.filter((f) => /^\.github\/workflows\/.+\.ya?ml$/.test(f)
   if (/secrets\./.test(s)) fail("ci", `${f} references secrets; CI needs none`);
   if (/\bnpm (install|i)\b/.test(s) || (/\bnpm ci\b/.test(s) && !/npm ci --ignore-scripts/.test(s))) fail("ci", `${f}: use "npm ci --ignore-scripts"`);
   if (/cache:\s*npm/.test(s)) fail("ci", `${f}: no dependency cache (a poisoned cache outlives the PR that made it)`);
+  // Text from a PR or issue (title, body, branch name) interpolated into a shell command runs as code.
+  const lines = s.split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    const m = lines[i].match(/^(\s*)(?:-\s*)?run:\s*(.*)$/);
+    if (!m) continue;
+    let command = m[2];
+    if (/^[|>]/.test(command)) {
+      const indent = m[1].length;
+      for (let j = i + 1; j < lines.length && (lines[j].trim() === "" || lines[j].search(/\S/) > indent + 2); j++) command += "\n" + lines[j];
+    }
+    if (/\$\{\{\s*github\.(event|head_ref)/.test(command)) fail("ci", `${f}: a run: command interpolates \${{ github.event... }}; pass it through env: instead`);
+  }
 }
 
 // --- 9. The public website stays static -------------------------------------------------
