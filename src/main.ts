@@ -4,7 +4,7 @@ import { fetchAlerts } from "./mta.js";
 import { checkClaude } from "./preflight.js";
 import { rewriteAlert, type RewriteOptions } from "./rewrite.js";
 import { checkRiderMessage } from "./safety.js";
-import { parseSubscribers, sendSms, smsSegments, twilioConfigFromEnv } from "./sms.js";
+import { parseSubscribers, sendSms, smsSegments, twilioConfigFromEnv, wantsAlert } from "./sms.js";
 import { loadState, planAnnouncements, saveState } from "./state.js";
 import { postToTelegram, telegramConfigFromEnv, telegramPosts } from "./telegram.js";
 
@@ -74,6 +74,7 @@ async function tick(): Promise<void> {
     }
     if (twilio) {
       for (const sub of subscribers) {
+        if (!wantsAlert(sub, alert.routes)) continue; // they only asked for other lines
         try {
           await sendSms(twilio, sub.phone, msg[sub.lang]);
         } catch (err) {

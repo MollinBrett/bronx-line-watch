@@ -1,19 +1,46 @@
+import { BRONX_LINES } from "./filter.js";
+
 export type Lang = "en" | "es";
 
 export interface Subscriber {
   phone: string;
   lang: Lang;
+  /** The lines this rider wants texts about. Missing means every Bronx line. */
+  lines?: string[];
 }
 
-/** Parse "+17185550100:es,+13475550199:en" (language defaults to en). */
+/**
+ * Parse "+17185550100:es:4,5,+13475550199:en,+13475550142".
+ * Each entry is phone[:language[:lines]]. Language defaults to en; no lines means all Bronx lines.
+ * Lines are comma-separated too, so a new entry starts only at a comma followed by "+"
+ * (every phone number starts with "+").
+ */
 export function parseSubscribers(raw: string | undefined): Subscriber[] {
   if (!raw?.trim()) return [];
-  return raw.split(",").map((entry) => {
-    const [phone = "", lang = "en"] = entry.trim().split(":");
+  return raw.split(/,(?=\s*\+)/).map((entry, i) => {
+    const [phone = "", lang = "en", linesField, ...extra] = entry.trim().split(":");
     if (!/^\+1\d{10}$/.test(phone)) throw new Error(`Bad phone number in SMS_SUBSCRIBERS: ${phone}`);
     if (lang !== "en" && lang !== "es") throw new Error(`Bad language for ${phone}: ${lang}`);
-    return { phone, lang };
+    if (extra.length) throw new Error(`SMS_SUBSCRIBERS entry #${i + 1} has too many ":" fields`);
+    if (linesField === undefined) return { phone, lang };
+
+    const lines = linesField.split(",").map((l) => l.trim().toUpperCase());
+    // Entry number, not the phone number: error messages end up in logs.
+    const bad = lines.filter((l) => !BRONX_LINES.has(l));
+    if (bad.length) {
+      throw new Error(
+        `SMS_SUBSCRIBERS entry #${i + 1} lists line(s) that aren't Bronx lines: ${bad.map((l) => `"${l}"`).join(", ")}` +
+          ` (allowed: ${[...BRONX_LINES].join(", ")})`,
+      );
+    }
+    return { phone, lang, lines: [...new Set(lines)] };
   });
+}
+
+/** Should this subscriber get a text about an alert on these routes? */
+export function wantsAlert(sub: Subscriber, routes: string[]): boolean {
+  if (!sub.lines) return true;
+  return routes.some((r) => sub.lines!.includes(r));
 }
 
 // GSM-7: the basic character set that fits 160 characters in one SMS segment.
