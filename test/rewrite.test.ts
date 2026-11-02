@@ -1,6 +1,6 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { describe, expect, it, vi } from "vitest";
-import { alertPrompt, rewriteAlert } from "../src/rewrite.js";
+import { alertPrompt, rewriteAlert, rewriteOptionsFromEnv } from "../src/rewrite.js";
 import { makeAlert } from "./helpers.js";
 
 function fakeClient(response: object) {
@@ -25,5 +25,22 @@ describe("rewriteAlert", () => {
   it("returns null when Claude declines", async () => {
     const { client } = fakeClient({ stop_reason: "refusal", parsed_output: null });
     expect(await rewriteAlert(client, makeAlert())).toBeNull();
+  });
+});
+
+describe("rewriteOptionsFromEnv", () => {
+  it("defaults to Opus at low effort", () => {
+    expect(rewriteOptionsFromEnv({})).toEqual({ model: "claude-opus-5-5", effort: "low" });
+  });
+
+  it("reads CLAUDE_MODEL and CLAUDE_EFFORT", () => {
+    expect(rewriteOptionsFromEnv({ CLAUDE_MODEL: "claude-sonnet-5-5", CLAUDE_EFFORT: "medium" })).toEqual({
+      model: "claude-sonnet-5-5",
+      effort: "medium",
+    });
+  });
+
+  it("rejects an unknown effort instead of silently using it", () => {
+    expect(() => rewriteOptionsFromEnv({ CLAUDE_EFFORT: "turbo" })).toThrow(/CLAUDE_EFFORT/);
   });
 });

@@ -35,6 +35,23 @@ export interface RewriteOptions {
   effort?: "low" | "medium" | "high" | "xhigh" | "max";
 }
 
+const EFFORTS = ["low", "medium", "high", "xhigh", "max"] as const;
+
+/**
+ * Model and effort from CLAUDE_MODEL / CLAUDE_EFFORT. The live watcher and the eval both
+ * use this, so an eval always tests the configuration production would run.
+ */
+export function rewriteOptionsFromEnv(env = process.env): Required<RewriteOptions> {
+  const effort = env.CLAUDE_EFFORT ?? "low";
+  if (!(EFFORTS as readonly string[]).includes(effort)) {
+    throw new Error(`CLAUDE_EFFORT must be one of ${EFFORTS.join(", ")}; got "${effort}"`);
+  }
+  return {
+    model: env.CLAUDE_MODEL ?? "claude-opus-5-5",
+    effort: effort as (typeof EFFORTS)[number],
+  };
+}
+
 /**
  * Ask Claude for an English + Spanish rider message. Returns null if Claude declines
  * or the output can't be parsed - the caller skips that alert rather than sending junk.

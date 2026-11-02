@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { textworthy } from "./filter.js";
 import { fetchAlerts } from "./mta.js";
 import { checkClaude } from "./preflight.js";
-import { rewriteAlert, type RewriteOptions } from "./rewrite.js";
+import { rewriteAlert, rewriteOptionsFromEnv } from "./rewrite.js";
 import { checkRiderMessage } from "./safety.js";
 import { parseSubscribers, sendSms, smsSegments, twilioConfigFromEnv } from "./sms.js";
 import { loadState, planAnnouncements, saveState } from "./state.js";
@@ -17,10 +17,7 @@ const telegram = dryRun ? null : telegramConfigFromEnv();
 const subscribers = parseSubscribers(process.env.SMS_SUBSCRIBERS);
 const pollSeconds = Number(process.env.POLL_SECONDS ?? 60);
 const stateFile = process.env.STATE_FILE ?? "data/state.json";
-const rewriteOpts: RewriteOptions = {
-  model: process.env.CLAUDE_MODEL ?? "claude-opus-5-5",
-  effort: (process.env.CLAUDE_EFFORT as RewriteOptions["effort"]) ?? "low",
-};
+const rewriteOpts = rewriteOptionsFromEnv();
 
 const claude = new Anthropic();
 
@@ -87,7 +84,7 @@ async function tick(): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  const preflight = await checkClaude(claude, rewriteOpts.model!);
+  const preflight = await checkClaude(claude, rewriteOpts.model);
   if (preflight.ok) console.log(`[startup] ${preflight.message}`);
   else if (preflight.fatal) {
     console.error(`[startup] ${preflight.message}`);
