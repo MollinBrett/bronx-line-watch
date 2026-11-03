@@ -25,3 +25,11 @@ agent may pick them up.
 - #19 Quiet hours (`agent-ok`)
 - #20 Send texts through the Twilio Messaging Service (`Angel`)
 - #21 Your call: Discord, a web page, or something else (`Angel`)
+
+## Autonomy and limiting the worst case (see `docs/AUTONOMY.md`)
+- #54 Put a hard ceiling on every bill (`Brett`)
+- #55 Rehearse the five-minute shutdown (`Brett`)
+- #56 Circuit breakers and a PAUSED switch (`Angel`)
+- #57 Build the guardian: an agent that can only stop things (`Angel`)
+- #58 Write down how pull requests are actually reviewed (`Angel`, `Brett`)
+- #59 Climb the autonomy ladder: first automatic merges (`Angel`, `Brett`)
