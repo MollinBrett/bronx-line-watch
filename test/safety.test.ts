@@ -117,31 +117,50 @@ describe("checkRiderMessage vs. disguised links", () => {
     expect(blocked("[4] delayed. http://xn--mta-refund-abc.xn--p1ai/r").length).toBeGreaterThan(0);
   });
 
-  // Known gaps (#38): hosts with non-ASCII letters, or IP addresses, never match the link
+  // Disguised links (#38): hosts with non-ASCII letters, or IP addresses, never match the link
   // pattern at all - even with https:// in front.
-  it.fails("blocks a Cyrillic lookalike of mta.info - known gap, #38", () => {
+  it("blocks a Cyrillic lookalike of mta.info (#38)", () => {
     expect(blocked("[4] delayed. Refunds at https://mt\u0430.info/refund").length).toBeGreaterThan(0);
   });
 
-  it.fails("blocks hosts with accented letters - known gap, #38", () => {
+  it("blocks hosts with accented letters (#38)", () => {
     expect(blocked("[4] delayed. Reembolso en mta-reembols\u00f3.com").length).toBeGreaterThan(0);
   });
 
-  it.fails("blocks hosts with non-Latin letters - known gap, #38", () => {
+  it("blocks hosts with non-Latin letters (#38)", () => {
     expect(blocked("[4] delayed. Info: \u043c\u0442\u0430.com").length).toBeGreaterThan(0);
   });
 
-  it.fails("blocks IP-address links - known gap, #38", () => {
+  it("blocks IP-address links (#38)", () => {
     expect(blocked("[4] delayed. http://203.0.113.7/r").length).toBeGreaterThan(0);
   });
 
-  it.fails("blocks links written with a fullwidth dot - known gap, #38", () => {
+  it("blocks links written with a fullwidth dot (#38)", () => {
     expect(blocked("[4] delayed. mta-refund\uff0ecom").length).toBeGreaterThan(0);
+  });
+
+  it("blocks hosts containing combining marks (#38)", () => {
+    expect(blocked("[4] delayed. mta\u0327.info").length).toBeGreaterThan(0);
+    expect(blocked("[4] delayed. mta.info\uFE0F.top").length).toBeGreaterThan(0);
   });
 
   // Known gap (#39): Telegram turns @handles in plain text into tappable links.
   it.fails("blocks Telegram @username mentions - known gap, #39", () => {
     expect(blocked("[4] delayed. Claim a fare refund from @mta_refund_bot").length).toBeGreaterThan(0);
+  });
+
+  it("still passes normal Spanish: accents, \u00BF \u00A1, curly quotes, dashes, a.m. (#38)", () => {
+    const es = "\u00BFVas al Bronx? Los trenes [4] van con retraso. \u00A1Sal con tiempo! Pr\u00F3ximo a las 11:30 a.m. en 161 St\u2013Yankee Stadium. \u201COjo\u201D: and\u00E9n cerrado\u2026";
+    expect(checkRiderMessage({ ...good, es }, alert)).toEqual([]);
+  });
+
+  it("allows the real MTA site, even with a fullwidth dot (#38)", () => {
+    expect(blocked("[4] delayed. Details: https://new.mta.info/alerts")).toEqual([]);
+    expect(blocked("[4] delayed. Details: new\uFF0Emta\uFF0Einfo")).toEqual([]);
+  });
+
+  it("blocks a link hidden with invisible characters (#38)", () => {
+    expect(blocked("[4] delayed. mta-refund\u200B.top").length).toBeGreaterThan(0);
   });
 
   it("doesn't flag an @ used as 'at' before a station", () => {
