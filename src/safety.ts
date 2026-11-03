@@ -1,7 +1,13 @@
 import type { Alert } from "./mta.js";
 import type { RiderMessage } from "./rewrite.js";
+import { smsSegments } from "./sms.js";
 
 export const MAX_CHARS = 320;
+/**
+ * Carriers bill per SMS segment. Spanish accents switch a text to UCS-2 (70 characters
+ * per segment), so a message can be well under MAX_CHARS and still cost 4-5 segments (#18).
+ */
+export const MAX_SEGMENTS = 3;
 const ALLOWED_LINK_HOSTS = ["mta.info", "new.mta.info"];
 
 /**
@@ -14,6 +20,10 @@ export function checkRiderMessage(msg: RiderMessage, alert: Alert): string[] {
   for (const [lang, text] of Object.entries(msg)) {
     if (!text.trim()) problems.push(`${lang}: empty`);
     if (text.length > MAX_CHARS) problems.push(`${lang}: ${text.length} chars (max ${MAX_CHARS})`);
+    const { segments, encoding } = smsSegments(text);
+    if (segments > MAX_SEGMENTS) {
+      problems.push(`${lang}: ${segments} SMS segments in ${encoding} (max ${MAX_SEGMENTS})`);
+    }
     if (/<[a-z/][^>]*>/i.test(text)) problems.push(`${lang}: contains markup`);
 
     // Normalize first, so lookalike punctuation can't hide a link: NFKC turns the fullwidth

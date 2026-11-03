@@ -1,6 +1,6 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { describe, expect, it, vi } from "vitest";
-import { alertPrompt, rewriteAlert, rewriteOptionsFromEnv } from "../src/rewrite.js";
+import { alertPrompt, rewriteAlert, rewriteOptionsFromEnv, SYSTEM_PROMPT } from "../src/rewrite.js";
 import { makeAlert } from "./helpers.js";
 
 function fakeClient(response: object) {
@@ -11,6 +11,12 @@ function fakeClient(response: object) {
 describe("rewriteAlert", () => {
   it("wraps the alert in tags so Claude treats it as data", () => {
     expect(alertPrompt(makeAlert())).toMatch(/^<mta_alert>[\s\S]*<\/mta_alert>$/);
+  });
+
+  it("asks for short texts so each one fits in one or two SMS segments (#18)", () => {
+    expect(SYSTEM_PROMPT).toContain("English at most 150 characters");
+    expect(SYSTEM_PROMPT).toContain("Spanish at most 130 characters");
+    expect(SYSTEM_PROMPT).not.toContain("280");
   });
 
   it("returns the parsed message", async () => {
