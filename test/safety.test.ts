@@ -167,3 +167,37 @@ describe("checkRiderMessage vs. disguised links", () => {
     expect(blocked("[4] trains skip 138 St @ Grand Concourse.")).toEqual([]);
   });
 });
+
+// Invisible format characters and feed route IDs (#51, #52). Non-ASCII written as \u escapes.
+describe("checkRiderMessage vs. invisible characters and odd route IDs", () => {
+  const blocked = (en: string) => checkRiderMessage({ ...good, en }, alert);
+
+  // Regression guards: caught today, must stay caught.
+  it("blocks a scheme link with a bidi mark before the ://", () => {
+    expect(blocked("[4] delayed. https\u200E://mta-refund.top/r")).toContainEqual(expect.stringContaining("mta-refund.top"));
+  });
+
+  it("blocks a host padded with a Hangul filler", () => {
+    expect(blocked("[4] delayed. Refunds: mta-refund\u3164.top").length).toBeGreaterThan(0);
+  });
+
+  // Known gap (#51): invisible format characters split the host so no link is seen,
+  // though the rider still reads "mta-refund.top".
+  it.fails("blocks links hidden with bidi marks and other invisible characters - known gap, #51", () => {
+    for (const ch of ["\u200E", "\u200F", "\u202A", "\u202E", "\u2066", "\u2069", "\u2061", "\u061C", "\u180E", "\u2800"]) {
+      expect(blocked(`[4] delayed. Refunds: mta-refund${ch}.top`).length).toBeGreaterThan(0);
+    }
+  });
+
+  // Known gap (#52): route IDs from the feed are put into a RegExp unescaped.
+  it.fails("does not throw on a route ID with regex characters - known gap, #52", () => {
+    // No line named, so the check reaches the "(" route instead of stopping at "4".
+    const msg = { en: "Trains are delayed.", es: "Los trenes van con retraso." };
+    expect(() => checkRiderMessage(msg, makeAlert({ routes: ["4", "("] }))).not.toThrow();
+  });
+
+  it.fails("a route ID of a single dot does not bypass the line-name check - known gap, #52", () => {
+    const msg = { en: "Trains are delayed.", es: "Los trenes van con retraso." };
+    expect(checkRiderMessage(msg, makeAlert({ routes: ["."] })).length).toBeGreaterThan(0);
+  });
+});
