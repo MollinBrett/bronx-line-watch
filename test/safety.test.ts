@@ -29,6 +29,33 @@ describe("checkRiderMessage", () => {
     expect(checkRiderMessage({ ...good, es: "  " }, alert).length).toBeGreaterThan(0);
   });
 
+  // #18: carriers bill per segment, and Spanish accents force UCS-2 (70 characters per segment).
+  it("blocks a Spanish message that would cost more than 3 SMS segments", () => {
+    // 246 characters with accents: under MAX_CHARS, but 4 UCS-2 segments.
+    const es =
+      "Los trenes [4] van con retrasos en ambas direcciones por actividad policial en 149 St-Grand Concourse. " +
+      "Si puedes, toma el [2] o el [5] en la estaci\u00F3n m\u00E1s cercana. Sal con m\u00E1s tiempo de lo normal hoy, " +
+      "porque los andenes est\u00E1n llenos y hay demoras.";
+    expect(es.length).toBeLessThanOrEqual(320);
+    expect(checkRiderMessage({ ...good, es }, alert)).toContainEqual(
+      expect.stringMatching(/^es: \d+ SMS segments in UCS-2 \(max 3\)$/),
+    );
+  });
+
+  it("passes a short Spanish message with accents", () => {
+    const es = "Los trenes [4] van con retrasos por actividad policial en 149 St. Sal con m\u00E1s tiempo.";
+    expect(checkRiderMessage({ ...good, es }, alert)).toEqual([]);
+  });
+
+  it("allows exactly 3 segments but not 4", () => {
+    // UCS-2: 3 segments hold up to 201 characters, 202 needs a fourth.
+    const pad = (n: number) => "[4] Est\u00E1n demorados. " + "a".repeat(n - "[4] Est\u00E1n demorados. ".length);
+    expect(checkRiderMessage({ ...good, es: pad(201) }, alert)).toEqual([]);
+    expect(checkRiderMessage({ ...good, es: pad(202) }, alert)).toContainEqual(
+      expect.stringContaining("4 SMS segments"),
+    );
+  });
+
   it("blocks messages that don't name the affected line", () => {
     expect(checkRiderMessage({ ...good, en: "Trains are delayed." }, alert)).toContainEqual(
       expect.stringContaining("line"),
