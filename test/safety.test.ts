@@ -117,7 +117,7 @@ describe("checkRiderMessage vs. disguised links", () => {
     expect(blocked("[4] delayed. http://xn--mta-refund-abc.xn--p1ai/r").length).toBeGreaterThan(0);
   });
 
-  // Known gaps (#38): hosts with non-ASCII letters, or IP addresses, never match the link
+  // Disguised links (#38): hosts with non-ASCII letters, or IP addresses, never match the link
   // pattern at all - even with https:// in front.
   it("blocks a Cyrillic lookalike of mta.info (#38)", () => {
     expect(blocked("[4] delayed. Refunds at https://mt\u0430.info/refund").length).toBeGreaterThan(0);
