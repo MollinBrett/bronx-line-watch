@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { textworthy } from "./filter.js";
 import { fetchAlerts } from "./mta.js";
 import { checkClaude } from "./preflight.js";
+import { shouldSendSms } from "./quiet-hours.js";
 import { rewriteAlert, rewriteOptionsFromEnv } from "./rewrite.js";
 import { checkRiderMessage } from "./safety.js";
 import { parseSubscribers, sendSms, smsSegments, twilioConfigFromEnv, wantsAlert } from "./sms.js";
@@ -69,7 +70,10 @@ async function tick(): Promise<void> {
         }
       }
     }
-    if (twilio) {
+    if (twilio && !shouldSendSms(alert, new Date())) {
+      // Quiet hours: no texts at night unless it's a suspension. Not retried in the morning (#19).
+      console.log(`[sms] quiet hours - not texting ${alert.id} (${alert.type})`);
+    } else if (twilio) {
       for (const sub of subscribers) {
         if (!wantsAlert(sub, alert.routes)) continue; // they only asked for other lines
         try {
