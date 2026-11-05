@@ -167,3 +167,50 @@ describe("checkRiderMessage vs. disguised links", () => {
     expect(blocked("[4] trains skip 138 St @ Grand Concourse.")).toEqual([]);
   });
 });
+
+// Link forms that aren't a plain "https://name.tld": other URL schemes, encoded or numeric hosts,
+// and dot lookalikes that NFKC folds. All caught today; these guard against a future refactor of
+// the normalization or the scheme check. Non-ASCII written as \u escapes.
+describe("checkRiderMessage vs. unusual link encodings", () => {
+  const blocked = (en: string) => checkRiderMessage({ ...good, en }, alert);
+
+  it("blocks app-opening schemes (Telegram tg://, Android intent://)", () => {
+    expect(blocked("[4] delayed. Refunds: tg://resolve?domain=mta_refund_bot").length).toBeGreaterThan(0);
+    expect(blocked("[4] delayed. intent://mta-refund#Intent;scheme=https;end").length).toBeGreaterThan(0);
+  });
+
+  it("blocks numeric, hex, IPv6 and percent-encoded hosts", () => {
+    expect(blocked("[4] delayed. http://3405803783/r")).toContainEqual(expect.stringContaining("203.0.113.7"));
+    expect(blocked("[4] delayed. http://0xcb.0.0x71.7/r")).toContainEqual(expect.stringContaining("203.0.113.7"));
+    expect(blocked("[4] delayed. http://[2001:db8::1]/r").length).toBeGreaterThan(0);
+    expect(blocked("[4] delayed. https://mta%2Erefund%2Etop/").length).toBeGreaterThan(0);
+  });
+
+  it("blocks malformed scheme links that browsers still open", () => {
+    expect(blocked("[4] delayed. https:mta-refund.top")).toContainEqual(expect.stringContaining("mta-refund.top"));
+    expect(blocked("[4] delayed. https:/\\mta-refund.top")).toContainEqual(expect.stringContaining("mta-refund.top"));
+    expect(blocked("[4] delayed. //mta-refund.top")).toContainEqual(expect.stringContaining("mta-refund.top"));
+  });
+
+  it("blocks an allowed host used as userinfo with a port", () => {
+    expect(blocked("[4] delayed. https://new.mta.info:8443@203.0.113.7")).toContainEqual(expect.stringContaining("203.0.113.7"));
+  });
+
+  it("blocks dots that NFKC folds: halfwidth, vertical, small, one-dot-leader", () => {
+    for (const dot of ["\uFF61", "\uFE12", "\uFE52", "\u2024"]) {
+      expect(blocked(`[4] delayed. mta-refund${dot}top`)).toContainEqual(expect.stringContaining("mta-refund.top"));
+    }
+    expect(blocked("[4] delayed. 203\uFF0E0\uFF0E113\uFF0E7")).toContainEqual(expect.stringContaining("203.0.113.7"));
+  });
+
+  it("blocks fullwidth letters and Unicode hyphens in a host", () => {
+    expect(blocked("[4] delayed. \uFF4D\uFF54\uFF41-refund.top")).toContainEqual(expect.stringContaining("mta-refund.top"));
+    expect(blocked("[4] delayed. mta\u2010refund.top").length).toBeGreaterThan(0);
+    expect(blocked("[4] delayed. https://mta\u2011refund.top").length).toBeGreaterThan(0);
+  });
+
+  it("blocks chat invite links", () => {
+    expect(blocked("[4] delayed. https://t.me/+AbCdEf")).toContainEqual(expect.stringContaining("t.me"));
+    expect(blocked("[4] delayed. https://wa.me/message/ABC")).toContainEqual(expect.stringContaining("wa.me"));
+  });
+});
