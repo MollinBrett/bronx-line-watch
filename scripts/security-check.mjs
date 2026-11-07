@@ -69,6 +69,8 @@ const DEV_DEP_ALLOWLIST = ["@types/node", "typescript", "vitest"];
   for (const [name, ok] of Object.entries(approved)) {
     if (ok !== false) fail("supply-chain", `allowScripts.${name} is enabled; install scripts are denied by policy`);
   }
+  // `npm start` is production: it texts real phones, so it must never load a local .env (#67).
+  if (/--env-file/.test(pkg.scripts?.start || "")) fail("supply-chain", 'package.json "start" must not load a .env file (--env-file); only production runs npm start (#67)');
   const npmrc = existsSync(path.join(root, ".npmrc")) ? read(".npmrc") : "";
   if (!/^save-exact=true$/m.test(npmrc)) fail("supply-chain", ".npmrc must set save-exact=true");
 }
