@@ -5,7 +5,7 @@ import { checkClaude } from "./preflight.js";
 import { rewriteAlert, rewriteOptionsFromEnv } from "./rewrite.js";
 import { checkRiderMessage } from "./safety.js";
 import { parseSubscribers, sendSms, smsSegments, twilioConfigFromEnv, wantsAlert } from "./sms.js";
-import { loadState, planAnnouncements, saveState } from "./state.js";
+import { afterRewriteFailure, clearRewriteFailures, loadState, planAnnouncements, saveState, type RewriteFailure } from "./state.js";
 import { postToTelegram, telegramConfigFromEnv, telegramPosts } from "./telegram.js";
 
 const args = new Set(process.argv.slice(2));
@@ -35,18 +35,25 @@ async function tick(): Promise<void> {
   }
 
   for (const alert of toAnnounce) {
-    let msg;
+    let msg = null;
+    let failure: RewriteFailure | null = null;
     try {
       msg = await rewriteAlert(claude, alert, rewriteOpts);
+      if (!msg) failure = "permanent"; // refusal, max_tokens or unparseable: same input, same result
     } catch (err) {
       // An API error on one alert must not stop the others (or re-text the ones already sent).
       console.error(`[rewrite] ${alert.id} failed:`, err);
-      msg = null;
+      failure = "transient";
     }
-    if (!msg) {
-      delete next.announced[alert.id]; // retry next tick
+    if (failure || !msg) {
+      // Bounded retries (#65): an alert Claude can't rewrite must not cost a call every minute.
+      const { retry, attempts } = afterRewriteFailure(next, alert, failure ?? "permanent");
+      if (!retry) {
+        console.warn(`[rewrite] giving up on ${alert.id} after ${attempts} attempt(s) (${failure}); it is retried only if the alert changes`);
+      }
       continue;
     }
+    clearRewriteFailures(next, alert.id);
     const problems = checkRiderMessage(msg, alert);
     if (problems.length) {
       console.warn(`[safety] blocked ${alert.id}: ${problems.join("; ")}`);
