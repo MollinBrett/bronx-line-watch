@@ -278,3 +278,33 @@ describe("checkRiderMessage vs. links glued onto an MTA link", () => {
     }
   });
 });
+
+// Scams that need neither a link nor a 7+ digit phone number, and link disguises that rely on
+// how the text is displayed rather than on the host's characters.
+describe("checkRiderMessage vs. callbacks without a full phone number", () => {
+  const blocked = (en: string) => checkRiderMessage({ ...good, en }, alert);
+
+  // Regression guards: these are caught today and must stay caught.
+  it("blocks a markdown-style link whose visible text is the MTA site", () => {
+    // Plain-text channels show it as-is today, but the real target must still be checked.
+    expect(blocked("[4] delayed. Details: [new.mta.info](https://mta-refund.top/claim)")).toContainEqual(
+      expect.stringContaining("mta-refund.top"),
+    );
+  });
+
+  it("blocks a host glued onto mta.info after a port", () => {
+    expect(blocked("[4] delayed. Details: mta.info:443@mta-refund.top")).toContainEqual(
+      expect.stringContaining("mta-refund.top"),
+    );
+  });
+
+  // Known gap (#23): vanity numbers and SMS short codes have fewer than 7 digits, so a
+  // "7 or more digits" rule alone would still let these through.
+  it.fails("blocks vanity callback numbers - known gap, #23", () => {
+    expect(blocked("[4] delayed. For a fare refund call 1-888-MTA-HELP.").length).toBeGreaterThan(0);
+  });
+
+  it.fails("blocks SMS short codes - known gap, #23", () => {
+    expect(blocked("[4] delayed. Text REFUND to 62687 for your OMNY credit.").length).toBeGreaterThan(0);
+  });
+});
