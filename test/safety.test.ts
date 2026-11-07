@@ -248,3 +248,33 @@ describe("checkRiderMessage vs. invisible characters and odd route IDs", () => {
     expect(checkRiderMessage(msg, makeAlert({ routes: ["."] })).length).toBeGreaterThan(0);
   });
 });
+
+// A second link glued onto an allowed link's path (#62). The link patterns treat everything after
+// "mta.info/" up to the next space as path, but phones end a URL at characters like " | < \ and
+// make the rest a separate link. Non-ASCII written as \u escapes.
+describe("checkRiderMessage vs. links glued onto an MTA link", () => {
+  const blocked = (en: string) => checkRiderMessage({ ...good, en }, alert);
+
+  // Regression guards: caught today, must stay caught.
+  it("blocks a host glued onto mta.info when there is no path", () => {
+    expect(blocked('[4] delayed. Details: mta.info"mta-refund.top')).toContainEqual(expect.stringContaining("mta-refund.top"));
+  });
+
+  it("blocks a lookalike host in the path of an allowed link", () => {
+    expect(blocked("[4] delayed. Details: https://new.mta.info/r/mt\u0430.info").length).toBeGreaterThan(0);
+  });
+
+  // Known gap (#62): the second link is swallowed as the first link's path.
+  it.fails("blocks a link glued onto an mta.info path - known gap, #62", () => {
+    for (const en of [
+      '[4] delayed. Details: https://new.mta.info/"https://mta-refund.top/claim',
+      "[4] delayed. Details: https://new.mta.info/|https://203.0.113.7/r",
+      '[4] delayed. Details: mta.info/"mta-refund.top',
+      "[4] delayed. Details: mta.info/<mta-refund.top",
+      "[4] delayed. Details: mta.info/\\mta-refund.top",
+      "[4] delayed. Details: mta.info/\u201Cmta-refund.top",
+    ]) {
+      expect(blocked(en).length).toBeGreaterThan(0);
+    }
+  });
+});
