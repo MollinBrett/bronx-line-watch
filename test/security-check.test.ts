@@ -73,6 +73,8 @@ describe("security gate", () => {
       patch(d, "src/main.ts", /const problems = checkRiderMessage\(msg, alert\);/, "const problems: string[] = [];")],
     ["a skipped test", "[tests]", (d) =>
       patch(d, "test/safety.test.ts", 'it("passes a normal message"', 'it' + '.skip("passes a normal message"')],
+    ["an expected-failure test that names no issue", "[tests]", (d) =>
+      append(d, "test/safety.test.ts", "\nit." + "fails(`gap for ${\"x\"} with no issue`, () => {});\n")],
     ["an agent giving itself web access", "[agents]", (d) =>
       patch(d, "agents/maintainer/agent.md", "{name: web_fetch, enabled: false}", "{name: web_fetch, enabled: true}")],
     ["an agent dropping its no-push rule", "[agents]", (d) =>

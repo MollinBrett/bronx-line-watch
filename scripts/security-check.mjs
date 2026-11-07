@@ -200,8 +200,10 @@ for (const f of textFiles) {
 for (const f of testFiles) {
   const code = stripComments(read(f));
   if (/\b(it|test|describe)\.(skip|only|todo)\b|\bx(it|describe)\s*\(/.test(code)) fail("tests", `${f} skips or isolates tests (.skip/.only/.todo/xit)`);
-  for (const m of code.matchAll(/\b(?:it|test)\.fails\(\s*["'`]([^"'`]*)/g)) {
-    if (!/#\d+/.test(m[1])) fail("tests", `${f}: expected-failure test "${m[1].slice(0, 50)}" must name its open issue (#123)`);
+  // Read the whole test name, including a template literal with ${...} inside it.
+  for (const m of code.matchAll(/\b(?:it|test)\.fails\(\s*(?:"([^"]*)"|'([^']*)'|`((?:[^`\\]|\\.)*)`)/g)) {
+    const name = m[1] ?? m[2] ?? m[3] ?? "";
+    if (!/#\d+/.test(name)) fail("tests", `${f}: expected-failure test "${name.slice(0, 50)}" must name its open issue (#123)`);
   }
 }
 if (!testFiles.includes("test/safety.test.ts")) fail("tests", "test/safety.test.ts must exist");
