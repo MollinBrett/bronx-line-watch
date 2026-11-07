@@ -166,4 +166,31 @@ describe("checkRiderMessage vs. disguised links", () => {
   it("doesn't flag an @ used as 'at' before a station", () => {
     expect(blocked("[4] trains skip 138 St @ Grand Concourse.")).toEqual([]);
   });
+
+  // Regression guards: "styled" letters and digits that NFKC folds back to ASCII. Each renders
+  // as a readable domain or IP address, and is caught today because normalization runs first.
+  it("blocks hosts written in circled, mathematical, or superscript letters", () => {
+    expect(blocked("[4] delayed. Refunds: mta-refund.\u24E3\u24DE\u24DF")).toContainEqual(expect.stringContaining("mta-refund.top"));
+    expect(blocked("[4] delayed. Refunds: \u{1D426}\u{1D42D}\u{1D41A}-refund.top")).toContainEqual(expect.stringContaining("mta-refund.top"));
+    expect(blocked("[4] delayed. Refunds: mta-refund.\u1D57\u1D52\u1D56")).toContainEqual(expect.stringContaining("mta-refund.top"));
+  });
+
+  it("blocks IP addresses written in mathematical digits", () => {
+    const ip = "\u{1D7D0}\u{1D7CE}\u{1D7D1}.\u{1D7CE}.\u{1D7CF}\u{1D7CF}\u{1D7D1}.\u{1D7D5}"; // 203.0.113.7
+    expect(blocked(`[4] delayed. http://${ip}/r`)).toContainEqual(expect.stringContaining("203.0.113.7"));
+    expect(blocked(`[4] delayed. ${ip}`)).toContainEqual(expect.stringContaining("203.0.113.7"));
+  });
+
+  it("still passes a message with an ordinary line break", () => {
+    expect(blocked("[4] trains are delayed.\nAllow extra time.")).toEqual([]);
+  });
+
+  // Known gap (#51): C0/C1 control characters (category Cc, e.g. BEL, ESC, NEL, CSI) split a
+  // host the same way bidi marks do. #51's first suggested fix rejects \p{Cf} only, which
+  // would still miss these; the fix must also reject \p{Cc} other than "\n".
+  it.fails("blocks links hidden with control characters - known gap, #51", () => {
+    for (const ch of ["\u0000", "\u0007", "\u0008", "\u001B", "\u007F", "\u0085", "\u009B", "\u009F"]) {
+      expect(blocked(`[4] delayed. Refunds: mta-refund${ch}.top`).length).toBeGreaterThan(0);
+    }
+  });
 });
