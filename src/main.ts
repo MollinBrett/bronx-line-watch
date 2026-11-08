@@ -2,9 +2,10 @@ import Anthropic from "@anthropic-ai/sdk";
 import { textworthy } from "./filter.js";
 import { fetchAlerts } from "./mta.js";
 import { checkClaude } from "./preflight.js";
+import { textSubscribers } from "./quiet-hours.js";
 import { rewriteAlert, rewriteOptionsFromEnv } from "./rewrite.js";
 import { checkRiderMessage } from "./safety.js";
-import { parseSubscribers, sendSms, smsSegments, twilioConfigFromEnv, wantsAlert } from "./sms.js";
+import { parseSubscribers, sendSms, smsSegments, twilioConfigFromEnv } from "./sms.js";
 import { loadState, planAnnouncements, saveState } from "./state.js";
 import { postToTelegram, telegramConfigFromEnv, telegramPosts } from "./telegram.js";
 
@@ -70,14 +71,16 @@ async function tick(): Promise<void> {
       }
     }
     if (twilio) {
-      for (const sub of subscribers) {
-        if (!wantsAlert(sub, alert.routes)) continue; // they only asked for other lines
+      // Quiet hours: no texts at night unless it's a suspension. Not retried in the morning (#19).
+      // textSubscribers checks the clock before every text, not just once per alert.
+      const { heldBack } = await textSubscribers(alert, subscribers, async (sub) => {
         try {
           await sendSms(twilio, sub.phone, msg[sub.lang]);
         } catch (err) {
           console.error(`[sms] failed to text ${sub.phone.slice(0, -4)}XXXX:`, err);
         }
-      }
+      });
+      if (heldBack) console.log(`[sms] quiet hours - not texting ${alert.id} (${alert.type}) to ${heldBack} subscriber(s)`);
     }
   }
   await saveState(stateFile, next);
