@@ -14,7 +14,7 @@ import { smsSegments } from "../src/sms.js";
 import { evalCases } from "./cases.js";
 
 const client = new Anthropic();
-// Same settings as the live watcher (CLAUDE_MODEL, CLAUDE_EFFORT), so the eval tests what production runs.
+// Same settings as the live watcher (BLW_CLAUDE_MODEL, BLW_CLAUDE_EFFORT), so the eval tests what production runs.
 const options = rewriteOptionsFromEnv();
 console.log(`Rewriting with ${options.model}, effort ${options.effort}\n`);
 const rubric = await readFile(new URL("./rubric.md", import.meta.url), "utf8");

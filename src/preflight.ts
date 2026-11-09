@@ -21,7 +21,7 @@ export async function checkClaude(client: Anthropic, model: string): Promise<Pre
         return { ok: false, fatal: true, message: "ANTHROPIC_API_KEY doesn't have permission - check the key's workspace in the Claude Console" };
       }
       if (err.status === 404) {
-        return { ok: false, fatal: true, message: `Model "${model}" isn't available to this key - check CLAUDE_MODEL` };
+        return { ok: false, fatal: true, message: `Model "${model}" isn't available to this key - check BLW_CLAUDE_MODEL` };
       }
     }
     // Network blips or API hiccups: worth a warning, not worth refusing to start.

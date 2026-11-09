@@ -33,14 +33,22 @@ describe("rewriteOptionsFromEnv", () => {
     expect(rewriteOptionsFromEnv({})).toEqual({ model: "claude-opus-5-5", effort: "low" });
   });
 
-  it("reads CLAUDE_MODEL and CLAUDE_EFFORT", () => {
-    expect(rewriteOptionsFromEnv({ CLAUDE_MODEL: "claude-sonnet-5-5", CLAUDE_EFFORT: "medium" })).toEqual({
+  it("reads BLW_CLAUDE_MODEL and BLW_CLAUDE_EFFORT", () => {
+    expect(rewriteOptionsFromEnv({ BLW_CLAUDE_MODEL: "claude-sonnet-5-5", BLW_CLAUDE_EFFORT: "medium" })).toEqual({
       model: "claude-sonnet-5-5",
       effort: "medium",
     });
   });
 
   it("rejects an unknown effort instead of silently using it", () => {
-    expect(() => rewriteOptionsFromEnv({ CLAUDE_EFFORT: "turbo" })).toThrow(/CLAUDE_EFFORT/);
+    expect(() => rewriteOptionsFromEnv({ BLW_CLAUDE_EFFORT: "turbo" })).toThrow(/BLW_CLAUDE_EFFORT/);
+  });
+
+  // Claude Code sets its own CLAUDE_EFFORT; the app must not pick it up (#70).
+  it("ignores the old CLAUDE_MODEL / CLAUDE_EFFORT names", () => {
+    expect(rewriteOptionsFromEnv({ CLAUDE_MODEL: "claude-sonnet-5-5", CLAUDE_EFFORT: "max" })).toEqual({
+      model: "claude-opus-5-5",
+      effort: "low",
+    });
   });
 });

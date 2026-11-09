@@ -38,16 +38,19 @@ export interface RewriteOptions {
 const EFFORTS = ["low", "medium", "high", "xhigh", "max"] as const;
 
 /**
- * Model and effort from CLAUDE_MODEL / CLAUDE_EFFORT. The live watcher and the eval both
+ * Model and effort from BLW_CLAUDE_MODEL / BLW_CLAUDE_EFFORT. The live watcher and the eval both
  * use this, so an eval always tests the configuration production would run.
+ *
+ * The BLW_ prefix (Bronx Line Watch) is deliberate: Claude Code sets its own CLAUDE_EFFORT in
+ * its sessions, so an unprefixed name silently changed what `npm run eval` tested (#70).
  */
 export function rewriteOptionsFromEnv(env = process.env): Required<RewriteOptions> {
-  const effort = env.CLAUDE_EFFORT ?? "low";
+  const effort = env.BLW_CLAUDE_EFFORT ?? "low";
   if (!(EFFORTS as readonly string[]).includes(effort)) {
-    throw new Error(`CLAUDE_EFFORT must be one of ${EFFORTS.join(", ")}; got "${effort}"`);
+    throw new Error(`BLW_CLAUDE_EFFORT must be one of ${EFFORTS.join(", ")}; got "${effort}"`);
   }
   return {
-    model: env.CLAUDE_MODEL ?? "claude-opus-5-5",
+    model: env.BLW_CLAUDE_MODEL ?? "claude-opus-5-5",
     effort: effort as (typeof EFFORTS)[number],
   };
 }
