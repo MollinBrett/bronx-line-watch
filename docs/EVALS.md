@@ -2,13 +2,17 @@
 
 `npm run eval` checks whether Claude's rewrites of MTA alerts are any good, using Claude
 to grade Claude. Run it whenever you change the prompt, the model, or the effort setting.
-It reads `CLAUDE_MODEL` and `CLAUDE_EFFORT` through the same function as the live watcher
+It reads `BLW_CLAUDE_MODEL` and `BLW_CLAUDE_EFFORT` through the same function as the live watcher
 (`rewriteOptionsFromEnv()` in `src/rewrite.ts`), so set them the way production has them,
 or to the setting you want to try:
 
 ```bash
-CLAUDE_EFFORT=medium npm run eval
+BLW_CLAUDE_EFFORT=medium npm run eval
 ```
+
+The `BLW_` prefix matters: Claude Code sets its own `CLAUDE_EFFORT` in its sessions, so the
+app uses names only it reads. Otherwise an eval run from Claude Code could quietly test a
+different setting from production (#70).
 
 ```
 test alerts ──> [1] rewrite (the same code the live service uses) ──> EN + ES message
