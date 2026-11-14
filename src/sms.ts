@@ -75,9 +75,15 @@ export interface TwilioConfig {
   from: string;
 }
 
+/**
+ * Texting needs the Twilio settings AND an explicit SEND_SMS=true, which is set only on
+ * Render. A laptop with Twilio settings in its .env (or its shell) still can't text real
+ * subscribers by accident (#67).
+ */
 export function twilioConfigFromEnv(env = process.env): TwilioConfig | null {
-  const { TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER } = env;
+  const { TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER, SEND_SMS } = env;
   if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_FROM_NUMBER) return null;
+  if (SEND_SMS !== "true") return null;
   return { accountSid: TWILIO_ACCOUNT_SID, authToken: TWILIO_AUTH_TOKEN, from: TWILIO_FROM_NUMBER };
 }
 
