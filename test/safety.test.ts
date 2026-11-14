@@ -292,18 +292,18 @@ describe("checkRiderMessage vs. links glued onto an MTA link", () => {
   });
 
   // Known gap (#62): the second link is swallowed as the first link's path.
-  it.fails("blocks a link glued onto an mta.info path - known gap, #62", () => {
-    for (const en of [
-      '[4] delayed. Details: https://new.mta.info/"https://mta-refund.top/claim',
-      "[4] delayed. Details: https://new.mta.info/|https://203.0.113.7/r",
-      '[4] delayed. Details: mta.info/"mta-refund.top',
-      "[4] delayed. Details: mta.info/<mta-refund.top",
-      "[4] delayed. Details: mta.info/\\mta-refund.top",
-      "[4] delayed. Details: mta.info/\u201Cmta-refund.top",
-    ]) {
+  for (const en of [
+    '[4] delayed. Details: https://new.mta.info/"https://mta-refund.top/claim',
+    "[4] delayed. Details: https://new.mta.info/|https://203.0.113.7/r",
+    '[4] delayed. Details: mta.info/"mta-refund.top',
+    "[4] delayed. Details: mta.info/<mta-refund.top",
+    "[4] delayed. Details: mta.info/\\mta-refund.top",
+    "[4] delayed. Details: mta.info/\u201Cmta-refund.top",
+  ]) {
+    it.fails(`blocks a link glued onto an mta.info path: ${en} - known gap, #62`, () => {
       expect(blocked(en).length).toBeGreaterThan(0);
-    }
-  });
+    });
+  }
 });
 
 // Scams that need neither a link nor a 7+ digit phone number, and link disguises that rely on
