@@ -85,6 +85,8 @@ describe("security gate", () => {
       patch(d, ".github/workflows/ci.yml", "  pull_request:\n", "  pull_request_target:\n")],
     ["PR text interpolated into a shell command", "[ci]", (d) =>
       append(d, ".github/workflows/ci.yml", "\n      - run: echo \"${{ github.event.pull_request" + ".title }}\"\n")],
+    ["npm start loading a local .env", "[supply-chain]", (d) =>
+      patch(d, "package.json", '"start": "tsx src/main.ts"', '"start": "tsx --env-file-if-exists=.env src/main.ts"')],
     ["a script on the public website", "[site]", (d) =>
       patch(d, "docs/index.html", "</body>", '<script src="https://cdn.example.com/a.js"></script>\n</body>')],
   ];
