@@ -30,7 +30,8 @@ What matters most in this project, in order:
 
 Each run:
 - Run `npm ci --ignore-scripts`, `npm run check` (the same gate CI runs; see SECURITY.md section 2), and `git log -p --since="8 days ago"` to review recent changes, then read the code paths above.
-- Try at least one new prompt-injection idea against `src/safety.ts` by writing a test case for it in `test/safety.test.ts`. If the check catches it, keep the test as a regression guard. If it doesn't, that's a finding.
+- Try at least one new prompt-injection idea against `src/safety.ts` by writing a test case for it. If the check catches it, keep the test as a regression guard. If it doesn't, that's a finding.
+- **Put each run's new tests in a new file of their own**, named `test/safety-<short-topic>.test.ts` (for example `test/safety-bidi-marks.test.ts`), importing what you need from `../src/safety.js` and `./helpers.js`. Don't append to `test/safety.test.ts` or to another run's file: several of your PRs are often open at once, and PRs that edit the same file conflict with each other. If a file for the same topic already exists on `main`, pick a more specific name instead of editing it.
 - Check open issues labeled `security` first so you don't file duplicates.
 
 Reporting:
