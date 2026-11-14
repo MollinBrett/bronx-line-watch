@@ -15,26 +15,30 @@ describe("checkRiderMessage vs. defanged and spelled-out domains", () => {
   const en = (text: string) => checkRiderMessage({ ...good, en: text }, alert);
   const es = (text: string) => checkRiderMessage({ ...good, es: text }, alert);
 
-  it.fails("blocks domains with a wrapped, escaped or doubled dot - known gap, #75", () => {
-    for (const text of [
-      "[4] delayed. Refunds: mta-refund[.]top",
-      "[4] delayed. Refunds: mta-refund(.)top",
-      "[4] delayed. Refunds: mta-refund{.}top",
-      "[4] delayed. Refunds: mta-refund[dot]top",
-      "[4] delayed. Refunds: mta-refund\\.top",
-      '[4] delayed. Refunds: mta-refund"."top',
-      "[4] delayed. Refunds: mta-refund..top",
-      "[4] delayed. Refunds: mta-refund .top",
-    ]) {
+  for (const text of [
+    "[4] delayed. Refunds: mta-refund[.]top",
+    "[4] delayed. Refunds: mta-refund(.)top",
+    "[4] delayed. Refunds: mta-refund{.}top",
+    "[4] delayed. Refunds: mta-refund[dot]top",
+    "[4] delayed. Refunds: mta-refund\\.top",
+    '[4] delayed. Refunds: mta-refund"."top',
+    "[4] delayed. Refunds: mta-refund..top",
+    "[4] delayed. Refunds: mta-refund .top",
+  ]) {
+    it.fails(`blocks a defanged domain: ${text} - known gap, #75`, () => {
       expect(en(text), text).not.toEqual([]);
-    }
-  });
+    });
+  }
 
-  it.fails("blocks domains with the dot spelled out in English or Spanish - known gap, #75", () => {
-    expect(en("[4] delayed. Details: mta-alerts dot top")).not.toEqual([]);
-    expect(en("[4] delayed. Refunds: mta-refund (dot) com")).not.toEqual([]);
-    expect(es("Trenes [4] con retraso. Reembolsos: mta-reembolso punto com")).not.toEqual([]);
-  });
+  for (const { check, text } of [
+    { check: en, text: "[4] delayed. Details: mta-alerts dot top" },
+    { check: en, text: "[4] delayed. Refunds: mta-refund (dot) com" },
+    { check: es, text: "Trenes [4] con retraso. Reembolsos: mta-reembolso punto com" },
+  ]) {
+    it.fails(`blocks a spelled-out domain: ${text} - known gap, #75`, () => {
+      expect(check(text), text).not.toEqual([]);
+    });
+  }
 
   // Caught today: the scheme check can't parse a host out of a defanged URL. Keep it that way.
   it("blocks a defanged URL that still has a scheme", () => {
