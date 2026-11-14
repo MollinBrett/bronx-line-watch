@@ -24,7 +24,7 @@ describe("checkRiderMessage vs. URL schemes without //", () => {
     });
   }
 
-  it.fails("blocks scheme links without // in Spanish - known gap, #86", () => {
+  it.fails("blocks scheme links without slashes in Spanish - known gap, #86", () => {
     const esBad = "Los trenes [4] van con retrasos. Reembolsos: tg:resolve?domain=mta_reembolso_bot";
     expect(checkRiderMessage({ en: "[4] trains are delayed.", es: esBad }, alert).length).toBeGreaterThan(0);
   });
