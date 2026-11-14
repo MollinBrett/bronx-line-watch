@@ -51,9 +51,9 @@ describe("checkRiderMessage vs. IDN punctuation inside a host", () => {
   });
 
   // Known gap (#51, visible dot lookalikes NFKC doesn't fold): a middle dot reads as a dot.
-  it.fails("blocks middle dots used as a visible dot in a domain - known gap, #51", () => {
-    for (const dot of ["\u00B7", "\u30FB", "\uFF65"]) {
+  for (const dot of ["\u00B7", "\u30FB", "\uFF65"]) {
+    it.fails(`blocks middle dot U+${dot.codePointAt(0)!.toString(16).toUpperCase()} used as a visible dot in a domain - known gap, #51`, () => {
       expect(blocked(`[4] delayed. Refunds: mta-refund${dot}top`).length).toBeGreaterThan(0);
-    }
-  });
+    });
+  }
 });
