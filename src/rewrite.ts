@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod";
 import type { Alert } from "./mta.js";
+import type { RewriteFailure } from "./state.js";
 
 export const RiderMessage = z.object({
   en: z.string().describe("Plain-English text message for riders"),
@@ -85,4 +86,14 @@ export async function rewriteAlert(
     return null;
   }
   return response.parsed_output ?? null;
+}
+
+/**
+ * Why a rewriteAlert() call threw. An APIError means the request itself failed (network,
+ * overload, 5xx, rate or spend limit): nothing was generated. Anything else came from reading
+ * Claude's answer - the SDK's parse() throws on JSON cut off by max_tokens - so it counts as
+ * unusable output, the same as rewriteAlert() returning null.
+ */
+export function rewriteFailureKind(err: unknown): RewriteFailure {
+  return err instanceof Anthropic.APIError ? "api" : "output";
 }

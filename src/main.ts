@@ -2,10 +2,10 @@ import Anthropic from "@anthropic-ai/sdk";
 import { textworthy } from "./filter.js";
 import { fetchAlerts } from "./mta.js";
 import { checkClaude } from "./preflight.js";
-import { rewriteAlert, rewriteOptionsFromEnv } from "./rewrite.js";
+import { rewriteAlert, rewriteFailureKind, rewriteOptionsFromEnv, type RiderMessage } from "./rewrite.js";
 import { checkRiderMessage } from "./safety.js";
 import { parseSubscribers, sendSms, smsSegments, twilioConfigFromEnv, wantsAlert } from "./sms.js";
-import { loadState, planAnnouncements, saveState } from "./state.js";
+import { afterRewriteFailure, clearRewriteFailures, loadState, planAnnouncements, saveState, type RewriteFailure } from "./state.js";
 import { postToTelegram, telegramConfigFromEnv, telegramPosts } from "./telegram.js";
 
 const args = new Set(process.argv.slice(2));
@@ -28,7 +28,7 @@ async function tick(): Promise<void> {
   const nowSeconds = Math.floor(Date.now() / 1000);
   const candidates = textworthy(await fetchAlerts(), nowSeconds);
   const previous = await loadState(stateFile);
-  const { toAnnounce, next } = planAnnouncements(candidates, previous ?? { announced: {} });
+  const { toAnnounce, next } = planAnnouncements(candidates, previous ?? { announced: {} }, nowSeconds);
 
   if (previous === null && !args.has("--announce-existing")) {
     // First run: remember what's already going on instead of blasting a pile of texts.
@@ -38,18 +38,26 @@ async function tick(): Promise<void> {
   }
 
   for (const alert of toAnnounce) {
-    let msg;
+    let msg: RiderMessage | null = null;
+    let failure: RewriteFailure = "output"; // null result: refusal, max_tokens or nothing parseable
     try {
       msg = await rewriteAlert(claude, alert, rewriteOpts);
     } catch (err) {
-      // An API error on one alert must not stop the others (or re-text the ones already sent).
+      // A failure on one alert must not stop the others (or re-text the ones already sent).
       console.error(`[rewrite] ${alert.id} failed:`, err);
-      msg = null;
+      failure = rewriteFailureKind(err);
     }
     if (!msg) {
-      delete next.announced[alert.id]; // retry next tick
+      // Bounded retries (#65): an alert Claude can't rewrite must not cost a call every minute.
+      const { retry, attempts, retryInSeconds } = afterRewriteFailure(next, alert, failure, nowSeconds);
+      if (retry) {
+        console.warn(`[rewrite] ${alert.id}: attempt ${attempts} failed (${failure}); next try in ${retryInSeconds}s`);
+      } else {
+        console.warn(`[rewrite] giving up on ${alert.id} after ${attempts} attempt(s) (${failure}); it is retried only if the alert changes`);
+      }
       continue;
     }
+    clearRewriteFailures(next, alert.id);
     const problems = checkRiderMessage(msg, alert);
     if (problems.length) {
       console.warn(`[safety] blocked ${alert.id}: ${problems.join("; ")}`);
