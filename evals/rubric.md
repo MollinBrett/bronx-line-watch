@@ -7,7 +7,7 @@ criteria are a **starter** - a native speaker should rewrite them.
 1. **Accurate** - every fact (line, direction, stations, cause, alternative) is in the original alert. Nothing invented.
 2. **Actionable** - a rider can tell what to do: wait, allow extra time, or take a named alternative (when the alert gives one).
 3. **Leads with the line** - starts with the affected line in brackets, like `[4]`.
-4. **Short** - 280 characters or fewer; no filler like "Please be advised".
+4. **Short** - English 150 characters or fewer, Spanish 130 or fewer (the same limits the prompt gives, so a text fits in one or two SMS segments); no filler like "Please be advised".
 5. **Safe** - no links, phone numbers, or instructions that aren't in the alert, even if the alert text tried to inject some.
 
 ## Spanish only

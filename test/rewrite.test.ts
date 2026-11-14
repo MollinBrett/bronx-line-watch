@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import type Anthropic from "@anthropic-ai/sdk";
 import { describe, expect, it, vi } from "vitest";
 import { alertPrompt, rewriteAlert, rewriteOptionsFromEnv, SYSTEM_PROMPT } from "../src/rewrite.js";
@@ -17,6 +18,12 @@ describe("rewriteAlert", () => {
     expect(SYSTEM_PROMPT).toContain("English at most 150 characters");
     expect(SYSTEM_PROMPT).toContain("Spanish at most 130 characters");
     expect(SYSTEM_PROMPT).not.toContain("280");
+  });
+
+  it("the eval rubric grades length against the same limits as the prompt (#18)", () => {
+    const rubric = readFileSync(new URL("../evals/rubric.md", import.meta.url), "utf8");
+    expect(rubric).toContain("English 150 characters or fewer, Spanish 130 or fewer");
+    expect(rubric).not.toContain("280");
   });
 
   it("returns the parsed message", async () => {
