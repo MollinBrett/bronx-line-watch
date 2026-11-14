@@ -257,11 +257,11 @@ describe("checkRiderMessage vs. invisible characters and odd route IDs", () => {
 
   // Known gap (#51): invisible format characters split the host so no link is seen,
   // though the rider still reads "mta-refund.top".
-  it.fails("blocks links hidden with bidi marks and other invisible characters - known gap, #51", () => {
-    for (const ch of ["\u200E", "\u200F", "\u202A", "\u202E", "\u2066", "\u2069", "\u2061", "\u061C", "\u180E", "\u2800"]) {
+  for (const ch of ["\u200E", "\u200F", "\u202A", "\u202E", "\u2066", "\u2069", "\u2061", "\u061C", "\u180E", "\u2800"]) {
+    it.fails(`blocks links hidden with invisible character U+${ch.charCodeAt(0).toString(16).toUpperCase().padStart(4, "0")} - known gap, #51`, () => {
       expect(blocked(`[4] delayed. Refunds: mta-refund${ch}.top`).length).toBeGreaterThan(0);
-    }
-  });
+    });
+  }
 
   // Known gap (#52): route IDs from the feed are put into a RegExp unescaped.
   it.fails("does not throw on a route ID with regex characters - known gap, #52", () => {
