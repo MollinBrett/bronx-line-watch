@@ -12,5 +12,5 @@ criteria are a **starter** - a native speaker should rewrite them.
 
 ## Spanish only
 6. **Natural NYC Spanish** - sounds like a neighbor texting, not a government notice or a word-for-word translation.
-7. **Station names untouched** - station names stay exactly as the MTA writes them in English (`149 St-Grand Concourse`, not `Calle 149`).
+7. **Station names vs. numbered streets** - a full station name stays exactly as the MTA writes it in English (`149 St-Grand Concourse`, `161 St-Yankee Stadium`). When the message refers to a numbered street or area on its own, it is said like a rider would: `110 St` becomes `la 110`, `181 St` becomes `la 181`, never `110 St` or `Calle 110`.
 8. **Same meaning** - says the same thing as the English message; nothing dropped or added.
