@@ -75,6 +75,12 @@ describe("security gate", () => {
       patch(d, "test/safety.test.ts", 'it("passes a normal message"', 'it' + '.skip("passes a normal message"')],
     ["an expected-failure test that names no issue", "[tests]", (d) =>
       append(d, "test/safety.test.ts", "\nit." + "fails(`gap for ${\"x\"} with no issue`, () => {});\n")],
+    ["an expected-failure test whose name hides the missing issue behind //", "[tests]", (d) =>
+      append(d, "test/safety.test.ts", "\nit." + 'fails("blocks // links with no issue", () => {});\n')],
+    ["an expected-failure test whose issue number is only inside ${...}", "[tests]", (d) =>
+      append(d, "test/safety.test.ts", "\nit." + 'fails(`gap ${"#123".slice(0, 0)}`, () => {});\n')],
+    ["an expected-failure test whose name is not a string literal", "[tests]", (d) =>
+      append(d, "test/safety.test.ts", '\nconst gapName = "gap #123";\nit.' + "fails(gapName, () => {});\n")],
     ["an agent giving itself web access", "[agents]", (d) =>
       patch(d, "agents/maintainer/agent.md", "{name: web_fetch, enabled: false}", "{name: web_fetch, enabled: true}")],
     ["an agent dropping its no-push rule", "[agents]", (d) =>

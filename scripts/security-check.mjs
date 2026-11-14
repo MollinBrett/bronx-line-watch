@@ -202,10 +202,19 @@ for (const f of textFiles) {
 for (const f of testFiles) {
   const code = stripComments(read(f));
   if (/\b(it|test|describe)\.(skip|only|todo)\b|\bx(it|describe)\s*\(/.test(code)) fail("tests", `${f} skips or isolates tests (.skip/.only/.todo/xit)`);
-  // Read the whole test name, including a template literal with ${...} inside it.
-  for (const m of code.matchAll(/\b(?:it|test)\.fails\(\s*(?:"([^"]*)"|'([^']*)'|`((?:[^`\\]|\\.)*)`)/g)) {
-    const name = m[1] ?? m[2] ?? m[3] ?? "";
-    if (!/#\d+/.test(name)) fail("tests", `${f}: expected-failure test "${name.slice(0, 50)}" must name its open issue (#123)`);
+  // Every expected-failure test must name its open issue. Find each `.fails` first, then read
+  // its name, so a name this rule can't read fails here instead of going unchecked.
+  for (const m of code.matchAll(/\b(?:it|test)(?:\.\w+)*\.fails\b/g)) {
+    const lit = /^\(\s*(?:"((?:[^"\\\n]|\\.)*)"|'((?:[^'\\\n]|\\.)*)'|`((?:[^`\\]|\\.)*)`)/.exec(code.slice(m.index + m[0].length));
+    if (!lit) {
+      fail("tests", `${f}: can't read the name of an expected-failure test (${code.slice(m.index, m.index + 50).split("\n")[0]}); write it as one string literal with no // in it`);
+      continue;
+    }
+    let name = lit[1] ?? lit[2] ?? lit[3];
+    // In a template literal only the fixed text counts: what comes before the first ${ and after
+    // the last }. An issue number inside ${...} may never reach the test's real name.
+    if (lit[3] !== undefined && name.includes("${")) name = name.slice(0, name.indexOf("${")) + " " + name.slice(name.lastIndexOf("}") + 1);
+    if (!/#\d+/.test(name)) fail("tests", `${f}: expected-failure test "${name.slice(0, 50)}" must name its open issue (#123) in the fixed text of its name`);
   }
 }
 if (!testFiles.includes("test/safety.test.ts")) fail("tests", "test/safety.test.ts must exist");
