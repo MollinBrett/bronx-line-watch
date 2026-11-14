@@ -11,17 +11,20 @@ const es = "Los trenes [4] van con retrasos en ambas direcciones.";
 const blocked = (en: string) => checkRiderMessage({ en, es }, alert);
 
 describe("checkRiderMessage vs. URL schemes without //", () => {
-  it.fails("blocks scheme links with no slashes - known gap, #86", () => {
-    for (const en of [
-      "[4] delayed. Fare refunds: tg:resolve?domain=mta_refund_bot",
-      "[4] delayed. Fare refunds: TG:resolve?domain=mta_refund_bot&start=claim",
-      "[4] delayed. Fare refunds: tg:join?invite=AbCdEf123",
-      "[4] delayed. Fare refunds: tg:/resolve?domain=mta_refund_bot",
-      "[4] delayed. Fare refunds: ton:transfer/EQabc?amount=1",
-      "[4] delayed. Fare refunds: tonsite:mtarefund",
-    ]) {
+  for (const en of [
+    "[4] delayed. Fare refunds: tg:resolve?domain=mta_refund_bot",
+    "[4] delayed. Fare refunds: TG:resolve?domain=mta_refund_bot&start=claim",
+    "[4] delayed. Fare refunds: tg:join?invite=AbCdEf123",
+    "[4] delayed. Fare refunds: tg:/resolve?domain=mta_refund_bot",
+    "[4] delayed. Fare refunds: ton:transfer/EQabc?amount=1",
+    "[4] delayed. Fare refunds: tonsite:mtarefund",
+  ]) {
+    it.fails(`blocks ${en} - known gap, #86`, () => {
       expect(blocked(en).length, en).toBeGreaterThan(0);
-    }
+    });
+  }
+
+  it.fails("blocks scheme links without // in Spanish - known gap, #86", () => {
     const esBad = "Los trenes [4] van con retrasos. Reembolsos: tg:resolve?domain=mta_reembolso_bot";
     expect(checkRiderMessage({ en: "[4] trains are delayed.", es: esBad }, alert).length).toBeGreaterThan(0);
   });
