@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod";
 import type { Alert } from "./mta.js";
+import { plainPunctuation } from "./sms.js";
 
 export const RiderMessage = z.object({
   en: z.string().describe("Plain-English text message for riders"),
@@ -85,5 +86,9 @@ export async function rewriteAlert(
     console.warn(`[rewrite] ${alert.id}: stopped with ${response.stop_reason}`);
     return null;
   }
-  return response.parsed_output ?? null;
+  const msg = response.parsed_output;
+  if (!msg) return null;
+  // Straighten quotes and dashes here, before the safety check sees the text, so the text
+  // that is checked is exactly the text that is sent (#18).
+  return { en: plainPunctuation(msg.en), es: plainPunctuation(msg.es) };
 }

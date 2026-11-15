@@ -2,6 +2,8 @@ import { readFileSync } from "node:fs";
 import type Anthropic from "@anthropic-ai/sdk";
 import { describe, expect, it, vi } from "vitest";
 import { alertPrompt, rewriteAlert, rewriteOptionsFromEnv, SYSTEM_PROMPT } from "../src/rewrite.js";
+import { checkRiderMessage, MAX_SEGMENTS } from "../src/safety.js";
+import { smsSegments } from "../src/sms.js";
 import { makeAlert } from "./helpers.js";
 
 function fakeClient(response: object) {
@@ -22,7 +24,7 @@ describe("rewriteAlert", () => {
 
   it("lets multi-alternative alerts run longer rather than drop rider options, within the SMS segment cap (#18)", () => {
     expect(SYSTEM_PROMPT).toContain("Never drop an alternative, direction, or station");
-    // 300 GSM-7 chars = 2 segments; 200 UCS-2 chars = 3 segments (67 each), one under the safety cap of 4.
+    // 300 GSM-7 chars = 2-3 segments ([ and ] count double); 200 UCS-2 chars = 3 segments (67 each). Both fit the safety cap of 4.
     expect(SYSTEM_PROMPT).toContain("up to 300 characters in English and 200 in Spanish");
   });
 
@@ -45,6 +47,37 @@ describe("rewriteAlert", () => {
     const params = parse.mock.calls[0]![0];
     expect(params.model).toBe("claude-opus-5-5");
     expect(params.fallbacks).toBe("default");
+  });
+
+  // A detour text the prompt allows (up to 300 English characters). Review on PR #50 found that
+  // one curly apostrophe made this UCS-2, 5 segments, so the whole alert was blocked.
+  const longDetour =
+    "[4] Woodlawn-bound trains skip 170 St, Mt Eden Av and 176 St days and evenings for track work. " +
+    "To get there, ride to Burnside Av and take a Manhattan-bound [4] back. Leaving from there, " +
+    "take the [4] to 167 St and switch to a Woodlawn-bound [4]. Trains run every 16 min. It\u2019s the Bx32 too.";
+
+  it("a long English detour text with a curly apostrophe still gets through the safety check (#18)", async () => {
+    expect(longDetour.length).toBeLessThanOrEqual(300);
+    // Without the fix this is the reviewer's counterexample: blocked as 5 UCS-2 segments.
+    expect(smsSegments(longDetour)).toEqual({ encoding: "UCS-2", segments: 5 });
+
+    const { client } = fakeClient({
+      stop_reason: "end_turn",
+      parsed_output: { en: longDetour, es: "[4] Hay cambios en el servicio." },
+    });
+    const msg = await rewriteAlert(client, makeAlert());
+    expect(msg!.en).toBe(longDetour.replace("\u2019", "'"));
+    expect(smsSegments(msg!.en).encoding).toBe("GSM-7");
+    expect(checkRiderMessage(msg!, makeAlert())).toEqual([]);
+  });
+
+  it("a 300-character plain English text, the most the prompt allows, passes the safety check (#18)", () => {
+    const en = longDetour.replace("\u2019", "'").padEnd(300, ".");
+    expect(en.length).toBe(300);
+    // Each [ and ] counts as two GSM-7 characters, so this is 3 segments, not 2: still under the cap.
+    expect(smsSegments(en)).toEqual({ encoding: "GSM-7", segments: 3 });
+    expect(smsSegments(en).segments).toBeLessThanOrEqual(MAX_SEGMENTS);
+    expect(checkRiderMessage({ en, es: "[4] Hay cambios en el servicio." }, makeAlert())).toEqual([]);
   });
 
   it("returns null when Claude declines", async () => {
