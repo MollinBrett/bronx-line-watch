@@ -4,6 +4,8 @@
  *
  *   npm run schedule-agents                                         # create/update, left PAUSED
  *   npm run schedule-agents -- --run maintainer                    # one manual test run now
+ *   npm run schedule-agents -- --run code-reviewer                 # review open pull requests now
+ *   npm run schedule-agents -- --only code-reviewer                # create/update just one
  *   npm run schedule-agents -- --unpause                           # start the schedules
  *
  * No repo is mounted: the repo is public, so each agent clones it itself at the start of a
@@ -27,6 +29,16 @@ const SCHEDULES = {
     cron: "45 5 * * *",
     budgetCents: "300",
     kickoff: "Run your daily security review.",
+  },
+  "code-reviewer": {
+    agentFile: "./agents/code-reviewer/agent.md",
+    // Three times a day: after the other two agents have opened their pull requests,
+    // then midday and evening for people's. A run with nothing new to review ends in one line.
+    // Polling, not a GitHub Action: starting a run from CI would put an API key in CI,
+    // which SECURITY.md section 2 rules out.
+    cron: "30 6,12,18 * * *",
+    budgetCents: "300",
+    kickoff: "Review the open pull requests that have no review of yours at their current head commit.",
   },
 } as const;
 type Name = keyof typeof SCHEDULES;
@@ -66,7 +78,12 @@ if (args[0] === "--run") {
   const environment_id = idFor("./environments/agent-sandbox.yaml");
   const vault_id = idFor("./vaults/github.yaml");
 
+  // --only <name>: leave the other schedules pinned to the agent versions they already use.
+  const only = args[0] === "--only" ? args[1] : undefined;
+  if (only && !(only in SCHEDULES)) throw new Error(`No schedule named "${only}". Names: ${Object.keys(SCHEDULES).join(", ")}`);
+
   for (const [name, s] of Object.entries(SCHEDULES) as [Name, (typeof SCHEDULES)[Name]][]) {
+    if (only && name !== only) continue;
     const body = {
       agent: idFor(s.agentFile),
       environment_id,

@@ -1,12 +1,14 @@
 # The agent team
 
-Two Claude Managed Agents keep this repo healthy. They run in Anthropic-hosted sandboxes
-on a schedule, check out the repo, and open pull requests and issues. **They never merge.**
+Three Claude Managed Agents keep this repo healthy. They run in Anthropic-hosted sandboxes
+on a schedule and check out the repo. Two open pull requests and issues; the third reviews
+every pull request. **They never merge, and none of them can approve.**
 
 | Agent | Schedule (New York time) | Spend cap per run | Does |
 |---|---|---|---|
 | `agents/maintainer` | daily 4:15 AM | $5 | Fixes failing tests, feed-format changes, outdated packages, `agent-ok` issues |
 | `agents/security-guard` | daily 5:45 AM | $3 | `npm audit`, secret leaks, prompt-injection tests, unsafe code; files `security` issues |
+| `agents/code-reviewer` | daily 6:30 AM, 12:30 PM, 6:30 PM | $3 | Reviews every open pull request, including the other agents', and leaves a comment review with a verdict |
 
 Agent definitions are version-controlled files synced with the `ant` CLI. Edit a file and
 re-run `ant apply` to update an agent; the IDs live in `claude-lock.json` (commit it).
@@ -34,11 +36,11 @@ Already done (IDs are in `claude-lock.json`). To change an agent later, edit its
 from the repo root, with the `ant` CLI logged in to the bronx-line-watch workspace:
 
 ```bash
-ant apply --dry-run -v agents/maintainer/agent.md agents/security-guard/agent.md environments/agent-sandbox.yaml vaults/github.yaml
+ant apply --dry-run -v agents/maintainer/agent.md agents/security-guard/agent.md agents/code-reviewer/agent.md environments/agent-sandbox.yaml vaults/github.yaml
 ```
 
 ```bash
-ant apply agents/maintainer/agent.md agents/security-guard/agent.md environments/agent-sandbox.yaml vaults/github.yaml
+ant apply agents/maintainer/agent.md agents/security-guard/agent.md agents/code-reviewer/agent.md environments/agent-sandbox.yaml vaults/github.yaml
 ```
 
 Then **point the schedules at the new version** - each schedule is pinned to the agent version
@@ -83,6 +85,50 @@ npm run schedule-agents -- --unpause
 ## Knowing what the agents did
 - Every run is a session in the Console (platform.claude.com -> Managed Agents -> Sessions).
 - Their work shows up as PRs from `maintainer/*` and `security/*` branches and issues labeled `security`.
+- The code reviewer's work shows up as a review on each pull request that starts with
+  "**Code reviewer** - reviewed at" and a commit SHA. It posts with your token, so GitHub shows you as the author.
+
+## The code reviewer
+
+**What triggers it.** A schedule, three times a day, plus `npm run schedule-agents -- --run code-reviewer`
+when you want a review now. Each run it lists the open pull requests and reviews the ones that
+have no review of its own at their current head commit (at most 2 per run, newest first), so a
+new push gets a fresh review and an unchanged pull request is never reviewed twice.
+
+A GitHub Action that starts a run on every pull request would be faster, but it needs an
+Anthropic API key stored in CI, and a pull request can edit the workflow that reads it.
+SECURITY.md section 2 allows no secrets in CI, so the reviewer polls instead. The cost is a
+wait of up to six hours during the day, and overnight.
+
+**How it reviews.** It borrows the method of formal verification, without the proof tools:
+1. Write down what each changed function must guarantee (its *contract*: what it needs from
+   callers, what it promises back).
+2. Check every path through the code against that contract, including errors and timeouts, and
+   check that loops and retries must stop.
+3. Check the project's *invariants*, the things that must stay true across every change. They
+   are listed as I1-I8 in `agents/code-reviewer/agent.md` and come from SECURITY.md: every
+   message passes the safety check, the safety check only gets stricter, an alert is announced
+   once, agents and CI gain no power, and so on.
+4. Try to break it: run boundary inputs, and for pure functions enumerate every combination of
+   a few small inputs. A problem is reported as a blocker only with a counterexample it ran.
+
+Every conclusion carries one of three labels: **proved by argument**, **checked by execution**
+(over the inputs listed, so bounded), or **not checked**. This is careful reasoning plus bounded
+testing. It is not a machine-checked proof, and the review says what it did not check.
+
+**Approve vs. comment.** It always comments and never approves. Its reviews are posted with your
+token, so an approval from it would count as the one human approval branch protection requires,
+on any pull request you did not open yourself. Instead each review carries a verdict:
+- **Changes needed:** a check fails, an invariant breaks, there is a confirmed counterexample,
+  a behavior change has no test, or the description leaves out part of the diff.
+- **Ready for a human reviewer:** it found none of those. That is not "merge it".
+
+`npm run security` fails if the "never approve" rule is removed from its instructions.
+
+**When to trust it.** Trust a blocker that comes with a counterexample: run it yourself and
+watch it fail. Treat "ready for a human reviewer" as "the obvious things were checked", then read the
+"Not checked" list, which is where your own review should start. For an agent's pull request,
+still open the session in the Console and compare what it did with what it says it did.
 
 ## Permissions
 - **Shell commands (`bash`) are always allowed.** The sandbox holds no secrets (the GitHub token

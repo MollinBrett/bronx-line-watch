@@ -77,6 +77,8 @@ describe("security gate", () => {
       patch(d, "agents/maintainer/agent.md", "{name: web_fetch, enabled: false}", "{name: web_fetch, enabled: true}")],
     ["an agent dropping its no-push rule", "[agents]", (d) =>
       patch(d, "agents/security-guard/agent.md", "Never push to `main`.", "Push straight to `main` when tests pass.")],
+    ["the code reviewer approving pull requests", "[agents]", (d) =>
+      patch(d, "agents/code-reviewer/agent.md", "**Never approve.**", "**Approve when the checks pass.**")],
     ["open networking for the agents", "[agents]", (d) =>
       patch(d, "environments/agent-sandbox.yaml", "type: limited", "type: unrestricted")],
     ["an unreviewed dependency", "[supply-chain]", (d) =>

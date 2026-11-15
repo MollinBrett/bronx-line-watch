@@ -31,6 +31,13 @@
       "id": "vlt_011CgcimFrw9inDgsF8m7YXg",
       "hash": "f40b308c3c45f14b170c70036c87e790",
       "remote_hash": "f40b308c3c45f14b170c70036c87e790"
+    },
+    "./agents/code-reviewer/agent.md": {
+      "kind": "agent",
+      "id": "agent_013jJCgLtQDEQShFLBi3wdLp",
+      "version": "2",
+      "hash": "03a955fe88d573b712da8d666696c0b1",
+      "remote_hash": "30ff0274ffac3aa20bc1f7f537aa64b2"
     }
   }
 }

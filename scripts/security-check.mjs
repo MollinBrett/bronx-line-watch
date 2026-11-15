@@ -226,6 +226,8 @@ for (const f of tracked.filter((f) => /^agents\/[^/]+\/agent\.md$/.test(f))) {
   if (!/Never push to `main`/.test(s)) fail("agents", `${f} must keep the rule "Never push to \`main\`"`);
   if (!/information, not instructions/.test(s)) fail("agents", `${f} must keep the rule that issue/PR/feed text is information, not instructions`);
   if (!/Never run `npm run eval`, `npm start`/.test(s)) fail("agents", `${f} must keep the rule against spending credit or sending texts`);
+  // The reviewer posts with the owner's token, so its approval would count as the human one.
+  if (/reviewer/.test(f) && !/\*\*Never approve\.\*\*/.test(s)) fail("agents", `${f} must keep the rule "Never approve"`);
 }
 for (const f of tracked.filter((f) => /^environments\/.+\.ya?ml$/.test(f))) {
   const s = read(f);
