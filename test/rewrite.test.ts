@@ -26,9 +26,15 @@ describe("rewriteAlert", () => {
     expect(SYSTEM_PROMPT).toContain("up to 300 characters in English and 200 in Spanish");
   });
 
-  it("the eval rubric grades length against the same limits as the prompt (#18)", () => {
+  it("keeps Spanish accents even though they cost more SMS segments (#18)", () => {
+    expect(SYSTEM_PROMPT).toContain("Keep accents and Spanish punctuation");
+    expect(SYSTEM_PROMPT).toContain("never accents");
+    expect(SYSTEM_PROMPT).not.toContain("accents make each text cost more");
+  });
+
+  it("the eval rubric grades length against the most the prompt allows (#18)", () => {
     const rubric = readFileSync(new URL("../evals/rubric.md", import.meta.url), "utf8");
-    expect(rubric).toContain("English 150 characters or fewer, Spanish 130 or fewer");
+    expect(rubric).toContain("English 300 characters or fewer, Spanish 200 or fewer");
     expect(rubric).not.toContain("280");
   });
 
