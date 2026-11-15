@@ -37,7 +37,10 @@ export function parseSubscribers(raw: string | undefined): Subscriber[] {
     if (stationsField?.trim()) {
       const ids = [...new Set(stationsField.split(",").map((s) => s.trim().toUpperCase()))];
       if (!ids.every((id) => choiceForStop(id))) {
-        throw new Error(`SMS_SUBSCRIBERS entry #${i + 1} lists a station that isn't a Bronx stop ID from src/bronx-stops.ts`);
+        throw new Error(
+          `SMS_SUBSCRIBERS entry #${i + 1} lists a station that isn't a Bronx stop ID on a line we cover` +
+            ` (IDs are in src/bronx-stops.ts; lines: ${[...BRONX_LINES].join(", ")})`,
+        );
       }
       if (choicesForStops(ids).length > MAX_STATIONS) {
         throw new Error(`SMS_SUBSCRIBERS entry #${i + 1} lists more than ${MAX_STATIONS} stations`);

@@ -72,7 +72,7 @@ describe("parseSubscribers with stations (#49)", () => {
 
   it("rejects station IDs that aren't Bronx stations on a covered line", () => {
     expect(() => parseSubscribers("+17185550100:en::626")).toThrow(/entry #1.*isn't a Bronx stop ID/); // 86 St, Manhattan
-    expect(() => parseSubscribers("+17185550100:en::101")).toThrow(/entry #1/); // Bronx, but on the [1]
+    expect(() => parseSubscribers("+17185550100:en::101")).toThrow(/entry #1.*on a line we cover/); // Bronx, but on the [1]
     expect(() => parseSubscribers("+17185550100:en::Fordham Rd")).toThrow(/entry #1/); // names aren't IDs
   });
 
