@@ -29,6 +29,42 @@ describe("checkRiderMessage", () => {
     expect(checkRiderMessage({ ...good, es: "  " }, alert).length).toBeGreaterThan(0);
   });
 
+  // #18: carriers bill per segment, and Spanish accents force UCS-2 (70 characters per segment).
+  it("blocks a Spanish message that would cost more than 4 SMS segments", () => {
+    // 287 characters with accents: under MAX_CHARS, but 5 UCS-2 segments.
+    const es =
+      "Los trenes [4] van con retrasos en ambas direcciones por actividad policial en 149 St-Grand Concourse. " +
+      "Si puedes, toma el [2] o el [5] en la estaci\u00F3n m\u00E1s cercana. Sal con m\u00E1s tiempo de lo normal hoy, " +
+      "porque los andenes est\u00E1n llenos y hay demoras. Los buses de la zona tambi\u00E9n van llenos.";
+    expect(es.length).toBe(287);
+    expect(checkRiderMessage({ ...good, es }, alert)).toContainEqual(
+      expect.stringMatching(/^es: \d+ SMS segments in UCS-2 \(max 4\)$/),
+    );
+  });
+
+  it("passes a 4-segment Spanish message with accents, like a detour with several alternatives", () => {
+    const es =
+      "Los trenes [4] van con retrasos en ambas direcciones por actividad policial en 149 St-Grand Concourse. " +
+      "Si puedes, toma el [2] o el [5] en la estaci\u00F3n m\u00E1s cercana. Sal con m\u00E1s tiempo de lo normal hoy, " +
+      "porque los andenes est\u00E1n llenos y hay demoras.";
+    expect(es.length).toBe(246);
+    expect(checkRiderMessage({ ...good, es }, alert)).toEqual([]);
+  });
+
+  it("passes a short Spanish message with accents", () => {
+    const es = "Los trenes [4] van con retrasos por actividad policial en 149 St. Sal con m\u00E1s tiempo.";
+    expect(checkRiderMessage({ ...good, es }, alert)).toEqual([]);
+  });
+
+  it("allows exactly 4 segments but not 5", () => {
+    // UCS-2: 4 segments hold up to 268 characters, 269 needs a fifth.
+    const pad = (n: number) => "[4] Est\u00E1n demorados. " + "a".repeat(n - "[4] Est\u00E1n demorados. ".length);
+    expect(checkRiderMessage({ ...good, es: pad(268) }, alert)).toEqual([]);
+    expect(checkRiderMessage({ ...good, es: pad(269) }, alert)).toContainEqual(
+      expect.stringContaining("5 SMS segments"),
+    );
+  });
+
   it("blocks messages that don't name the affected line", () => {
     expect(checkRiderMessage({ ...good, en: "Trains are delayed." }, alert)).toContainEqual(
       expect.stringContaining("line"),

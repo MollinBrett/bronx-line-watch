@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { parseSubscribers, smsSegments, twilioConfigFromEnv, wantsAlert } from "../src/sms.js";
+import {
+  parseSubscribers,
+  plainPunctuation,
+  smsSegments,
+  twilioConfigFromEnv,
+  wantsAlert,
+} from "../src/sms.js";
 
 describe("smsSegments", () => {
   it("fits plain English in GSM-7", () => {
@@ -20,6 +26,26 @@ describe("smsSegments", () => {
 
   it("keeps ñ and é in GSM-7", () => {
     expect(smsSegments("Mañana el tren é").encoding).toBe("GSM-7");
+  });
+});
+
+describe("plainPunctuation (#18)", () => {
+  it("swaps curly quotes and long dashes for plain ones, one for one", () => {
+    const curly = "It\u2019s the \u2018local\u2019 \u201C[4]\u201D \u2013 Burnside Av\u2014167 St";
+    const plain = plainPunctuation(curly);
+    expect(plain).toBe("It's the 'local' \"[4]\" - Burnside Av-167 St");
+    expect(plain.length).toBe(curly.length);
+  });
+
+  it("turns a curly-apostrophe English text back into GSM-7", () => {
+    const text = "[4] It\u2019s running every 16 min.";
+    expect(smsSegments(text).encoding).toBe("UCS-2");
+    expect(smsSegments(plainPunctuation(text)).encoding).toBe("GSM-7");
+  });
+
+  it("leaves Spanish accents and punctuation alone", () => {
+    const es = "[4] \u00BFVas a la 170? Est\u00E1 cerrada. \u00A1Sal con tiempo!";
+    expect(plainPunctuation(es)).toBe(es);
   });
 });
 
