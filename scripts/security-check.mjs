@@ -217,6 +217,12 @@ const AGENT_FILES = ["agents/maintainer/agent.md", "agents/security-guard/agent.
 for (const f of tracked.filter((f) => f.startsWith("agents/") && !AGENT_FILES.includes(f))) {
   fail("agents", `${f} is not a known agent file; a new agent must be added to AGENT_FILES in scripts/security-check.mjs`);
 }
+// YAML also ends a line at a bare carriage return and at three Unicode line breaks. The checks
+// below split on newlines only, so one of those after a "#" would hide a real setting inside
+// what looks like a comment. Windows line endings are refused too: these files never use them.
+for (const f of tracked.filter((f) => /^(agents|environments|vaults)\//.test(f) || /^\.github\/workflows\//.test(f))) {
+  if (/[\r\u0085\u2028\u2029]/.test(read(f))) fail("agents", `${f} contains a carriage return or Unicode line break, which YAML reads as a new line`);
+}
 for (const f of tracked.filter((f) => AGENT_FILES.includes(f))) {
   const s = read(f);
   const front = s.split(/^---$/m)[1] || "";
