@@ -82,11 +82,12 @@ export function alertReachesStations(alert: Pick<Alert, "routes" | "stops">, sto
 // ---------------------------------------------------------------------------------------
 // Finding a station from what a rider typed
 
-const WORDS: Record<string, string> = {
+// A Map, not an object: riders type anything, and "constructor" must stay a plain word.
+const WORDS = new Map(Object.entries({
   street: "st", streets: "sts", avenue: "av", ave: "av", road: "rd", boulevard: "blvd",
-  parkway: "pkwy", square: "sq", east: "e", west: "w", mount: "mt", saint: "st", park: "park",
+  parkway: "pkwy", square: "sq", east: "e", west: "w", mount: "mt", saint: "st",
   calle: "st", avenida: "av",
-};
+}));
 
 /** Lowercase, drop accents and punctuation, and use the MTA's abbreviations ("149th Street" -> "149 st"). */
 function tokens(text: string): string[] {
@@ -98,7 +99,7 @@ function tokens(text: string): string[] {
     .split(/[^a-z0-9]+/)
     .filter(Boolean)
     .map((t) => t.replace(/^(\d+)(st|nd|rd|th)$/, "$1"))
-    .map((t) => WORDS[t] ?? t);
+    .map((t) => WORDS.get(t) ?? t);
 }
 
 function editDistance(a: string, b: string): number {
@@ -153,11 +154,16 @@ export function findStation(typed: string): StationLookup {
     const result = pick(exact.map((n) => n.choice), lines) ?? pick(contains.map((n) => n.choice), lines);
     if (result) return result;
   }
-  // One or two wrong letters ("Fordam Rd"). Short names are skipped: "170 St" is one digit from "174 St".
-  const joined = want.join(" ");
+  // One or two wrong letters ("Fordam Rd"). Only the name is compared, and a line the rider
+  // gave still has to fit ("Fordam Rd 4"; never "Parkchester D"). Short names and names
+  // with street numbers are skipped: "170 St" is one digit from "174 St".
+  const { name, lines } = attempts.at(-1)!;
+  const joined = name.join(" ");
   if (joined.length >= 7 && !/\d/.test(joined)) {
-    const close = named.filter((n) => editDistance(n.name.join(" "), joined) <= 2);
-    const result = pick(close.map((n) => n.choice));
+    const close = named.filter(
+      (n) => lines.every((l) => n.lines.includes(l)) && editDistance(n.name.join(" "), joined) <= 2,
+    );
+    const result = pick(close.map((n) => n.choice), lines);
     if (result) return result;
   }
   return { kind: "unknown" };

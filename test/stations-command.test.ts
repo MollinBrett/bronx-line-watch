@@ -74,6 +74,12 @@ describe("answerStationsCommand (#49)", () => {
     expect(answer("ESTACIONES Astor Pl").reply).toContain("no cambiamos nada");
   });
 
+  it("answers odd input with the unknown-station reply instead of crashing", () => {
+    const r = answer("STATIONS Parkchester constructor");
+    expect(r.stations).toBeUndefined();
+    expect(r.reply).toContain("nothing changed");
+  });
+
   it("asks which station when a name fits more than one", () => {
     const r = answer("STATIONS Fordham Rd");
     expect(r.stations).toBeUndefined();

@@ -122,6 +122,21 @@ describe("findStation", () => {
     expect(found("Woodlwan")).toBe("Woodlawn (4)");
   });
 
+  it("keeps a line the rider gave when forgiving a typo", () => {
+    expect(found("Fordam Rd 4")).toBe("Fordham Rd (4)");
+    expect(found("Fordam Rd D")).toBe("Fordham Rd (B D)");
+    expect(found("Fordam Rd")).toBe("ambiguous");
+    expect(found("Parkchester D")).toBe("unknown"); // Parkchester is on the [6] only
+    expect(found("Parkchestr 6")).toBe("Parkchester (6)");
+  });
+
+  it("treats words like \"constructor\" as ordinary unknown words", () => {
+    for (const word of ["constructor", "toString", "__proto__", "hasOwnProperty"]) {
+      expect(found(word)).toBe("unknown");
+      expect(found(`Parkchester ${word}`)).toBe("unknown");
+    }
+  });
+
   it("never guesses between numbered streets", () => {
     expect(found("171 St")).toBe("unknown"); // one digit from 170 St and 174 St
   });
