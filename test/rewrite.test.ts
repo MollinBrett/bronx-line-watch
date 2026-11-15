@@ -20,9 +20,9 @@ describe("rewriteAlert", () => {
     expect(SYSTEM_PROMPT).not.toContain("280");
   });
 
-  it("lets multi-alternative alerts run longer rather than drop rider options, within 3 SMS segments (#18)", () => {
+  it("lets multi-alternative alerts run longer rather than drop rider options, within the SMS segment cap (#18)", () => {
     expect(SYSTEM_PROMPT).toContain("Never drop an alternative, direction, or station");
-    // 300 GSM-7 chars = 2 segments; 200 UCS-2 chars = 3 segments (67 each), the safety cap.
+    // 300 GSM-7 chars = 2 segments; 200 UCS-2 chars = 3 segments (67 each), one under the safety cap of 4.
     expect(SYSTEM_PROMPT).toContain("up to 300 characters in English and 200 in Spanish");
   });
 

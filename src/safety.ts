@@ -6,8 +6,10 @@ export const MAX_CHARS = 320;
 /**
  * Carriers bill per SMS segment. Spanish accents switch a text to UCS-2 (70 characters
  * per segment), so a message can be well under MAX_CHARS and still cost 4-5 segments (#18).
+ * The cap is 4, not 3: Spanish texts keep their accents, and an alert with several
+ * alternatives needs about 270 accented characters. A 3-segment cap blocked those alerts.
  */
-export const MAX_SEGMENTS = 3;
+export const MAX_SEGMENTS = 4;
 const ALLOWED_LINK_HOSTS = ["mta.info", "new.mta.info"];
 
 /**
