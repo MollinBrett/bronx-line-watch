@@ -228,7 +228,9 @@ for (const f of tracked.filter((f) => /^agents\/[^/]+\/agent\.md$/.test(f))) {
   if (!/Never run `npm run eval`, `npm start`/.test(s)) fail("agents", `${f} must keep the rule against spending credit or sending texts`);
   // The reviewer posts with the owner's token, so its approval would count as the human one.
   if (/reviewer/.test(f)) {
-    if (!/\*\*Never approve\.\*\*/.test(s)) fail("agents", `${f} must keep the rule "Never approve"`);
+    // The whole rule, as its own line: an exception added to it must fail, not only its removal.
+    const NEVER_APPROVE = "- **Never approve.** Never submit a review with the APPROVE or REQUEST_CHANGES event, never merge, never close, reopen, or relabel a pull request, and never dismiss a review. Your reviews are posted with the repository owner's token, so an approval from you would count as the one human approval that branch protection requires. Your verdict is advice to the person who decides.";
+    if (!s.split("\n").includes(NEVER_APPROVE)) fail("agents", `${f} must keep the rule "Never approve" word for word`);
     // The prompt rule is only text, so the tool config backs it up: GitHub tools are off
     // unless named, and only the read and review tools may be named.
     // The whole frontmatter is compared line by line, indentation included, against the
