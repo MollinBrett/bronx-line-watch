@@ -36,23 +36,25 @@ export interface StationsReply {
   stations?: string[] | null;
 }
 
+// The copy never promises "every Bronx station": clearing stations leaves a rider's line
+// choices in place, so what they get is every station on their lines.
 const list = (choices: StationChoice[]): string => choices.map((c) => c.label).join(", ");
 
 const COPY = {
   en: {
-    showNone: `Bronx Line Watch: you get alerts for every Bronx station. To pick yours (up to ${MAX_STATIONS}), reply STATIONS and their names, like: STATIONS Fordham Rd 4, Parkchester`,
+    showNone: `Bronx Line Watch: you haven't picked stations, so you get alerts for every station on your lines. To pick yours (up to ${MAX_STATIONS}), reply STATIONS and their names, like: STATIONS Fordham Rd 4, Parkchester`,
     show: (s: string) => `Bronx Line Watch: your stations: ${s}. To change, reply STATIONS and the names, or STATIONS ALL.`,
     saved: (s: string) => `Bronx Line Watch: saved. You'll get alerts for: ${s}. To change, reply STATIONS and the names, or STATIONS ALL.`,
-    cleared: "Bronx Line Watch: done. You'll get alerts for every Bronx station again.",
+    cleared: "Bronx Line Watch: done, your stations are cleared. You'll get alerts for every station on your lines.",
     unknown: (n: number) => `Bronx Line Watch: nothing changed. We couldn't find station #${n} on your list among Bronx stations on the 2, 4, 5, 6, B or D. Check the name on the subway map and try again.`,
     ambiguous: (n: number, s: string) => `Bronx Line Watch: nothing changed. Station #${n} on your list could be: ${s}. Reply again with the line after the name, like: STATIONS Fordham Rd 4`,
     tooMany: `Bronx Line Watch: nothing changed. You can pick up to ${MAX_STATIONS} stations. Reply STATIONS with ${MAX_STATIONS} or fewer.`,
   },
   es: {
-    showNone: `Bronx Line Watch: recibes alertas de todas las estaciones del Bronx. Para elegir las tuyas (hasta ${MAX_STATIONS}), responde ESTACIONES y sus nombres, por ejemplo: ESTACIONES Fordham Rd 4, Parkchester`,
+    showNone: `Bronx Line Watch: no has elegido estaciones, así que recibes alertas de todas las estaciones de tus líneas. Para elegir las tuyas (hasta ${MAX_STATIONS}), responde ESTACIONES y sus nombres, por ejemplo: ESTACIONES Fordham Rd 4, Parkchester`,
     show: (s: string) => `Bronx Line Watch: tus estaciones: ${s}. Para cambiar, responde ESTACIONES y los nombres, o ESTACIONES TODAS.`,
     saved: (s: string) => `Bronx Line Watch: guardado. Vas a recibir alertas de: ${s}. Para cambiar, responde ESTACIONES y los nombres, o ESTACIONES TODAS.`,
-    cleared: "Bronx Line Watch: listo. Vas a recibir alertas de todas las estaciones del Bronx otra vez.",
+    cleared: "Bronx Line Watch: listo, borramos tus estaciones. Vas a recibir alertas de todas las estaciones de tus líneas.",
     unknown: (n: number) => `Bronx Line Watch: no cambiamos nada. No encontramos la estación #${n} de tu lista entre las estaciones del Bronx de las líneas 2, 4, 5, 6, B o D. Revisa el nombre en el mapa del subway e intenta otra vez.`,
     ambiguous: (n: number, s: string) => `Bronx Line Watch: no cambiamos nada. La estación #${n} de tu lista puede ser: ${s}. Responde otra vez con la línea después del nombre, por ejemplo: ESTACIONES Fordham Rd 4`,
     tooMany: `Bronx Line Watch: no cambiamos nada. Puedes elegir hasta ${MAX_STATIONS} estaciones. Responde ESTACIONES con ${MAX_STATIONS} o menos.`,

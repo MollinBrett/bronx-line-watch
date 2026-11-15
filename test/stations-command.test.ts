@@ -44,8 +44,8 @@ describe("answerStationsCommand (#49)", () => {
   it("shows the current stations with their exact MTA names, or how to pick some", () => {
     expect(answer("STATIONS", ["407", "608"]).reply).toContain("your stations: Fordham Rd (4), Parkchester (6).");
     expect(answer("ESTACIONES", ["407"]).reply).toContain("tus estaciones: Fordham Rd (4).");
-    expect(answer("STATIONS").reply).toContain("every Bronx station");
-    expect(answer("ESTACIONES", []).reply).toContain("todas las estaciones del Bronx");
+    expect(answer("STATIONS").reply).toContain("every station on your lines");
+    expect(answer("ESTACIONES", []).reply).toContain("todas las estaciones de tus líneas");
     expect(answer("STATIONS", ["407"]).stations).toBeUndefined(); // showing changes nothing
   });
 
@@ -62,8 +62,14 @@ describe("answerStationsCommand (#49)", () => {
   });
 
   it("clears the list", () => {
-    expect(answer("STATIONS ALL", ["407"])).toEqual({ reply: expect.stringContaining("every Bronx station"), stations: null });
+    expect(answer("STATIONS ALL", ["407"])).toEqual({ reply: expect.stringContaining("every station on your lines"), stations: null });
     expect(answer("ESTACIONES TODAS", ["407"]).stations).toBeNull();
+  });
+
+  it("doesn't promise every Bronx station: a rider's line choices still apply", () => {
+    for (const body of ["STATIONS", "STATIONS ALL", "ESTACIONES", "ESTACIONES TODAS"]) {
+      expect(answer(body).reply).not.toMatch(/every Bronx station|todas las estaciones del Bronx/);
+    }
   });
 
   it("saves nothing if any name is unknown or not in the Bronx", () => {
