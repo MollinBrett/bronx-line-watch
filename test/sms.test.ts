@@ -49,7 +49,7 @@ describe("parseSubscribers", () => {
     expect(() => parseSubscribers("+17185550100:es:4,L")).toThrow(/entry #1.*aren't Bronx lines/);
     expect(() => parseSubscribers("+17185550100:es:4,L")).not.toThrow(/7185550100/);
     expect(() => parseSubscribers("+17185550100:es:")).toThrow(); // empty list is a typo, not "all"
-    expect(() => parseSubscribers("+17185550100:es:4:5")).toThrow(/too many/);
+    expect(() => parseSubscribers("+17185550100:es:4:405:5")).toThrow(/too many/); // 4th field is stations (#49)
   });
 
   it("doesn't expose raw invalid tokens in errors", () => {
@@ -64,13 +64,13 @@ describe("wantsAlert", () => {
   const dRider = { ...all, lines: ["D"] };
 
   it("sends everything to subscribers who didn't pick lines", () => {
-    expect(wantsAlert(all, ["6"])).toBe(true);
+    expect(wantsAlert(all, { routes: ["6"], stops: [] })).toBe(true);
   });
 
   it("sends only alerts on a subscriber's lines", () => {
-    expect(wantsAlert(dRider, ["6"])).toBe(false);
-    expect(wantsAlert(dRider, ["B", "D"])).toBe(true);
-    expect(wantsAlert(dRider, [])).toBe(false);
+    expect(wantsAlert(dRider, { routes: ["6"], stops: [] })).toBe(false);
+    expect(wantsAlert(dRider, { routes: ["B", "D"], stops: [] })).toBe(true);
+    expect(wantsAlert(dRider, { routes: [], stops: [] })).toBe(false);
   });
 });
 

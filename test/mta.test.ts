@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseFeed } from "../src/mta.js";
+import { parentStopId, parseFeed } from "../src/mta.js";
 import { sampleAlerts } from "./helpers.js";
 
 describe("parseFeed", () => {
@@ -26,6 +26,32 @@ describe("parseFeed", () => {
       ],
     });
     expect(alert!.routes).toEqual(["4", "5"]);
+  });
+
+  it("reads stop IDs and normalizes platforms to the parent station (#49)", () => {
+    const [alert] = parseFeed({
+      entity: [
+        {
+          id: "x",
+          alert: {
+            informed_entity: [
+              { route_id: "4", stop_id: "401N" },
+              { route_id: "4", stop_id: "401S" },
+              { route_id: "D", stop_id: "D05" },
+              { route_id: "4" },
+            ],
+          },
+        },
+      ],
+    });
+    expect(alert!.stops).toEqual(["401", "D05"]);
+    expect(parentStopId("d05n")).toBe("D05");
+    expect(parentStopId("S18")).toBe("S18"); // a station ID that happens to start with S
+  });
+
+  it("gives line-wide alerts an empty stop list", () => {
+    const [alert] = parseFeed({ entity: [{ id: "x", alert: { informed_entity: [{ route_id: "6" }] } }] });
+    expect(alert!.stops).toEqual([]);
   });
 
   it("fails loudly if the MTA changes the feed shape", () => {

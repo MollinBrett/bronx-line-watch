@@ -70,6 +70,17 @@ That's why the agents are forbidden from running it.
   live service excludes, and two synthetic cases. Real-time disruptions are therefore
   still underrepresented.
 
+## The other eval: "My stations" matching
+
+Deciding which riders an alert reaches (#49) is plain code, not a Claude call, so it has
+its own eval set that costs nothing: `evals/matching-cases.ts`. Each case is a real alert
+from the same Nov 1, 2026 snapshot, labeled by hand with stations it should reach and
+stations it should not. The cases run as part of `npm test`
+(`test/stations-matching.test.ts`), so a change that breaks matching fails CI.
+
+When a rider reports a text they shouldn't have got, or one they missed, add that alert to
+the fixture and a case for it.
+
 ## Is this a standard?
 
 The script itself (`evals/run.ts`, about 80 lines) was written for this project, and the

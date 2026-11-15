@@ -34,6 +34,8 @@ MTA alert feed ──(every 60s, free)──> watcher ──(new alert only)─�
 | `src/rewrite.ts` | The Claude prompt and call |
 | `src/safety.ts` | Last check before a text goes out |
 | `src/sms.ts` | SMS segment math and Twilio |
+| `src/bronx-stops.ts` | Every Bronx station, generated from the MTA's station file by `scripts/build-bronx-stops.mjs` |
+| `src/stations.ts`, `src/stations-command.ts` | "My stations": which riders an alert reaches, and the STATIONS / ESTACIONES text command |
 | `evals/` | Quality evals: Claude grades rewrites against `evals/rubric.md` |
 | `agents/`, `environments/`, `vaults/` | The agent team, synced with `ant apply` |
 
