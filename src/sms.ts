@@ -28,13 +28,14 @@ export function parseSubscribers(raw: string | undefined): Subscriber[] {
   if (!raw?.trim()) return [];
   return raw.split(/,(?=\s*\+)/).map((entry, i) => {
     const [phone = "", lang = "en", linesField, stationsField, ...extra] = entry.trim().split(":");
-    if (!/^\+1\d{10}$/.test(phone)) throw new Error(`Bad phone number in SMS_SUBSCRIBERS: ${phone}`);
-    if (lang !== "en" && lang !== "es") throw new Error(`Bad language for ${phone}: ${lang}`);
+    // Entry number only, here and below: these messages end up in logs, and neither a phone
+    // number nor anything else typed into the setting belongs there (#24).
+    if (!/^\+1\d{10}$/.test(phone)) throw new Error(`SMS_SUBSCRIBERS entry #${i + 1} has a bad phone number (expected +1 and 10 digits)`);
+    if (lang !== "en" && lang !== "es") throw new Error(`SMS_SUBSCRIBERS entry #${i + 1} has a bad language (expected en or es)`);
     if (extra.length) throw new Error(`SMS_SUBSCRIBERS entry #${i + 1} has too many ":" fields`);
     const sub: Subscriber = { phone, lang };
     if (stationsField?.trim()) {
       const ids = [...new Set(stationsField.split(",").map((s) => s.trim().toUpperCase()))];
-      // Entry number only: neither the phone number nor the station list belongs in a log.
       if (!ids.every((id) => choiceForStop(id))) {
         throw new Error(`SMS_SUBSCRIBERS entry #${i + 1} lists a station that isn't a Bronx stop ID from src/bronx-stops.ts`);
       }
@@ -48,7 +49,6 @@ export function parseSubscribers(raw: string | undefined): Subscriber[] {
     if (!linesField.trim() && sub.stations) return sub;
 
     const lines = linesField.split(",").map((l) => l.trim().toUpperCase());
-    // Entry number, not the phone number: error messages end up in logs.
     const bad = lines.filter((l) => !BRONX_LINES.has(l));
     if (bad.length) {
       throw new Error(

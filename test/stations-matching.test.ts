@@ -83,7 +83,14 @@ describe("parseSubscribers with stations (#49)", () => {
   });
 
   it("keeps phone numbers and station lists out of error messages", () => {
-    for (const raw of ["+17185550100:en::407,626", "+17185550100:en::401,402,405,406,407,408", "+17185550100:en:4:407:x"]) {
+    for (const raw of [
+      "+17185550100:en::407,626",
+      "+17185550100:en::401,402,405,406,407,408",
+      "+17185550100:en:4:407:x",
+      "+17185550100:fr::407", // bad language
+      "+1718555010:en::407", // bad phone number (one digit short)
+      "17185550100:en::407", // bad phone number (no +)
+    ]) {
       let message = "";
       try {
         parseSubscribers(raw);
@@ -91,7 +98,7 @@ describe("parseSubscribers with stations (#49)", () => {
         message = String(err);
       }
       expect(message).toMatch(/entry #1/);
-      expect(message).not.toMatch(/7185550100/);
+      expect(message).not.toMatch(/718555/);
       expect(message).not.toMatch(/\b(407|626|401|402|405|406|408)\b/);
     }
   });
