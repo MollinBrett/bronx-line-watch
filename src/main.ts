@@ -74,7 +74,7 @@ async function tick(): Promise<void> {
     }
     if (twilio) {
       for (const sub of subscribers) {
-        if (!wantsAlert(sub, alert.routes)) continue; // they only asked for other lines
+        if (!wantsAlert(sub, alert)) continue; // they only asked for other lines or stations
         try {
           await sendSms(twilio, sub.phone, msg[sub.lang]);
         } catch (err) {
