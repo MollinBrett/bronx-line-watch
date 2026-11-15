@@ -104,7 +104,8 @@ wait of up to six hours during the day, and overnight.
 1. Write down what each changed function must guarantee (its *contract*: what it needs from
    callers, what it promises back).
 2. Check every path through the code against that contract, including errors and timeouts, and
-   check that loops and retries must stop.
+   check that loops and retries that are meant to finish must stop. (The watcher's polling
+   loop is meant to run forever; for that, each pass must finish and the wait must be bounded.)
 3. Check the project's *invariants*, the things that must stay true across every change. They
    are listed as I1-I8 in `agents/code-reviewer/agent.md` and come from SECURITY.md: every
    message passes the safety check, the safety check only gets stricter, an alert is announced

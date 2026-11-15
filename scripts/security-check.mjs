@@ -231,11 +231,21 @@ for (const f of tracked.filter((f) => /^agents\/[^/]+\/agent\.md$/.test(f))) {
     if (!/\*\*Never approve\.\*\*/.test(s)) fail("agents", `${f} must keep the rule "Never approve"`);
     // The prompt rule is only text, so the tool config backs it up: GitHub tools are off
     // unless named, and only the read and review tools may be named.
-    const github = front.slice(front.indexOf("mcp_toolset"));
-    if (!/default_config:\s*\{\s*enabled:\s*false\s*\}/.test(github)) fail("agents", `${f}: GitHub tools must be disabled by default`);
+    // This is checked line by line, not by searching the text: every line of the GitHub
+    // toolset must be one of the exact forms below, so a quoted name, a commented-out
+    // default, or any other YAML spelling fails instead of slipping past a pattern.
+    const lines = front.split("\n");
+    const start = lines.findIndex((l) => /^\s*-\s*type:\s*mcp_toolset\s*$/.test(l));
+    if (start < 0) fail("agents", `${f}: the GitHub toolset must be declared as "- type: mcp_toolset"`);
+    const github = start < 0 ? [] : lines.slice(start + 1).map((l) => l.trim()).filter((l) => l && !l.startsWith("#"));
     const allowed = ["list_pull_requests", "pull_request_read", "pull_request_review_write", "add_comment_to_pending_review"];
-    for (const m of github.matchAll(/(?<![A-Za-z_])name:\s*([A-Za-z0-9_]+)/g)) {
-      if (!allowed.includes(m[1])) fail("agents", `${f}: GitHub tool ${m[1]} is not one a reviewer needs`);
+    const tool = new RegExp(`^- \\{name: (${allowed.join("|")}), enabled: true, permission_policy: \\{type: auto\\}\\}$`);
+    const fixed = ["mcp_server_name: github", "default_config: {enabled: false}", "configs:"];
+    for (const l of github) {
+      if (!fixed.includes(l) && !tool.test(l)) fail("agents", `${f}: GitHub toolset line not allowed for a reviewer: ${l.slice(0, 80)}`);
+    }
+    for (const l of fixed) {
+      if (github.filter((g) => g === l).length !== 1) fail("agents", `${f}: the GitHub toolset must contain exactly one "${l}" line`);
     }
   }
 }
