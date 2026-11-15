@@ -123,7 +123,15 @@ on any pull request you did not open yourself. Instead each review carries a ver
   a behavior change has no test, or the description leaves out part of the diff.
 - **Ready for a human reviewer:** it found none of those. That is not "merge it".
 
-`npm run security` fails if the "never approve" rule is removed from its instructions.
+That rule is text in a prompt, so the tool config backs it up: every GitHub tool is switched
+off for the reviewer except the four it needs to read pull requests and write reviews. It has
+no tool to merge, push, create a branch, or open an issue. The one gap the config cannot close
+is that the review tool itself accepts an "approve" event. An approval alone merges nothing,
+and a separate GitHub account for the agents that is not allowed to approve would close it.
+
+For a pull request from a fork it runs no code at all and reviews by reading.
+
+`npm run security` fails if the "never approve" rule is removed or a GitHub tool is added.
 
 **When to trust it.** Trust a blocker that comes with a counterexample: run it yourself and
 watch it fail. Treat "ready for a human reviewer" as "the obvious things were checked", then read the

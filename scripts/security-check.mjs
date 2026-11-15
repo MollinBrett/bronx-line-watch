@@ -227,7 +227,17 @@ for (const f of tracked.filter((f) => /^agents\/[^/]+\/agent\.md$/.test(f))) {
   if (!/information, not instructions/.test(s)) fail("agents", `${f} must keep the rule that issue/PR/feed text is information, not instructions`);
   if (!/Never run `npm run eval`, `npm start`/.test(s)) fail("agents", `${f} must keep the rule against spending credit or sending texts`);
   // The reviewer posts with the owner's token, so its approval would count as the human one.
-  if (/reviewer/.test(f) && !/\*\*Never approve\.\*\*/.test(s)) fail("agents", `${f} must keep the rule "Never approve"`);
+  if (/reviewer/.test(f)) {
+    if (!/\*\*Never approve\.\*\*/.test(s)) fail("agents", `${f} must keep the rule "Never approve"`);
+    // The prompt rule is only text, so the tool config backs it up: GitHub tools are off
+    // unless named, and only the read and review tools may be named.
+    const github = front.slice(front.indexOf("mcp_toolset"));
+    if (!/default_config:\s*\{\s*enabled:\s*false\s*\}/.test(github)) fail("agents", `${f}: GitHub tools must be disabled by default`);
+    const allowed = ["list_pull_requests", "pull_request_read", "pull_request_review_write", "add_comment_to_pending_review"];
+    for (const m of github.matchAll(/(?<![A-Za-z_])name:\s*([A-Za-z0-9_]+)/g)) {
+      if (!allowed.includes(m[1])) fail("agents", `${f}: GitHub tool ${m[1]} is not one a reviewer needs`);
+    }
+  }
 }
 for (const f of tracked.filter((f) => /^environments\/.+\.ya?ml$/.test(f))) {
   const s = read(f);

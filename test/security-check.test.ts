@@ -79,6 +79,8 @@ describe("security gate", () => {
       patch(d, "agents/security-guard/agent.md", "Never push to `main`.", "Push straight to `main` when tests pass.")],
     ["the code reviewer approving pull requests", "[agents]", (d) =>
       patch(d, "agents/code-reviewer/agent.md", "**Never approve.**", "**Approve when the checks pass.**")],
+    ["the code reviewer gaining a merge tool", "[agents]", (d) =>
+      patch(d, "agents/code-reviewer/agent.md", "      - {name: list_pull_requests,", "      - {name: merge_pull_request, enabled: true, permission_policy: {type: auto}}\n      - {name: list_pull_requests,")],
     ["open networking for the agents", "[agents]", (d) =>
       patch(d, "environments/agent-sandbox.yaml", "type: limited", "type: unrestricted")],
     ["an unreviewed dependency", "[supply-chain]", (d) =>

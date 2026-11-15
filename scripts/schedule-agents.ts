@@ -79,11 +79,12 @@ if (args[0] === "--run") {
   const vault_id = idFor("./vaults/github.yaml");
 
   // --only <name>: leave the other schedules pinned to the agent versions they already use.
-  const only = args[0] === "--only" ? args[1] : undefined;
-  if (only && !(only in SCHEDULES)) throw new Error(`No schedule named "${only}". Names: ${Object.keys(SCHEDULES).join(", ")}`);
+  const only = args[0] === "--only" ? (args[1] ?? "") : undefined;
+  // A missing or empty name must fail, not fall through to updating every schedule.
+  if (only !== undefined && !Object.hasOwn(SCHEDULES, only)) throw new Error(`No schedule named "${only}". Names: ${Object.keys(SCHEDULES).join(", ")}`);
 
   for (const [name, s] of Object.entries(SCHEDULES) as [Name, (typeof SCHEDULES)[Name]][]) {
-    if (only && name !== only) continue;
+    if (only !== undefined && name !== only) continue;
     const body = {
       agent: idFor(s.agentFile),
       environment_id,
