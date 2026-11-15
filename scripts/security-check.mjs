@@ -231,22 +231,39 @@ for (const f of tracked.filter((f) => /^agents\/[^/]+\/agent\.md$/.test(f))) {
     if (!/\*\*Never approve\.\*\*/.test(s)) fail("agents", `${f} must keep the rule "Never approve"`);
     // The prompt rule is only text, so the tool config backs it up: GitHub tools are off
     // unless named, and only the read and review tools may be named.
-    // This is checked line by line, not by searching the text: every line of the GitHub
-    // toolset must be one of the exact forms below, so a quoted name, a commented-out
-    // default, or any other YAML spelling fails instead of slipping past a pattern.
-    const lines = front.split("\n");
-    const start = lines.findIndex((l) => /^\s*-\s*type:\s*mcp_toolset\s*$/.test(l));
-    if (start < 0) fail("agents", `${f}: the GitHub toolset must be declared as "- type: mcp_toolset"`);
-    const github = start < 0 ? [] : lines.slice(start + 1).map((l) => l.trim()).filter((l) => l && !l.startsWith("#"));
+    // The whole frontmatter is compared line by line, indentation included, against the
+    // one shape a reviewer may have. Searching the text for the right words is not enough:
+    // a quoted name, a commented-out default, or a look-alike stanza hidden inside a
+    // multi-line description would all pass a search. Anything unexpected fails.
     const allowed = ["list_pull_requests", "pull_request_read", "pull_request_review_write", "add_comment_to_pending_review"];
-    const tool = new RegExp(`^- \\{name: (${allowed.join("|")}), enabled: true, permission_policy: \\{type: auto\\}\\}$`);
-    const fixed = ["mcp_server_name: github", "default_config: {enabled: false}", "configs:"];
-    for (const l of github) {
-      if (!fixed.includes(l) && !tool.test(l)) fail("agents", `${f}: GitHub toolset line not allowed for a reviewer: ${l.slice(0, 80)}`);
-    }
-    for (const l of fixed) {
-      if (github.filter((g) => g === l).length !== 1) fail("agents", `${f}: the GitHub toolset must contain exactly one "${l}" line`);
-    }
+    const shape = [
+      /^name: [a-z0-9-]+$/,
+      /^description: [A-Za-z][^\\|>{}\[\]"#]*$/, // one plain line: no block scalar, quoting, or escapes
+      /^model: [a-z0-9-]+$/,
+      "mcp_servers:",
+      "  - type: url",
+      "    name: github",
+      "    url: https://api.githubcopilot.com/mcp/",
+      "tools:",
+      "  - type: agent_toolset_20260401",
+      "    default_config: {permission_policy: {type: auto}}",
+      "    configs:",
+      "      - {name: bash, permission_policy: {type: always_allow}}",
+      "      - {name: web_fetch, enabled: false}",
+      "      - {name: web_search, enabled: false}",
+      "  - type: mcp_toolset",
+      "    mcp_server_name: github",
+      "    default_config: {enabled: false}",
+      "    configs:",
+    ];
+    const tool = new RegExp(`^      - \\{name: (${allowed.join("|")}), enabled: true, permission_policy: \\{type: auto\\}\\}$`);
+    const lines = front.split("\n").map((l) => l.trimEnd()).filter((l) => l.trim() && !l.trim().startsWith("#"));
+    const bad = lines.find((l, n) => {
+      const want = n < shape.length ? shape[n] : tool;
+      return typeof want === "string" ? l !== want : !want.test(l);
+    });
+    if (bad !== undefined) fail("agents", `${f}: frontmatter line not allowed for a reviewer: ${bad.trim().slice(0, 80)}`);
+    else if (lines.length <= shape.length) fail("agents", `${f}: frontmatter is missing part of the reviewer's tool configuration`);
   }
 }
 for (const f of tracked.filter((f) => /^environments\/.+\.ya?ml$/.test(f))) {

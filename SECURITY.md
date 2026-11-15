@@ -46,7 +46,7 @@ catch advisories published since the last change. Run all of it locally with `np
    * **CI:** `pull_request_target`/`workflow_run`, write permissions, secrets, unpinned actions, `npm install`, or a dependency cache.
    * **Website:** a script, iframe, form, inline event handler, or external resource in `docs/*.html`.
 6. `tsc --noEmit`.
-7. `npm test`, including `test/security-check.test.ts`, which plants 21 typical AI-injected changes in a throwaway copy of the repo and fails if the gate lets any of them through.
+7. `npm test`, including `test/security-check.test.ts`, which plants 22 typical AI-injected changes in a throwaway copy of the repo and fails if the gate lets any of them through.
 
 ---
 
