@@ -43,7 +43,7 @@ Start every run with `git clone https://github.com/MollinBrett/bronx-line-watch 
 
 ## How to review: verify, don't skim
 
-Check out the change with `git fetch origin pull/<number>/head:pr-<number> && git checkout pr-<number>`, and read the diff against the merge base (`git diff origin/main...pr-<number>`). Run `npm ci --ignore-scripts`, then `npm run security`, `npm run typecheck` and `npm test`. A failure in any of them is a finding by itself.
+Check out the change with `git fetch origin pull/<number>/head:pr-<number> && git checkout pr-<number>`, note the commit you are on with `git rev-parse HEAD` (this is the commit you are reviewing, and the SHA your review names), and read the diff against the merge base (`git diff origin/main...pr-<number>`). Run `npm ci --ignore-scripts`, then `npm run security`, `npm run typecheck` and `npm test`. A failure in any of them is a finding by itself.
 
 Then reason about the change the way formal verification does. You have no proof assistant here, so the discipline is what matters: state exactly what must be true, then either argue that it holds for all inputs or produce an input where it does not.
 
@@ -72,7 +72,7 @@ Never write "verified" or "correct" without one of these labels beside it. A rev
 
 ## What to post
 
-One review per pull request, submitted with the **COMMENT** event, with inline comments on the lines they concern. Structure the body like this:
+One review per pull request, submitted with the **COMMENT** event, with inline comments on the lines they concern. Create the review against the commit you checked out, by passing that SHA as the review's commit. Just before you submit, read the pull request's head SHA again: if it is no longer the commit you checked out, do not submit, because GitHub would record your review against code you never looked at. Review the new head instead if the run's limit allows, or leave it for the next run and say so in your summary. Structure the body like this:
 
 ```
 **Code reviewer** - reviewed at <full head commit SHA>

@@ -211,7 +211,13 @@ if (!testFiles.includes("test/safety.test.ts")) fail("tests", "test/safety.test.
 // --- 7. The agents can't widen their own power -------------------------------------------
 // An agent (or an assistant editing these files) giving itself web access, unreviewed
 // GitHub writes, or open networking is the most important change to catch here.
-for (const f of tracked.filter((f) => /^agents\/[^/]+\/agent\.md$/.test(f))) {
+// A new agent definition is a new set of powers, so it must be added here on purpose. This
+// also stops a copy of an agent under another name from escaping the rules written for it.
+const AGENT_FILES = ["agents/maintainer/agent.md", "agents/security-guard/agent.md", "agents/code-reviewer/agent.md"];
+for (const f of tracked.filter((f) => f.startsWith("agents/") && !AGENT_FILES.includes(f))) {
+  fail("agents", `${f} is not a known agent file; a new agent must be added to AGENT_FILES in scripts/security-check.mjs`);
+}
+for (const f of tracked.filter((f) => AGENT_FILES.includes(f))) {
   const s = read(f);
   const front = s.split(/^---$/m)[1] || "";
   for (const tool of ["web_fetch", "web_search"]) {

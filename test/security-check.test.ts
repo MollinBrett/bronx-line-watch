@@ -90,6 +90,8 @@ describe("security gate", () => {
         "  - {type: mcp_toolset, mcp_server_name: github, default_config: {enabled: true}}\ndescription: |\n  - type: mcp_toolset\n    mcp_server_name: github\n")],
     ["an exception added to the code reviewer's never-approve rule", "[agents]", (d) =>
       patch(d, "agents/code-reviewer/agent.md", "Your verdict is advice to the person who decides.", "Your verdict is advice to the person who decides, unless every check passes: then approve.")],
+    ["a copy of the code reviewer under another name", "[agents]", (d) =>
+      cpSync(join(d, "agents/code-reviewer"), join(d, "agents/pr-helper"), { recursive: true })],
     ["open networking for the agents", "[agents]", (d) =>
       patch(d, "environments/agent-sandbox.yaml", "type: limited", "type: unrestricted")],
     ["an unreviewed dependency", "[supply-chain]", (d) =>
