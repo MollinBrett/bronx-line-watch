@@ -17,6 +17,10 @@ const read = (f) => readFileSync(path.join(root, f), "utf8");
 const failures = [];
 const fail = (rule, msg) => failures.push(`[${rule}] ${msg}`);
 const stripComments = (s) => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'`])\/\/.*$/gm, "$1");
+// The same comments, replaced by spaces of the same length: a position in the result is the
+// same position in the file.
+const blank = (s) => s.replace(/[^\n]/g, " ");
+const blankComments = (s) => s.replace(/\/\*[\s\S]*?\*\//g, blank).replace(/(^|[^:"'`])\/\/.*$/gm, (m, before) => before + blank(m.slice(before.length)));
 
 // Reads the string or template literal that starts at src[i]. Returns its fixed text - for a
 // template, each stretch outside ${...} - or null when it can't be read with certainty.
@@ -243,21 +247,21 @@ for (const f of testFiles) {
   const code = stripComments(read(f));
   if (/\b(it|test|describe)\.(skip|only|todo)\b|\bx(it|describe)\s*\(/.test(code)) fail("tests", `${f} skips or isolates tests (.skip/.only/.todo/xit)`);
   // Every expected-failure test must name its open issue in the fixed text of its name.
-  // Names are read from the file as written, not from the comment-stripped copy: stripping
-  // cuts a name at "//" and can splice text from elsewhere into it.
+  // Calls are found in a copy with comments blanked out, so an example in a comment isn't
+  // taken for a test. Names are then read from the file as written, at the same position:
+  // comment stripping cuts a name at "//" and can splice text from elsewhere into it.
   const raw = read(f);
-  for (const m of raw.matchAll(/\b(?:it|test)(?:\s*\.\s*\w+)*\s*\.\s*fails\s*\(\s*/g)) {
-    const lit = readLiteral(raw, m.index + m[0].length);
+  for (const m of blankComments(raw).matchAll(/\b(?:it|test)(?:\s*\.\s*\w+)*\s*\.\s*fails\b\s*(\(\s*)?/g)) {
     const shown = raw.slice(m.index, m.index + 60).split("\n")[0];
-    if (!lit) {
+    const lit = m[1] ? readLiteral(raw, m.index + m[0].length) : null;
+    if (!m[1]) {
+      // An alias or .fails.each has no name to read here.
+      fail("tests", `${f}: .fails must be called directly, as it.fails("name - #123", ...), so its issue number can be checked (${shown})`);
+    } else if (!lit) {
       fail("tests", `${f}: can't read the name of an expected-failure test (${shown}); write it as a string literal, with no / inside any \${...}`);
     } else if (!lit.fixed.some((part) => /#\d+/.test(part))) {
       fail("tests", `${f}: expected-failure test (${shown}) must name its open issue (#123) in the fixed text of its name`);
     }
-  }
-  // Anything else done with .fails (an alias, .fails.each) has no name to read here.
-  for (const m of code.matchAll(/\b(?:it|test)(?:\.\w+)*\.fails\b(?!\s*\()/g)) {
-    fail("tests", `${f}: ${m[0]} must be called directly, as ${m[0]}("name - #123", ...), so its issue number can be checked`);
   }
 }
 if (!testFiles.includes("test/safety.test.ts")) fail("tests", "test/safety.test.ts must exist");

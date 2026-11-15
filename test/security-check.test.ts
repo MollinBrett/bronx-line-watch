@@ -50,13 +50,16 @@ describe("security gate", () => {
     expect(r.output).toContain("all rules hold");
   });
 
-  it("accepts expected-failure names whose fixed text has the issue number", () => {
+  it("accepts expected-failure names whose fixed text has the issue number, and examples in comments", () => {
     const r = gate(copyWith((d) => append(d, "test/safety.test.ts", [
       "",
       "it." + 'fails("blocks links without // - known gap, #123", () => {});',
       "it." + "fails('single quotes - known gap, #123', () => {});",
       "it." + "fails(`gap ${a} #123 ${b}`, () => {});",
       "it." + 'fails(`gap ${[1, 2].map((n) => `${n}`).join("}")} - known gap, #123`, () => {});',
+      "/" + "/ it." + 'fails("an example in a comment, no issue", () => {});',
+      "const n = 1; /" + "/ it." + 'fails("an example in a trailing comment", () => {});',
+      "/* it." + 'fails("an example in a block comment", () => {}); */',
       "",
     ].join("\n"))));
     expect(r.output).toContain("all rules hold");
@@ -99,6 +102,10 @@ describe("security gate", () => {
       append(d, "test/safety.test.ts", "\nit." + 'fails(`gap ${"}".replace(/}/, "")} ${"#123".slice(0, 0)}`, () => {});\n')],
     ["an expected-failure test whose issue number is only in a comment after the name", "[tests]", (d) =>
       append(d, "test/safety.test.ts", "\nit." + 'fails("gap /* a", () => {}); // */ #123 "\n')],
+    ["an expected-failure test with a comment between it. and fails", "[tests]", (d) =>
+      append(d, "test/safety.test.ts", "\nit./* x */" + 'fails("gap with no issue", () => {});\n')],
+    ["an expected-failure test split across a comment line", "[tests]", (d) =>
+      append(d, "test/safety.test.ts", "\nconst viaTest = test\n/" + "/ it\n  ." + 'fails("gap with no issue", () => {});\n')],
     ["an expected-failure test registered through an alias", "[tests]", (d) =>
       append(d, "test/safety.test.ts", "\nconst gap = it." + 'fails;\ngap("gap #123", () => {});\n')],
     ["an agent giving itself web access", "[agents]", (d) =>
