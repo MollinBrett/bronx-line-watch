@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseSubscribers, smsSegments, wantsAlert } from "../src/sms.js";
+import { parseSubscribers, smsSegments, twilioConfigFromEnv, wantsAlert } from "../src/sms.js";
 
 describe("smsSegments", () => {
   it("fits plain English in GSM-7", () => {
@@ -71,5 +71,27 @@ describe("wantsAlert", () => {
     expect(wantsAlert(dRider, ["6"])).toBe(false);
     expect(wantsAlert(dRider, ["B", "D"])).toBe(true);
     expect(wantsAlert(dRider, [])).toBe(false);
+  });
+});
+
+describe("twilioConfigFromEnv (#67)", () => {
+  const twilio = { TWILIO_ACCOUNT_SID: "AC_test", TWILIO_AUTH_TOKEN: "t", TWILIO_FROM_NUMBER: "+18885550100" };
+
+  it("texts only when SEND_SMS is exactly \"true\"", () => {
+    expect(twilioConfigFromEnv({ ...twilio, SEND_SMS: "true" })).toEqual({
+      accountSid: "AC_test",
+      authToken: "t",
+      from: "+18885550100",
+    });
+  });
+
+  it("doesn't text with Twilio settings alone, as on a laptop with a .env", () => {
+    expect(twilioConfigFromEnv(twilio)).toBeNull();
+    expect(twilioConfigFromEnv({ ...twilio, SEND_SMS: "1" })).toBeNull();
+    expect(twilioConfigFromEnv({ ...twilio, SEND_SMS: "TRUE" })).toBeNull();
+  });
+
+  it("doesn't text with SEND_SMS but missing Twilio settings", () => {
+    expect(twilioConfigFromEnv({ SEND_SMS: "true" })).toBeNull();
   });
 });

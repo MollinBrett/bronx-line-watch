@@ -57,7 +57,8 @@ npm run once
 ```
 
 Run continuously and send alerts: set the Telegram and/or Twilio variables from `.env.example`
-(either one works alone; without both, it only prints), then:
+(either one works alone; without both, it only prints). Texting also needs
+`SEND_SMS=true`, which is set **only on Render**, so a laptop can never text real subscribers. Then:
 
 ```bash
 npm start
