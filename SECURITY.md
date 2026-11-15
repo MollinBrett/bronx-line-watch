@@ -21,6 +21,7 @@ make the service send something harmful, leak a secret, or give an agent more po
 - **Bare words that look like domains are blocked.** `src/safety.ts` treats any `word.word` as a link, so a message that happens to contain one is dropped rather than sent. That's the right trade for a service that texts strangers.
 - **Phone numbers and "reply with your card number" scams aren't blocked yet** (#23). Claude is told never to add contact details, but `safety.ts` doesn't enforce it.
 - **Agent bash is always allowed inside their sandbox.** The sandbox holds no secrets and reaches only npm, GitHub, and the MTA feed. GitHub actions stay on the `auto` permission policy, and branch protection is the backstop (see `docs/agents.md`).
+- **The code reviewer could technically approve.** Its GitHub tools are limited to reading pull requests and writing reviews, but the review tool itself accepts an "approve" event, and its reviews are posted as the repository owner. Only its instructions and the server's `auto` policy stop it. It has no tool to merge, so an approval alone ships nothing. A separate GitHub account for the agents would close this (see `docs/agents.md`).
 - **`npm audit signatures` needs network access to Sigstore**, so it runs in CI but may fail on a restricted local network.
 
 ---
