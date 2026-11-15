@@ -74,7 +74,8 @@ async function tick(): Promise<void> {
       }
     }
     if (twilio) {
-      // Quiet hours: no texts at night unless it's a suspension. Not retried in the morning (#19).
+      // Quiet hours are opt-in: riders who asked for them get no texts at night unless it's a
+      // suspension (not retried in the morning). Everyone else is texted at any hour (#19).
       // textSubscribers checks the clock before every text, not just once per alert.
       const { heldBack } = await textSubscribers(alert, subscribers, async (sub) => {
         try {
@@ -83,7 +84,7 @@ async function tick(): Promise<void> {
           console.error(`[sms] failed to text ${sub.phone.slice(0, -4)}XXXX:`, err);
         }
       });
-      if (heldBack) console.log(`[sms] quiet hours - not texting ${alert.id} (${alert.type}) to ${heldBack} subscriber(s)`);
+      if (heldBack) console.log(`[sms] quiet hours - not texting ${alert.id} (${alert.type}) to ${heldBack} subscriber(s) who opted in`);
     }
   }
   await saveState(stateFile, next);

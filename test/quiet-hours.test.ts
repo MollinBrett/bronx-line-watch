@@ -32,27 +32,36 @@ describe("isQuietHours", () => {
 describe("shouldSendSms", () => {
   const night = new Date("2026-01-15T02:00:00-05:00");
   const day = new Date("2026-01-15T14:00:00-05:00");
+  const rider: Subscriber = { phone: "+17185550101", lang: "en" };
+  const quietRider: Subscriber = { ...rider, quiet: true };
 
   it("texts any alert during the day", () => {
-    expect(shouldSendSms(makeAlert({ type: "Delays" }), day)).toBe(true);
+    expect(shouldSendSms(makeAlert({ type: "Delays" }), rider, day)).toBe(true);
+    expect(shouldSendSms(makeAlert({ type: "Delays" }), quietRider, day)).toBe(true);
   });
 
-  it("holds back ordinary alerts at night", () => {
-    expect(shouldSendSms(makeAlert({ type: "Delays" }), night)).toBe(false);
-    expect(shouldSendSms(makeAlert({ type: "Reduced Service" }), night)).toBe(false);
+  it("texts at night by default: quiet hours are opt-in", () => {
+    expect(shouldSendSms(makeAlert({ type: "Delays" }), rider, night)).toBe(true);
+    expect(shouldSendSms(makeAlert({ type: "Reduced Service" }), rider, night)).toBe(true);
   });
 
-  it("still texts suspensions at night", () => {
-    expect(shouldSendSms(makeAlert({ type: "Suspended" }), night)).toBe(true);
-    expect(shouldSendSms(makeAlert({ type: "Part Suspended" }), night)).toBe(true);
+  it("holds back ordinary alerts at night for a rider who opted in", () => {
+    expect(shouldSendSms(makeAlert({ type: "Delays" }), quietRider, night)).toBe(false);
+    expect(shouldSendSms(makeAlert({ type: "Reduced Service" }), quietRider, night)).toBe(false);
+  });
+
+  it("still texts suspensions at night to a rider who opted in", () => {
+    expect(shouldSendSms(makeAlert({ type: "Suspended" }), quietRider, night)).toBe(true);
+    expect(shouldSendSms(makeAlert({ type: "Part Suspended" }), quietRider, night)).toBe(true);
   });
 });
 
 describe("textSubscribers", () => {
+  // The first rider never asked for quiet hours; the other two did.
   const subs: Subscriber[] = [
     { phone: "+17185550101", lang: "en" },
-    { phone: "+17185550102", lang: "es" },
-    { phone: "+17185550103", lang: "en" },
+    { phone: "+17185550102", lang: "es", quiet: true },
+    { phone: "+17185550103", lang: "en", quiet: true },
   ];
 
   // A fake clock that starts at the given New York time and moves forward one second per text,
@@ -76,32 +85,33 @@ describe("textSubscribers", () => {
     expect(f.texted).toEqual(["+17185550101", "+17185550102", "+17185550103"]);
   });
 
-  it("stops the moment quiet hours begin partway through the list", async () => {
-    // First text at 10:59:59 PM; the clock reaches 11:00:00 PM before the second one.
-    const f = fakeSend("2026-01-15T22:59:59-05:00");
+  it("at night, texts riders who didn't opt in and holds back only those who did", async () => {
+    const f = fakeSend("2026-01-15T02:00:00-05:00");
     expect(await textSubscribers(makeAlert({ type: "Delays" }), subs, f.send, f.now)).toEqual({ heldBack: 2 });
     expect(f.texted).toEqual(["+17185550101"]);
   });
 
-  it("keeps texting a suspension across 11 PM", async () => {
+  it("holds back opted-in riders the moment quiet hours begin partway through the list", async () => {
+    // Two opted-in riders. First text at 10:59:59 PM; the clock reaches 11:00:00 PM before the second.
     const f = fakeSend("2026-01-15T22:59:59-05:00");
+    const alert = makeAlert({ type: "Delays" });
+    expect(await textSubscribers(alert, [subs[1]!, subs[2]!, subs[0]!], f.send, f.now)).toEqual({ heldBack: 1 });
+    expect(f.texted).toEqual(["+17185550102", "+17185550101"]); // the rider with no quiet hours still gets it
+  });
+
+  it("texts a suspension to everyone at night", async () => {
+    const f = fakeSend("2026-01-15T02:00:00-05:00");
     expect(await textSubscribers(makeAlert({ type: "Suspended" }), subs, f.send, f.now)).toEqual({ heldBack: 0 });
     expect(f.texted).toHaveLength(3);
   });
 
-  it("texts nobody at night for an ordinary alert", async () => {
-    const f = fakeSend("2026-01-15T02:00:00-05:00");
-    expect(await textSubscribers(makeAlert({ type: "Delays" }), subs, f.send, f.now)).toEqual({ heldBack: 3 });
-    expect(f.texted).toEqual([]);
-  });
-
   it("skips riders who only asked for other lines, and doesn't count them as held back", async () => {
     const f = fakeSend("2026-01-15T14:00:00-05:00");
-    const dRider: Subscriber = { phone: "+17185550104", lang: "en", lines: ["D"] };
+    const dRider: Subscriber = { phone: "+17185550104", lang: "en", lines: ["D"], quiet: true };
     expect(await textSubscribers(makeAlert({ routes: ["4"] }), [...subs, dRider], f.send, f.now)).toEqual({ heldBack: 0 });
     expect(f.texted).not.toContain(dRider.phone);
 
     const night = fakeSend("2026-01-15T02:00:00-05:00");
-    expect(await textSubscribers(makeAlert({ routes: ["4"] }), [...subs, dRider], night.send, night.now)).toEqual({ heldBack: 3 });
+    expect(await textSubscribers(makeAlert({ routes: ["4"] }), [...subs, dRider], night.send, night.now)).toEqual({ heldBack: 2 });
   });
 });

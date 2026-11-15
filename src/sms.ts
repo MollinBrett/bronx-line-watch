@@ -7,22 +7,31 @@ export interface Subscriber {
   lang: Lang;
   /** The lines this rider wants texts about. Missing means every Bronx line. */
   lines?: string[];
+  /** Opted in to quiet hours: no texts 11 PM-5 AM except suspensions. Off unless they ask. */
+  quiet?: true;
 }
 
 /**
- * Parse "+17185550100:es:4,5,+13475550199:en,+13475550142".
- * Each entry is phone[:language[:lines]]. Language defaults to en; no lines means all Bronx lines.
+ * Parse "+17185550100:es:4,5,+13475550199:en:quiet,+13475550142".
+ * Each entry is phone[:language[:lines][:quiet]]. Language defaults to en; no lines means all
+ * Bronx lines. "quiet" opts that rider in to quiet hours (see quiet-hours.ts); without it they
+ * get texts at any hour, because plenty of Bronx riders travel at night.
  * Lines are comma-separated too, so a new entry starts only at a comma followed by "+"
  * (every phone number starts with "+").
  */
 export function parseSubscribers(raw: string | undefined): Subscriber[] {
   if (!raw?.trim()) return [];
   return raw.split(/,(?=\s*\+)/).map((entry, i) => {
-    const [phone = "", lang = "en", linesField, ...extra] = entry.trim().split(":");
+    const [phone = "", lang = "en", ...rest] = entry.trim().split(":");
+    // "quiet" may come right after the language or after the lines; it is not a line name.
+    const isQuiet = (f: string) => f.trim().toLowerCase() === "quiet";
+    const quietCount = rest.filter(isQuiet).length;
+    const [linesField, ...extra] = rest.filter((f) => !isQuiet(f));
+    const flags = quietCount ? { quiet: true as const } : {};
     if (!/^\+1\d{10}$/.test(phone)) throw new Error(`Bad phone number in SMS_SUBSCRIBERS: ${phone}`);
     if (lang !== "en" && lang !== "es") throw new Error(`Bad language for ${phone}: ${lang}`);
-    if (extra.length) throw new Error(`SMS_SUBSCRIBERS entry #${i + 1} has too many ":" fields`);
-    if (linesField === undefined) return { phone, lang };
+    if (extra.length || quietCount > 1) throw new Error(`SMS_SUBSCRIBERS entry #${i + 1} has too many ":" fields`);
+    if (linesField === undefined) return { phone, lang, ...flags };
 
     const lines = linesField.split(",").map((l) => l.trim().toUpperCase());
     // Entry number, not the phone number: error messages end up in logs.
@@ -33,7 +42,7 @@ export function parseSubscribers(raw: string | undefined): Subscriber[] {
           ` (allowed: ${[...BRONX_LINES].join(", ")})`,
       );
     }
-    return { phone, lang, lines: [...new Set(lines)] };
+    return { phone, lang, lines: [...new Set(lines)], ...flags };
   });
 }
 

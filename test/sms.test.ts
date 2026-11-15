@@ -52,6 +52,16 @@ describe("parseSubscribers", () => {
     expect(() => parseSubscribers("+17185550100:es:4:5")).toThrow(/too many/);
   });
 
+  it("parses the opt-in quiet flag, with or without lines", () => {
+    expect(parseSubscribers("+17185550100:es:quiet, +13475550199:en:4,5:QUIET,+13475550142:en:d")).toEqual([
+      { phone: "+17185550100", lang: "es", quiet: true },
+      { phone: "+13475550199", lang: "en", lines: ["4", "5"], quiet: true },
+      { phone: "+13475550142", lang: "en", lines: ["D"] }, // no flag, no quiet hours
+    ]);
+    expect(() => parseSubscribers("+17185550100:es:quiet:quiet")).toThrow(/too many/);
+    expect(() => parseSubscribers("+17185550100:es:4:quite")).toThrow(/too many/); // typo is an error, not ignored
+  });
+
   it("doesn't expose raw invalid tokens in errors", () => {
     const raw = "+17185550100:es:4,13475550199";
     expect(() => parseSubscribers(raw)).toThrow(/entry #1.*aren't Bronx lines/);

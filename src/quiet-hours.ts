@@ -20,19 +20,20 @@ export function isQuietHours(date: Date): boolean {
 }
 
 /**
- * Should this alert be texted right now? At night we only wake people for suspensions
- * (e.g. "Suspended", "Part Suspended"): those can strand a rider. Telegram is not affected,
- * because a channel post doesn't buzz anyone's phone the way a text does (#19).
+ * Should this alert be texted to this subscriber right now? Quiet hours are opt-in: New Yorkers
+ * keep odd hours, and someone waiting on a platform at 2 AM needs the delay text. Only riders
+ * who asked for quiet hours are held back at night, and even they still get suspensions
+ * (e.g. "Suspended", "Part Suspended"): those can strand a rider. Telegram is not affected (#19).
  */
-export function shouldSendSms(alert: Alert, now: Date): boolean {
-  return !isQuietHours(now) || alert.type.includes("Suspended");
+export function shouldSendSms(alert: Alert, sub: Subscriber, now: Date): boolean {
+  return !sub.quiet || !isQuietHours(now) || alert.type.includes("Suspended");
 }
 
 /**
  * Text every subscriber who wants this alert, checking quiet hours again before *each* text.
  * Sending is one request at a time, so a loop that starts at 10:59:59 PM can still be running
- * after 11 PM. Checking once up front would let those later texts wake people up; checking
- * every time stops the rest the moment quiet hours begin.
+ * after 11 PM. Checking once up front would let those later texts wake a rider who asked for
+ * quiet hours; checking every time holds theirs back the moment quiet hours begin.
  *
  * `send` does the actual texting and must handle its own errors (main.ts logs and moves on),
  * so one failed text never stops the rest. `send` and `now` are passed in so tests can use a
@@ -44,10 +45,11 @@ export async function textSubscribers(
   send: (sub: Subscriber) => Promise<void>,
   now: () => Date = () => new Date(),
 ): Promise<{ heldBack: number }> {
-  const wanting = subscribers.filter((sub) => wantsAlert(sub, alert.routes)); // others asked for other lines
-  for (const [i, sub] of wanting.entries()) {
-    if (!shouldSendSms(alert, now())) return { heldBack: wanting.length - i }; // quiet hours began
-    await send(sub);
+  let heldBack = 0;
+  for (const sub of subscribers) {
+    if (!wantsAlert(sub, alert.routes)) continue; // they only asked for other lines
+    if (shouldSendSms(alert, sub, now())) await send(sub);
+    else heldBack++;
   }
-  return { heldBack: 0 };
+  return { heldBack };
 }
