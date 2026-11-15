@@ -43,7 +43,7 @@ for (const alert of evalCases()) {
     messages: [
       {
         role: "user",
-        content: `Original alert:\n${alertPrompt(alert)}\n\nEnglish message:\n${msg.en}\n\nSpanish message:\n${msg.es}\n\nGrade criteria 1-5 for both "en" and "es", and criteria 6-8 for "es" only.`,
+        content: `Original alert:\n${alertPrompt(alert)}\n\nEnglish message:\n${msg.en}\n\nSpanish message:\n${msg.es}\n\nGrade criteria 1-5 for both "en" and "es", and criteria 6-11 for "es" only.`,
       },
     ],
   });

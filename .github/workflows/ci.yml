@@ -69,5 +69,13 @@ jobs:
           # Passed as environment variables, never interpolated into the command,
           # so text in a PR description can't run as shell code.
           PR_BODY: ${{ github.event.pull_request.body }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: CHANGED_FILES="$(git diff --name-only "$BASE_SHA...HEAD")" node scripts/pr-checklist.mjs
+        # HEAD is GitHub's test merge of the PR into the base branch as it is now, and its
+        # first parent is that base. Comparing the two lists exactly what merging would change.
+        # (The event's base.sha can be several merges old, which blamed a PR for files that
+        # other PRs had changed.) Each command is on its own line so a failed git command
+        # fails the step instead of leaving an empty file list that passes.
+        run: |
+          git rev-parse --verify --quiet "HEAD^2" > /dev/null || { echo "HEAD is not a pull request merge commit"; exit 1; }
+          CHANGED_FILES="$(git diff --name-only "HEAD^1" HEAD)"
+          export CHANGED_FILES
+          node scripts/pr-checklist.mjs

