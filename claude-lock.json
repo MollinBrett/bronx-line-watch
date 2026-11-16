@@ -35,9 +35,9 @@
     "./agents/code-reviewer/agent.md": {
       "kind": "agent",
       "id": "agent_013jJCgLtQDEQShFLBi3wdLp",
-      "version": "2",
-      "hash": "03a955fe88d573b712da8d666696c0b1",
-      "remote_hash": "30ff0274ffac3aa20bc1f7f537aa64b2"
+      "version": "3",
+      "hash": "9344b27c8388f58bda2ec101d2e6dc91",
+      "remote_hash": "bfffb698b93fbfe9d0cbdf1973493e26"
     }
   }
 }
