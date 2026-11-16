@@ -271,12 +271,14 @@ for (const f of tracked.filter((f) => AGENT_FILES.includes(f))) {
       "    configs:",
     ];
     const tool = new RegExp(`^      - \\{name: (${allowed.join("|")}), enabled: true, permission_policy: \\{type: auto\\}\\}$`);
-    const lines = front.split("\n").map((l) => l.trimEnd()).filter((l) => l.trim() && !l.trim().startsWith("#"));
-    const bad = lines.find((l, n) => {
+    // Failures name the line number only. The line's text is whatever someone put in the file,
+    // and this output lands in CI logs.
+    const lines = front.split("\n").map((l, i) => ({ text: l.trimEnd(), at: i + 1 })).filter(({ text }) => text.trim() && !text.trim().startsWith("#"));
+    const bad = lines.find(({ text }, n) => {
       const want = n < shape.length ? shape[n] : tool;
-      return typeof want === "string" ? l !== want : !want.test(l);
+      return typeof want === "string" ? text !== want : !want.test(text);
     });
-    if (bad !== undefined) fail("agents", `${f}: frontmatter line not allowed for a reviewer: ${bad.trim().slice(0, 80)}`);
+    if (bad !== undefined) fail("agents", `${f}: line ${bad.at} is not allowed in a reviewer's frontmatter (the expected shape is in scripts/security-check.mjs)`);
     else if (lines.length <= shape.length) fail("agents", `${f}: frontmatter is missing part of the reviewer's tool configuration`);
   }
 }

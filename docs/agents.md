@@ -2,7 +2,8 @@
 
 Three Claude Managed Agents keep this repo healthy. They run in Anthropic-hosted sandboxes
 on a schedule and check out the repo. Two open pull requests and issues; the third reviews
-every pull request. **They never merge, and none of them can approve.**
+every pull request. **They never merge.** The reviewer is also told never to approve; that is a rule in its
+instructions, not a technical limit (see "Approve vs. comment" below).
 
 | Agent | Schedule (New York time) | Spend cap per run | Does |
 |---|---|---|---|
