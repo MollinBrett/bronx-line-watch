@@ -214,7 +214,7 @@ if (!testFiles.includes("test/safety.test.ts")) fail("tests", "test/safety.test.
 // A new agent definition is a new set of powers, so it must be added here on purpose. This
 // also stops a copy of an agent under another name from escaping the rules written for it.
 const AGENT_FILES = ["agents/maintainer/agent.md", "agents/security-guard/agent.md", "agents/code-reviewer/agent.md"];
-for (const f of tracked.filter((f) => f.startsWith("agents/") && !AGENT_FILES.includes(f))) {
+for (const f of tracked.filter((f) => (f.startsWith("agents/") || /(^|\/)agent\.md$/.test(f)) && !AGENT_FILES.includes(f))) {
   fail("agents", `${f} is not a known agent file; a new agent must be added to AGENT_FILES in scripts/security-check.mjs`);
 }
 // YAML also ends a line at a bare carriage return and at three Unicode line breaks. The checks

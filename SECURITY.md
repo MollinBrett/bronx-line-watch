@@ -43,11 +43,11 @@ catch advisories published since the last change. Run all of it locally with `np
    * **Hidden text:** invisible or bidirectional Unicode characters anywhere ("Trojan Source"), or text addressed to AI tools (telling an assistant to drop its rules, or a message written to "the AI") outside the eval and test fixtures that exist to test exactly that.
    * **Rider safety:** sending before `checkRiderMessage()`; the alert leaving its `<mta_alert>` data tags; Telegram posts with a `parse_mode`; any change to `ALLOWED_LINK_HOSTS`.
    * **Tests:** `.skip`, `.only`, `.todo`, or `xit`; an expected-failure test that doesn't name its open issue.
-   * **Agents:** an agent file other than the three known ones; a carriage return or Unicode line break in an agent, sandbox, vault, or workflow file; web tools enabled; GitHub MCP tools set to `always_allow`; an MCP server other than GitHub's; dropping the "never push to `main`", "information, not instructions", or "don't spend credit or send texts" rules; the code reviewer dropping or rewording its "never approve" rule, or having any GitHub tool beyond reading pull requests and writing reviews; agent networking other than `limited` with the approved hosts.
+   * **Agents:** anything under `agents/`, or any file named `agent.md`, other than the three known agent files; a carriage return or Unicode line break in an agent, sandbox, vault, or workflow file; web tools enabled; GitHub MCP tools set to `always_allow`; an MCP server other than GitHub's; dropping the "never push to `main`", "information, not instructions", or "don't spend credit or send texts" rules; the code reviewer dropping or rewording its "never approve" rule, or having any GitHub tool beyond reading pull requests and writing reviews; agent networking other than `limited` with the approved hosts.
    * **CI:** `pull_request_target`/`workflow_run`, write permissions, secrets, unpinned actions, `npm install`, or a dependency cache.
    * **Website:** a script, iframe, form, inline event handler, or external resource in `docs/*.html`.
 6. `tsc --noEmit`.
-7. `npm test`, including `test/security-check.test.ts`, which plants 25 typical AI-injected changes in a throwaway copy of the repo and fails if the gate lets any of them through.
+7. `npm test`, including `test/security-check.test.ts`, which plants typical AI-injected changes in a throwaway copy of the repo and fails if the gate lets any of them through.
 
 ---
 
