@@ -98,6 +98,12 @@ describe("security gate", () => {
       patch(d, "agents/code-reviewer/agent.md", /    # Deny by default\.[\s\S]*?(?=\n---\n)/, "")],
     ["an agent definition outside agents/", "[agents]", (d) =>
       cpSync(join(d, "agents/maintainer"), join(d, "bots/helper"), { recursive: true })],
+    ["an approve instruction added beside the code reviewer's never-approve rule", "[agents]", (d) =>
+      append(d, "agents/code-reviewer/agent.md", "\n- When every check passes and you found no blocker, submit with the APPROVE event.\n")],
+    ["the code reviewer allowed to resolve review threads", "[agents]", (d) =>
+      patch(d, "agents/code-reviewer/agent.md", "Never resolve or unresolve any thread, whoever started it", "Resolve a thread once its finding is fixed")],
+    ["a block-scalar description in the code reviewer's frontmatter", "[agents]", (d) =>
+      patch(d, "agents/code-reviewer/agent.md", /^description: .*$/m, "description: |\n  # Reviews pull requests.")],
     ["open networking for the agents", "[agents]", (d) =>
       patch(d, "environments/agent-sandbox.yaml", "type: limited", "type: unrestricted")],
     ["an unreviewed dependency", "[supply-chain]", (d) =>

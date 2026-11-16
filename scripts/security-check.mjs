@@ -243,6 +243,12 @@ for (const f of tracked.filter((f) => AGENT_FILES.includes(f))) {
     // The whole rule, as its own line: an exception added to it must fail, not only its removal.
     const NEVER_APPROVE = "- **Never approve.** Never submit a review with the APPROVE or REQUEST_CHANGES event, never merge, never close, reopen, or relabel a pull request, and never dismiss a review. Your reviews are posted with the repository owner's token, so an approval from you would count as the one human approval that branch protection requires. Your verdict is advice to the person who decides.";
     if (!s.split("\n").includes(NEVER_APPROVE)) fail("agents", `${f} must keep the rule "Never approve" word for word`);
+    const NEVER_RESOLVE = "- **Never touch other people's review threads.** The review tool can also resolve and unresolve review threads and delete drafts. Never resolve or unresolve any thread, whoever started it: a resolved thread hides a finding from the next reader. Never delete a draft review you did not create in this run.";
+    if (!s.split("\n").includes(NEVER_RESOLVE)) fail("agents", `${f} must keep the rule "Never touch other people's review threads" word for word`);
+    // The pinned line can be left intact and contradicted somewhere else. No text check catches
+    // every rewording (a person reading the diff is the real control), but the event name
+    // itself has no business anywhere but that line.
+    if (s.split("\n").some((l) => l !== NEVER_APPROVE && /APPROVE/.test(l))) fail("agents", `${f} mentions the APPROVE event outside the "Never approve" rule`);
     // The prompt rule is only text, so the tool config backs it up: GitHub tools are off
     // unless named, and only the read and review tools may be named.
     // The whole frontmatter is compared line by line, indentation included, against the

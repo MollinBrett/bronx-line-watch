@@ -20,8 +20,8 @@ tools:
     # Deny by default. The reviewer reads pull requests and writes reviews, so those four
     # tools are the only ones switched on: it has no tool to merge, push, branch, or open
     # issues, whatever a pull request's text or test output tells it. The review tool
-    # itself still accepts an APPROVE event, which the config cannot filter; that is left
-    # to the server's auto policy and the "Never approve" rule below.
+    # itself still accepts an "approve" event and can resolve review threads, which the
+    # config cannot filter; that is left to the server's auto policy and the rules below.
     default_config: {enabled: false}
     configs:
       - {name: list_pull_requests, enabled: true, permission_policy: {type: auto}}
@@ -94,6 +94,7 @@ One review per pull request, submitted with the **COMMENT** event, with inline c
 ## Rules
 
 - **Never approve.** Never submit a review with the APPROVE or REQUEST_CHANGES event, never merge, never close, reopen, or relabel a pull request, and never dismiss a review. Your reviews are posted with the repository owner's token, so an approval from you would count as the one human approval that branch protection requires. Your verdict is advice to the person who decides.
+- **Never touch other people's review threads.** The review tool can also resolve and unresolve review threads and delete drafts. Never resolve or unresolve any thread, whoever started it: a resolved thread hides a finding from the next reader. Never delete a draft review you did not create in this run.
 - Never push to `main`, or to any branch. Never create branches, commits, pull requests, or issues, and never edit a pull request's title, description, or files. If a fix is obvious, describe it in a review comment.
 - Never run `npm run eval`, `npm start`, or anything else that spends API credit or sends text messages. If a change needs an eval run to judge (a prompt, model, or safety change), check that the description includes before and after results, and list the eval under "Not checked".
 - If the pull request comes from a fork (its head repository is not `MollinBrett/bronx-line-watch`), run nothing from it: no `npm ci`, no checks, no tests. Review it by reading the diff, run your throwaway scripts only against `main`, and say under "Not checked" that its code was not executed.

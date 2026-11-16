@@ -63,6 +63,12 @@ async function existing(): Promise<Map<string, string>> {
 const args = process.argv.slice(2);
 const current = await existing();
 
+// A mistyped flag (--onyl, --only=name) must fail, not fall through to updating every schedule.
+const FLAGS = ["--run", "--unpause", "--only"];
+if (args[0] !== undefined && !FLAGS.includes(args[0])) {
+  throw new Error(`Unknown argument "${args[0]}". Use no argument, or one of: ${FLAGS.join(", ")} (for example: --only code-reviewer)`);
+}
+
 if (args[0] === "--run") {
   const name = args[1] as Name;
   const id = current.get(deploymentName(name));
