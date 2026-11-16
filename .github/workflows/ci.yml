@@ -49,8 +49,9 @@ jobs:
         run: npm audit --audit-level=low
 
       - name: Registry signatures and provenance
-        # Up to 3 tries: the registry sometimes returns incomplete attestation data to a
-        # runner. A pass still means everything verified. See the script for details.
+        # Up to 3 tries, and on failure it prints what the registry returned. A pass still
+        # means everything verified. If it fails on a stale registry cache, re-run the job:
+        # see the script for details.
         run: bash scripts/audit-signatures.sh
 
       - name: No package newer than 7 days

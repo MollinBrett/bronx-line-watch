@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
-# Runs `npm audit signatures`, trying up to 3 times.
+# Runs `npm audit signatures`, trying up to 3 times, and explains a failure.
 #
-# Why retry: the npm registry now and then answers a CI runner with incomplete attestation
-# data for a package, and npm reports "has attestations but no corresponding public key(s)
-# can be found". In November 2026 that failed about one CI run in six, always on a package
-# that verified fine a minute later.
+# Known cause of failures (found Nov 16, 2026): some of the npm registry's CDN locations
+# serve an old cached copy of a package's attestations that lacks npm's publish attestation.
+# npm then reports "has attestations but no corresponding public key(s) can be found".
+# A runner keeps hitting the same location, so the retries below do NOT get past that; a
+# re-run of the job on a new runner usually does. The retries only help with short network
+# errors.
 #
 # Why retrying is safe: a pass still means npm verified every registry signature and every
 # attestation for the installed packages. Trying again can't turn a bad package into a pass.
 #
-# After each failed try this prints what the registry returns for the package npm named, so
-# the log shows whether the registry or the package is at fault.
+# After each failed try this prints what the registry returns for the package npm named
+# (CDN location in cf-ray, age of the cached copy, and each attestation's signing key), so
+# the log shows whether it is the stale cache again or something new.
 set -u
 
 tries=3
@@ -51,5 +54,5 @@ for attempt in $(seq 1 "$tries"); do
   fi
 done
 
-echo "audit-signatures: failed $tries times in a row. This is not the usual one-off registry hiccup: read the output above before re-running."
+echo "audit-signatures: failed $tries times in a row. If the output above shows 1 attestation with no signing key and a large age, it is the registry stale cache: re-run the job. Anything else needs a closer look before re-running."
 exit 1
