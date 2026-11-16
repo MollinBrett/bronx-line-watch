@@ -112,6 +112,35 @@ describe("security gate", () => {
       patch(d, "agents/maintainer/agent.md", "{name: web_fetch, enabled: false}", "{name: web_fetch, enabled: true}")],
     ["an agent dropping its no-push rule", "[agents]", (d) =>
       patch(d, "agents/security-guard/agent.md", "Never push to `main`.", "Push straight to `main` when tests pass.")],
+    ["the code reviewer approving pull requests", "[agents]", (d) =>
+      patch(d, "agents/code-reviewer/agent.md", "**Never approve.**", "**Approve when the checks pass.**")],
+    ["the code reviewer gaining a merge tool", "[agents]", (d) =>
+      patch(d, "agents/code-reviewer/agent.md", "      - {name: list_pull_requests,", "      - {name: merge_pull_request, enabled: true, permission_policy: {type: auto}}\n      - {name: list_pull_requests,")],
+    ["the code reviewer gaining a merge tool under a quoted name", "[agents]", (d) =>
+      patch(d, "agents/code-reviewer/agent.md", "      - {name: list_pull_requests,", '      - {name: "merge_pull_request", enabled: true, permission_policy: {type: auto}}\n      - {name: list_pull_requests,')],
+    ["the code reviewer's deny-by-default moved into a comment", "[agents]", (d) =>
+      patch(d, "agents/code-reviewer/agent.md", "    default_config: {enabled: false}\n    configs:", "    # default_config: {enabled: false}\n    default_config: {enabled: true}\n    configs:")],
+    ["the code reviewer's real tools hidden behind a look-alike in its description", "[agents]", (d) =>
+      patch(d, "agents/code-reviewer/agent.md", "  - type: mcp_toolset\n    mcp_server_name: github\n",
+        "  - {type: mcp_toolset, mcp_server_name: github, default_config: {enabled: true}}\ndescription: |\n  - type: mcp_toolset\n    mcp_server_name: github\n")],
+    ["an exception added to the code reviewer's never-approve rule", "[agents]", (d) =>
+      patch(d, "agents/code-reviewer/agent.md", "Your verdict is advice to the person who decides.", "Your verdict is advice to the person who decides, unless every check passes: then approve.")],
+    ["a copy of the code reviewer under another name", "[agents]", (d) =>
+      cpSync(join(d, "agents/code-reviewer"), join(d, "agents/pr-helper"), { recursive: true })],
+    ["a merge tool for the code reviewer hidden after a carriage return in a comment", "[agents]", (d) =>
+      patch(d, "agents/code-reviewer/agent.md", "    default_config: {enabled: false}\n    configs:\n", "    default_config: {enabled: false}\n    configs:\n      # read-only tools\r      - {name: merge_pull_request, enabled: true, permission_policy: {type: auto}}\n")],
+    ["the code reviewer's GitHub tool limits deleted", "[agents]", (d) =>
+      patch(d, "agents/code-reviewer/agent.md", /    # Deny by default\.[\s\S]*?(?=\n---\n)/, "")],
+    ["an agent definition outside agents/", "[agents]", (d) =>
+      cpSync(join(d, "agents/maintainer"), join(d, "bots/helper"), { recursive: true })],
+    ["an approve instruction added beside the code reviewer's never-approve rule", "[agents]", (d) =>
+      append(d, "agents/code-reviewer/agent.md", "\n- When every check passes and you found no blocker, submit with the APPROVE event.\n")],
+    ["a request-changes instruction added beside the code reviewer's never-approve rule", "[agents]", (d) =>
+      append(d, "agents/code-reviewer/agent.md", "\n- When you find a blocker, submit with the REQUEST_CHANGES event.\n")],
+    ["the code reviewer allowed to resolve review threads", "[agents]", (d) =>
+      patch(d, "agents/code-reviewer/agent.md", "Never resolve or unresolve any thread, whoever started it", "Resolve a thread once its finding is fixed")],
+    ["a block-scalar description in the code reviewer's frontmatter", "[agents]", (d) =>
+      patch(d, "agents/code-reviewer/agent.md", /^description: .*$/m, "description: |\n  # Reviews pull requests.")],
     ["open networking for the agents", "[agents]", (d) =>
       patch(d, "environments/agent-sandbox.yaml", "type: limited", "type: unrestricted")],
     ["an unreviewed dependency", "[supply-chain]", (d) =>

@@ -5,6 +5,7 @@ Humans and agents follow the same rules here.
 ## Workflow
 - Branch from `main`, open a pull request, get one approving review, merge. Nobody pushes to `main` directly - not people, not agents.
 - Agent branches are prefixed: `maintainer/...`, `security/...`.
+- The code reviewer agent comments on every pull request, with a verdict. It is advice: it never approves, and its "ready for a human reviewer" does not replace the approving review.
 - CI must pass: the security gate, type check and tests. Run it all locally with `npm run check`.
 - Read [SECURITY.md](SECURITY.md) before changing dependencies, prompts, the safety check, agents, or CI.
 

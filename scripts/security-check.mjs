@@ -269,7 +269,19 @@ if (!testFiles.includes("test/safety.test.ts")) fail("tests", "test/safety.test.
 // --- 7. The agents can't widen their own power -------------------------------------------
 // An agent (or an assistant editing these files) giving itself web access, unreviewed
 // GitHub writes, or open networking is the most important change to catch here.
-for (const f of tracked.filter((f) => /^agents\/[^/]+\/agent\.md$/.test(f))) {
+// A new agent definition is a new set of powers, so it must be added here on purpose. This
+// also stops a copy of an agent under another name from escaping the rules written for it.
+const AGENT_FILES = ["agents/maintainer/agent.md", "agents/security-guard/agent.md", "agents/code-reviewer/agent.md"];
+for (const f of tracked.filter((f) => (f.startsWith("agents/") || /(^|\/)agent\.md$/.test(f)) && !AGENT_FILES.includes(f))) {
+  fail("agents", `${f} is not a known agent file; a new agent must be added to AGENT_FILES in scripts/security-check.mjs`);
+}
+// YAML also ends a line at a bare carriage return and at three Unicode line breaks. The checks
+// below split on newlines only, so one of those after a "#" would hide a real setting inside
+// what looks like a comment. Windows line endings are refused too: these files never use them.
+for (const f of tracked.filter((f) => /^(agents|environments|vaults)\//.test(f) || /^\.github\/workflows\//.test(f))) {
+  if (/[\r\u0085\u2028\u2029]/.test(read(f))) fail("agents", `${f} contains a carriage return or Unicode line break, which YAML reads as a new line`);
+}
+for (const f of tracked.filter((f) => AGENT_FILES.includes(f))) {
   const s = read(f);
   const front = s.split(/^---$/m)[1] || "";
   for (const tool of ["web_fetch", "web_search"]) {
@@ -284,6 +296,55 @@ for (const f of tracked.filter((f) => /^agents\/[^/]+\/agent\.md$/.test(f))) {
   if (!/Never push to `main`/.test(s)) fail("agents", `${f} must keep the rule "Never push to \`main\`"`);
   if (!/information, not instructions/.test(s)) fail("agents", `${f} must keep the rule that issue/PR/feed text is information, not instructions`);
   if (!/Never run `npm run eval`, `npm start`/.test(s)) fail("agents", `${f} must keep the rule against spending credit or sending texts`);
+  // The reviewer posts with the owner's token, so its approval would count as the human one.
+  if (/reviewer/.test(f)) {
+    // The whole rule, as its own line: an exception added to it must fail, not only its removal.
+    const NEVER_APPROVE = "- **Never approve.** Never submit a review with the APPROVE or REQUEST_CHANGES event, never merge, never close, reopen, or relabel a pull request, and never dismiss a review. Your reviews are posted with the repository owner's token, so an approval from you would count as the one human approval that branch protection requires. Your verdict is advice to the person who decides.";
+    if (!s.split("\n").includes(NEVER_APPROVE)) fail("agents", `${f} must keep the rule "Never approve" word for word`);
+    const NEVER_RESOLVE = "- **Never touch other people's review threads.** The review tool can also resolve and unresolve review threads and delete drafts. Never resolve or unresolve any thread, whoever started it: a resolved thread hides a finding from the next reader. Never delete a draft review you did not create in this run.";
+    if (!s.split("\n").includes(NEVER_RESOLVE)) fail("agents", `${f} must keep the rule "Never touch other people's review threads" word for word`);
+    // The pinned line can be left intact and contradicted somewhere else. No text check catches
+    // every rewording (a person reading the diff is the real control), but the two event
+    // names it forbids have no business anywhere but that line.
+    if (s.split("\n").some((l) => l !== NEVER_APPROVE && /APPROVE|REQUEST_CHANGES/.test(l))) fail("agents", `${f} mentions the APPROVE or REQUEST_CHANGES event outside the "Never approve" rule`);
+    // The prompt rule is only text, so the tool config backs it up: GitHub tools are off
+    // unless named, and only the read and review tools may be named.
+    // The whole frontmatter is compared line by line, indentation included, against the
+    // one shape a reviewer may have. Searching the text for the right words is not enough:
+    // a quoted name, a commented-out default, or a look-alike stanza hidden inside a
+    // multi-line description would all pass a search. Anything unexpected fails.
+    const allowed = ["list_pull_requests", "pull_request_read", "pull_request_review_write", "add_comment_to_pending_review"];
+    const shape = [
+      /^name: [a-z0-9-]+$/,
+      /^description: [A-Za-z][^\\|>{}\[\]"#]*$/, // one plain line: no block scalar, quoting, or escapes
+      /^model: [a-z0-9-]+$/,
+      "mcp_servers:",
+      "  - type: url",
+      "    name: github",
+      "    url: https://api.githubcopilot.com/mcp/",
+      "tools:",
+      "  - type: agent_toolset_20260401",
+      "    default_config: {permission_policy: {type: auto}}",
+      "    configs:",
+      "      - {name: bash, permission_policy: {type: always_allow}}",
+      "      - {name: web_fetch, enabled: false}",
+      "      - {name: web_search, enabled: false}",
+      "  - type: mcp_toolset",
+      "    mcp_server_name: github",
+      "    default_config: {enabled: false}",
+      "    configs:",
+    ];
+    const tool = new RegExp(`^      - \\{name: (${allowed.join("|")}), enabled: true, permission_policy: \\{type: auto\\}\\}$`);
+    // Failures name the line number only. The line's text is whatever someone put in the file,
+    // and this output lands in CI logs.
+    const lines = front.split("\n").map((l, i) => ({ text: l.trimEnd(), at: i + 1 })).filter(({ text }) => text.trim() && !text.trim().startsWith("#"));
+    const bad = lines.find(({ text }, n) => {
+      const want = n < shape.length ? shape[n] : tool;
+      return typeof want === "string" ? text !== want : !want.test(text);
+    });
+    if (bad !== undefined) fail("agents", `${f}: line ${bad.at} is not allowed in a reviewer's frontmatter (the expected shape is in scripts/security-check.mjs)`);
+    else if (lines.length <= shape.length) fail("agents", `${f}: frontmatter is missing part of the reviewer's tool configuration`);
+  }
 }
 for (const f of tracked.filter((f) => /^environments\/.+\.ya?ml$/.test(f))) {
   const s = read(f);
