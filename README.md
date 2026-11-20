@@ -34,6 +34,7 @@ MTA alert feed ──(every 60s, free)──> watcher ──(new alert only)─�
 | `src/rewrite.ts` | The Claude prompt and call |
 | `src/safety.ts` | Last check before a text goes out |
 | `src/sms.ts` | SMS segment math and Twilio |
+| `src/breaker.ts` | Pauses the watcher when it sends or spends too much |
 | `evals/` | Quality evals: Claude grades rewrites against `evals/rubric.md` |
 | `agents/`, `environments/`, `vaults/` | The agent team, synced with `ant apply` |
 
@@ -80,6 +81,48 @@ npm run eval
 ## Before texting real people
 - US carriers require **A2P 10DLC registration** (or toll-free verification) for app-to-person SMS. Start it in the Twilio console early - approval takes days to weeks.
 - Only text people who opted in. Twilio handles STOP replies automatically.
+
+## Pausing and resuming
+
+The watcher pauses itself when it is about to send or spend more than a normal day needs, and
+stays paused until a person resumes it. While paused it keeps polling and logging, but makes no
+Claude calls, posts nothing and texts no one. Alerts that come in while it is paused are never
+sent afterwards: only alerts that are new, or that change, after it resumes go out.
+
+It pauses itself (the breaker trips) just before going over any of these limits. Each is a
+setting on Render; the defaults are about twice the busiest hour and one and a half times the
+busiest day measured (Nov 12-19, 2026: 12 alerts in one hour, 78 in 24 hours).
+
+| Setting | Default | Limit |
+|---|---|---|
+| `MAX_TEXTS_PER_HOUR` | 24 per subscriber | texts in any hour, all subscribers together |
+| `MAX_TEXTS_PER_DAY` | 120 per subscriber | texts in any 24 hours, all subscribers together |
+| `MAX_CLAUDE_CALLS_PER_HOUR` | 30 | Claude calls in any hour |
+| `MAX_SAFETY_BLOCKS_IN_A_ROW` | 3 | messages in a row the safety check blocked |
+
+`MAX_ALERTS_PER_POLL` (default 5) doesn't trip it: alerts over it wait for the next poll.
+
+**Getting told.** When it trips, the bot posts what happened and how to resume to a private
+Telegram chat: set `TELEGRAM_CHANNEL_ADMIN` to that chat's numeric id (a private channel's
+starts with `-100`; see [docs/ONBOARDING.md](docs/ONBOARDING.md#your-own-test-channel-see-real-posts-without-touching-production)
+for how to find it) and add the bot to it. Never use a public channel. Without it, only the
+Render logs say so: look for lines starting with `[breaker]`.
+
+**Pause it by hand.** On Render, open the service's Environment page, set `PAUSED` to `true`,
+and choose **Save and deploy** ("Save only" changes nothing until the next deploy). Anything
+other than `false`, `0`, `no`, `off` or blank counts as paused. Remove it, or set it to `false`,
+the same way to switch it back on.
+
+**Resume after it paused itself.** First find out what went wrong, in the Render logs. Then set
+`RESUME_AFTER_TRIP` to the code in the Telegram alert (it is also in the logs), and choose
+**Save and deploy**. The code only works for that one pause, so it can stay set: if the watcher
+pauses itself again later, that pause has a new code.
+
+**Keep the state file on a persistent disk.** The pause, and the counts, live in the state file
+(`STATE_FILE`, by default `data/state.json`). On Render without a persistent disk, every deploy
+and restart starts with an empty disk, so a new deploy forgets the pause. Attach a persistent
+disk to the service (for example at `/var/data`) and set `STATE_FILE=/var/data/state.json`.
+Until then, set `PAUSED=true` as well to be sure it stays off.
 
 ## What's next
 New here? Start with [docs/ONBOARDING.md](docs/ONBOARDING.md). Open work: [docs/starter-issues.md](docs/starter-issues.md).
