@@ -39,6 +39,9 @@ const FeedSchema = z.object({
   ),
 });
 
+/** Real ids look like "lmm:alert:12345" or "lmm:planned_work:28103". */
+const ALERT_ID = /^(?!__proto__$)[A-Za-z0-9:._-]{1,200}$/;
+
 function plainText(t: z.infer<typeof Translations>): string {
   return t?.translation.find((x) => x.language === "en")?.text.trim() ?? "";
 }
@@ -46,7 +49,12 @@ function plainText(t: z.infer<typeof Translations>): string {
 /** Parse a raw feed body into Alerts. Throws if the MTA changes the shape we depend on. */
 export function parseFeed(raw: unknown): Alert[] {
   const feed = FeedSchema.parse(raw);
-  return feed.entity.map(({ id, alert }) => {
+  // The id becomes a key in the state file. One odd entry is dropped, not allowed to fail the
+  // whole feed or to slip past the "already announced" memory (#96).
+  const entities = feed.entity.filter(({ id }) => ALERT_ID.test(id));
+  const dropped = feed.entity.length - entities.length;
+  if (dropped) console.warn(`[mta] ignored ${dropped} feed entr${dropped === 1 ? "y" : "ies"} with a malformed id`);
+  return entities.map(({ id, alert }) => {
     const meta = alert["transit_realtime.mercury_alert"];
     const routes = [
       ...new Set((alert.informed_entity ?? []).flatMap((e) => (e.route_id ? [e.route_id] : []))),

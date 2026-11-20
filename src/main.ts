@@ -1,16 +1,17 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { textworthy } from "./filter.js";
-import { fetchAlerts } from "./mta.js";
+import { fetchAlerts, type Alert } from "./mta.js";
 import { checkClaude } from "./preflight.js";
 import { rewriteAlert, rewriteOptionsFromEnv } from "./rewrite.js";
 import { checkRiderMessage } from "./safety.js";
 import { parseSubscribers, sendSms, smsSegments, twilioConfigFromEnv, wantsAlert } from "./sms.js";
-import { loadState, planAnnouncements, saveState } from "./state.js";
+import { DEFAULT_LIMITS, forget, loadState, planAnnouncements, primed, saveState, without, type State } from "./state.js";
 import { postToTelegram, telegramConfigFromEnv, telegramPosts } from "./telegram.js";
 
 const args = new Set(process.argv.slice(2));
 const once = args.has("--once");
 const dryRun = args.has("--dry-run");
+const announceExisting = args.has("--announce-existing");
 // --no-sms: local development never texts real phones, even if Twilio settings are present.
 const twilio = dryRun || args.has("--no-sms") ? null : twilioConfigFromEnv();
 if (!twilio && process.env.TWILIO_ACCOUNT_SID && process.env.SEND_SMS !== "true" && !dryRun) {
@@ -28,63 +29,94 @@ async function tick(): Promise<void> {
   const nowSeconds = Math.floor(Date.now() / 1000);
   const candidates = textworthy(await fetchAlerts(), nowSeconds);
   const previous = await loadState(stateFile);
-  const { toAnnounce, next } = planAnnouncements(candidates, previous ?? { announced: {} });
 
-  if (previous === null && !args.has("--announce-existing")) {
+  if (previous === null && !announceExisting) {
     // First run: remember what's already going on instead of blasting a pile of texts.
     console.log(`[watch] first run - priming with ${candidates.length} current alerts, sending nothing`);
-    await saveState(stateFile, next);
+    await saveState(stateFile, primed(candidates, nowSeconds));
     return;
   }
 
+  // --announce-existing (local development) sends what is already in the feed on purpose, so a
+  // long list is not a flood there. It is still sent a few alerts per poll.
+  const limits = previous === null ? { ...DEFAULT_LIMITS, floodAbove: Infinity } : DEFAULT_LIMITS;
+  const { toAnnounce, next, deferred, flood } = planAnnouncements(
+    candidates,
+    previous ?? { announced: {} },
+    nowSeconds,
+    limits,
+  );
+  if (flood) {
+    console.error(
+      `[watch] more than ${limits.floodAbove} new alerts in one poll - treating the feed as broken: ` +
+        "sending nothing and marking them all as announced",
+    );
+  }
+  if (deferred) console.warn(`[watch] ${deferred} new alert(s) held for the next poll (at most ${limits.maxPerTick} per poll)`);
+
+  // The state is saved after every alert, without the alerts not handled yet. Whatever stops
+  // this loop early, an alert that was already sent is never sent again (#52).
+  const notHandled = new Set(toAnnounce.map((a) => a.id));
   for (const alert of toAnnounce) {
-    let msg;
     try {
-      msg = await rewriteAlert(claude, alert, rewriteOpts);
+      await announce(alert, next);
     } catch (err) {
-      // An API error on one alert must not stop the others (or re-text the ones already sent).
-      console.error(`[rewrite] ${alert.id} failed:`, err);
-      msg = null;
+      // Something may already have gone out, so the alert stays marked as announced.
+      console.error(`[watch] ${alert.id} failed part-way; not retrying it:`, err);
     }
-    if (!msg) {
-      delete next.announced[alert.id]; // retry next tick
-      continue;
-    }
-    const problems = checkRiderMessage(msg, alert);
-    if (problems.length) {
-      console.warn(`[safety] blocked ${alert.id}: ${problems.join("; ")}`);
-      continue; // stays marked as announced, so a bad rewrite is not retried every minute
-    }
+    notHandled.delete(alert.id);
+    await saveState(stateFile, without(next, notHandled));
+  }
+  if (toAnnounce.length === 0) await saveState(stateFile, next);
+  console.log(`[watch] ${new Date().toISOString()} - ${candidates.length} active, ${toAnnounce.length} new`);
+}
 
-    console.log(`\n[${alert.routes.join(",")}] ${alert.type}\n  EN: ${msg.en}\n  ES: ${msg.es}`);
-    for (const lang of ["en", "es"] as const) {
-      const { segments, encoding } = smsSegments(msg[lang]);
-      console.log(`  ${lang}: ${segments} segment(s), ${encoding}`);
-    }
+/** Rewrite one alert, check it, and send it to every channel. */
+async function announce(alert: Alert, next: State): Promise<void> {
+  let msg;
+  try {
+    msg = await rewriteAlert(claude, alert, rewriteOpts);
+  } catch (err) {
+    // An API error on one alert must not stop the others (or re-text the ones already sent).
+    console.error(`[rewrite] ${alert.id} failed:`, err);
+    msg = null;
+  }
+  if (!msg) {
+    forget(next, alert.id); // retry next tick
+    return;
+  }
+  const problems = checkRiderMessage(msg, alert);
+  if (problems.length) {
+    console.warn(`[safety] blocked ${alert.id}: ${problems.join("; ")}`);
+    return; // stays marked as announced, so a bad rewrite is not retried every minute
+  }
 
-    // Each channel is independent: a failure in one never blocks the other.
-    if (telegram) {
-      for (const post of telegramPosts(telegram, msg)) {
-        try {
-          await postToTelegram(telegram, post.chatId, post.text);
-        } catch (err) {
-          console.error(`[telegram] failed to post to ${post.chatId}:`, err);
-        }
-      }
-    }
-    if (twilio) {
-      for (const sub of subscribers) {
-        if (!wantsAlert(sub, alert.routes)) continue; // they only asked for other lines
-        try {
-          await sendSms(twilio, sub.phone, msg[sub.lang]);
-        } catch (err) {
-          console.error(`[sms] failed to text ${sub.phone.slice(0, -4)}XXXX:`, err);
-        }
+  console.log(`\n[${alert.routes.join(",")}] ${alert.type}\n  EN: ${msg.en}\n  ES: ${msg.es}`);
+  for (const lang of ["en", "es"] as const) {
+    const { segments, encoding } = smsSegments(msg[lang]);
+    console.log(`  ${lang}: ${segments} segment(s), ${encoding}`);
+  }
+
+  // Each channel is independent: a failure in one never blocks the other.
+  if (telegram) {
+    for (const post of telegramPosts(telegram, msg)) {
+      try {
+        await postToTelegram(telegram, post.chatId, post.text);
+      } catch (err) {
+        console.error(`[telegram] failed to post to ${post.chatId}:`, err);
       }
     }
   }
-  await saveState(stateFile, next);
-  console.log(`[watch] ${new Date().toISOString()} - ${candidates.length} active, ${toAnnounce.length} new`);
+  if (twilio) {
+    for (const sub of subscribers) {
+      if (!wantsAlert(sub, alert.routes)) continue; // they only asked for other lines
+      try {
+        await sendSms(twilio, sub.phone, msg[sub.lang]);
+      } catch (err) {
+        console.error(`[sms] failed to text ${sub.phone.slice(0, -4)}XXXX:`, err);
+      }
+    }
+  }
 }
 
 async function main(): Promise<void> {
