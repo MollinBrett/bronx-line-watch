@@ -263,16 +263,25 @@ describe("checkRiderMessage vs. invisible characters and odd route IDs", () => {
     });
   }
 
-  // Known gap (#52): route IDs from the feed are put into a RegExp unescaped.
-  it.fails("does not throw on a route ID with regex characters - known gap, #52", () => {
+  // Route IDs come from the feed and must never reach a RegExp unescaped (#52).
+  it("does not throw on a route ID with regex characters, and blocks the alert", () => {
     // No line named, so the check reaches the "(" route instead of stopping at "4".
     const msg = { en: "Trains are delayed.", es: "Los trenes van con retraso." };
     expect(() => checkRiderMessage(msg, makeAlert({ routes: ["4", "("] }))).not.toThrow();
+    const named = { en: "[4] trains are delayed.", es: "Los trenes [4] van con retraso." };
+    expect(checkRiderMessage(named, makeAlert({ routes: ["4", "("] }))).toEqual(["alert has 1 malformed route id(s)"]);
   });
 
-  it.fails("a route ID of a single dot does not bypass the line-name check - known gap, #52", () => {
+  it("a route ID of a single dot does not bypass the line-name check", () => {
     const msg = { en: "Trains are delayed.", es: "Los trenes van con retraso." };
     expect(checkRiderMessage(msg, makeAlert({ routes: ["."] })).length).toBeGreaterThan(0);
+  });
+
+  it("accepts every Bronx line name as a route ID", () => {
+    for (const r of ["2", "4", "5", "6", "6X", "B", "D"]) {
+      const msg = { en: `[${r}] trains are delayed.`, es: `Los trenes [${r}] van con retraso.` };
+      expect(checkRiderMessage(msg, makeAlert({ routes: [r] }))).toEqual([]);
+    }
   });
 });
 
