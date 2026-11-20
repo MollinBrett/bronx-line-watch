@@ -29,13 +29,15 @@ vi.mock("@anthropic-ai/sdk", () => {
   return { default: Anthropic };
 });
 
-const disk = vi.hoisted(() => ({ full: false }));
+/** `full`: every write fails. `failWrite`: only that write fails (counted from 1, reset per test). */
+const disk = vi.hoisted(() => ({ full: false, writes: 0, failWrite: 0 }));
 vi.mock("node:fs/promises", async (original) => {
   const real = await original<typeof import("node:fs/promises")>();
   return {
     ...real,
     writeFile: (async (...a: Parameters<typeof real.writeFile>) => {
-      if (disk.full) throw Object.assign(new Error("ENOSPC: no space left on device"), { code: "ENOSPC" });
+      disk.writes += 1;
+      if (disk.full || disk.writes === disk.failWrite) throw Object.assign(new Error("ENOSPC: no space left on device"), { code: "ENOSPC" });
       return real.writeFile(...a);
     }) as typeof real.writeFile,
   };
@@ -94,6 +96,8 @@ beforeEach(() => {
   twilioDown = false;
   beforeText = null;
   disk.full = false;
+  disk.writes = 0;
+  disk.failWrite = 0;
   sdk.parse.mockReset().mockResolvedValue(good);
   sdk.retrieve.mockReset().mockImplementation(async (model: string) => ({ id: model }));
   vi.useFakeTimers({ toFake: ["Date"] });
@@ -492,16 +496,33 @@ describe("telling the operators", () => {
     expect(adminPosts()).toHaveLength(1);
   });
 
-  it("gives up on the alert after 30 tries, and stays paused", async () => {
+  it("after 30 failed tries it tries once an hour, so a long outage still ends with the operators told", async () => {
     await pollWith("a");
     await pollWith("a", "b");
     telegramDown = true;
     for (let i = 0; i < 40; i++) await pollWith("a", "b", "c");
     expect(state().breaker.tripped).toMatchObject({ alerted: false, alertTries: 30 });
     telegramDown = false;
-    await pollWith("a", "b", "c");
+    for (let i = 0; i < 15; i++) await pollWith("a", "b", "c"); // not yet the hour
     expect(adminPosts()).toEqual([]);
-    expect(texts()).toHaveLength(2);
+    for (let i = 0; i < 10; i++) await pollWith("a", "b", "c"); // passes one hour after the trip
+    expect(adminPosts()).toHaveLength(1);
+    expect(texts()).toHaveLength(2); // still paused
+  });
+
+  it("saves the trip before telling anyone its resume code", async () => {
+    setEnv({ MAX_TEXTS_PER_HOUR: undefined, MAX_CLAUDE_CALLS_PER_HOUR: "1" });
+    await pollWith("a");
+    await pollWith("a", "b");
+    let onDiskWhenTold: { breaker: { tripped?: { at: number } } } | undefined;
+    const real = vi.mocked(fetch).getMockImplementation()!;
+    vi.mocked(fetch).mockImplementation(async (url, init) => {
+      if (String(url).includes("api.telegram.org")) onDiskWhenTold = state();
+      return real(url, init);
+    });
+    await pollWith("a", "b", "c");
+    expect(adminPosts()).toHaveLength(1);
+    expect(adminPosts()[0]!.text).toContain(String(onDiskWhenTold!.breaker.tripped!.at));
   });
 
   it("still pauses when there is no private chat to tell", async () => {
@@ -614,6 +635,30 @@ describe("when the breaker's own machinery fails", () => {
     expect(texts()).toHaveLength(2);
   });
 
+  it("counts no Claude calls while the state file can't be written, so a full disk is not reported as overspending", async () => {
+    setEnv({ MAX_CLAUDE_CALLS_PER_HOUR: "2" });
+    await pollWith("a");
+    disk.full = true;
+    for (let i = 0; i < 5; i++) await pollWith("a", "b");
+    disk.full = false;
+    await pollWith("a", "b");
+    expect(sdk.parse).toHaveBeenCalledTimes(1);
+    expect(state().breaker.tripped).toBeUndefined();
+    expect(Object.values(state().breaker.claudeCalls)).toEqual([1]);
+  });
+
+  it("when the save just before sending fails, nothing is sent or counted and the alert is tried again", async () => {
+    await pollWith("a");
+    disk.writes = 0;
+    disk.failWrite = 2; // 1: before the Claude call. 2: before sending.
+    await pollWith("a", "b");
+    expect(sent).toEqual([]);
+    expect(state().announced.b).toBeUndefined();
+    await pollWith("a", "b");
+    expect(texts()).toHaveLength(2);
+    expect(Object.values(state().breaker.texts).reduce((x: number, y) => x + (y as number), 0)).toBe(2);
+  });
+
   it("does not send an alert twice when the process dies part-way through sending it", async () => {
     await pollWith("a");
     // The first text goes out, then the process is killed before the second. A killed process
@@ -669,6 +714,7 @@ describe("settings", () => {
     ["POLL_SECONDS", "0"],
     ["POLL_SECONDS", "60s"],
     ["POLL_SECONDS", "1"],
+    ["POLL_SECONDS", "1e12"],
   ])("refuses to start with %s=%j", async (name, value) => {
     setEnv({ [name]: value });
     await expect(run()).rejects.toThrow(name);

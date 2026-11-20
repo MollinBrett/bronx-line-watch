@@ -40,7 +40,7 @@ export const TEXTS_PER_SUBSCRIBER = { hour: 24, day: 120 };
 /** About twice the busiest hour measured (12 alerts, so at least 12 Claude calls). */
 export const DEFAULT_CLAUDE_CALLS_PER_HOUR = 30;
 export const DEFAULT_SAFETY_BLOCKS_IN_A_ROW = 3;
-/** The alert to the operators is tried on this many polls, then given up on. */
+/** The alert to the operators is tried on this many polls in a row, then once an hour. */
 export const MAX_ALERT_TRIES = 30;
 
 /**
@@ -68,8 +68,9 @@ export function pollSecondsFromEnv(raw: string | undefined): number {
   const value = (raw ?? "").trim();
   if (value === "") return 60;
   const seconds = Number(value);
-  if (!Number.isFinite(seconds) || seconds < 10) {
-    throw new Error(`POLL_SECONDS must be a number of seconds, 10 or more; got "${value.slice(0, 20)}"`);
+  // Over an hour is refused too: a huge delay overflows the timer and becomes no delay at all.
+  if (!Number.isFinite(seconds) || seconds < 10 || seconds > 3600) {
+    throw new Error(`POLL_SECONDS must be a number of seconds from 10 to 3600; got "${value.slice(0, 20)}"`);
   }
   return seconds;
 }
@@ -158,7 +159,10 @@ function total(counts: Record<string, number>, span: Span, nowSeconds: number): 
 }
 
 function add(counts: Record<string, number>, span: Span, nowSeconds: number, n: number): void {
-  const oldest = bucketOf(span, nowSeconds) - span.buckets;
+  // Old buckets are dropped by the earlier of the clock and the newest bucket, so a clock that
+  // jumps ahead for one poll can't wipe out what was really sent in the last hour.
+  const newest = Math.max(...Object.keys(counts).map(Number));
+  const oldest = Math.min(bucketOf(span, nowSeconds), newest) - span.buckets;
   for (const bucket of Object.keys(counts)) if (Number(bucket) < oldest) delete counts[bucket];
   if (n === 0) return;
   const current = String(bucketOf(span, nowSeconds));
@@ -209,6 +213,22 @@ export function allowTexts(b: Breaker, caps: Caps, n: number, nowSeconds: number
   add(b.texts, HOUR, nowSeconds, n);
   add(b.textsByHour, DAY, nowSeconds, n);
   return true;
+}
+
+/** Take back texts that were allowed but never sent, because the save before sending failed. */
+export function textsNotSent(b: Breaker, n: number, nowSeconds: number): void {
+  add(b.texts, HOUR, nowSeconds, -n);
+  add(b.textsByHour, DAY, nowSeconds, -n);
+}
+
+/**
+ * Whether to try the operators' alert on this poll: every poll for the first MAX_ALERT_TRIES,
+ * then once an hour, so a long Telegram outage doesn't leave a pause nobody was told about.
+ */
+export function alertDue(t: Trip, nowSeconds: number): boolean {
+  if (t.alerted) return false;
+  if (t.alertTries < MAX_ALERT_TRIES) return true;
+  return Math.floor((nowSeconds - t.at) / 60) % 60 === 0;
 }
 
 /** Tell the breaker how a safety check went. Enough blocks in a row trip it; one pass starts the count again. */

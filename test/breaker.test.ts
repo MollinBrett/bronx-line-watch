@@ -10,6 +10,7 @@ import {
   recordSafetyCheck,
   restoreBreaker,
   resumeCode,
+  textsNotSent,
   tripMessage,
   tripReason,
   tripTime,
@@ -108,7 +109,7 @@ describe("pollSecondsFromEnv", () => {
     expect(pollSecondsFromEnv("30.5")).toBe(30.5);
   });
 
-  it.each(["0", "1", "9.9", "-60", "60s", "a minute", "NaN", "Infinity"])("refuses %j: it would poll in a tight loop", (raw) => {
+  it.each(["0", "1", "9.9", "-60", "60s", "a minute", "NaN", "Infinity", "3601", "1e12", "2200000"])("refuses %j: it would poll in a tight loop", (raw) => {
     expect(() => pollSecondsFromEnv(raw)).toThrow("POLL_SECONDS");
   });
 });
@@ -160,9 +161,10 @@ describe("Claude calls per hour", () => {
       allowClaudeCall(b, roomy, t);
       allowTexts(b, roomy, 1, t);
     }
-    expect(Object.keys(b.claudeCalls).length).toBeLessThanOrEqual(61);
-    expect(Object.keys(b.texts).length).toBeLessThanOrEqual(61);
-    expect(Object.keys(b.textsByHour).length).toBeLessThanOrEqual(25);
+    // The window (61 and 25 buckets) plus one: old buckets are dropped before the new one is added.
+    expect(Object.keys(b.claudeCalls).length).toBeLessThanOrEqual(62);
+    expect(Object.keys(b.texts).length).toBeLessThanOrEqual(62);
+    expect(Object.keys(b.textsByHour).length).toBeLessThanOrEqual(26);
   });
 });
 
@@ -206,6 +208,25 @@ describe("texts per hour and per day", () => {
     const b = freshBreaker();
     allowTexts(b, caps, 10, T0 + 3 * HOUR);
     expect(allowTexts(b, caps, 1, T0)).toBe(false);
+  });
+
+  it("a clock that jumps ahead for one poll does not wipe out what was really sent", () => {
+    const b = freshBreaker();
+    allowTexts(b, caps, 10, T0);
+    expect(allowTexts(b, caps, 0, T0 + 2 * HOUR)).toBe(true); // one poll with the clock two hours ahead
+    expect(allowTexts(b, caps, 1, T0 + 5 * MIN)).toBe(false); // the clock is right again: still at the limit
+    const c = freshBreaker();
+    for (let i = 0; i < 3; i++) allowClaudeCall(c, caps, T0);
+    claudeCallNotBilled(c, T0 + 2 * HOUR);
+    expect(allowClaudeCall(c, caps, T0 + 5 * MIN)).toBe(false);
+  });
+
+  it("takes back texts that were never sent", () => {
+    const b = freshBreaker();
+    allowTexts(b, caps, 10, T0);
+    textsNotSent(b, 10, T0);
+    expect(allowTexts(b, caps, 10, T0)).toBe(true);
+    expect(b.tripped).toBeUndefined();
   });
 
   it("once tripped, refuses everything, and keeps the first reason", () => {

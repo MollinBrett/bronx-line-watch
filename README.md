@@ -106,7 +106,8 @@ busiest day measured (Nov 12-19, 2026: 12 alerts in one hour, 78 in 24 hours).
 Telegram chat: set `TELEGRAM_CHANNEL_ADMIN` to that chat's numeric id (a private channel's
 starts with `-100`; see [docs/ONBOARDING.md](docs/ONBOARDING.md#your-own-test-channel-see-real-posts-without-touching-production)
 for how to find it) and add the bot to it. Never use a public channel. Without it, only the
-Render logs say so: look for lines starting with `[breaker]`.
+Render logs say so: look for lines starting with `[breaker]`. If Telegram is down, it keeps trying:
+every poll for half an hour, then once an hour.
 
 **Pause it by hand.** On Render, open the service's Environment page, set `PAUSED` to `true`,
 and choose **Save and deploy** ("Save only" changes nothing until the next deploy). Anything

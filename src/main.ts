@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import {
   MAX_ALERT_TRIES,
+  alertDue,
   allowClaudeCall,
   allowTexts,
   breakerSettingsFromEnv,
@@ -9,6 +10,7 @@ import {
   recordSafetyCheck,
   restoreBreaker,
   resumeCode,
+  textsNotSent,
   tripReason,
   tripTime,
   type Breaker,
@@ -61,8 +63,10 @@ async function tick(): Promise<void> {
   if (paused) {
     // Paused: no Claude call, no post, no text. It keeps marking what is in the feed as
     // announced, so resuming never sends a backlog.
-    await tellOperators(b);
-    await save(primed(candidates, nowSeconds, previous ?? undefined));
+    // Saved first, so the trip and its resume code are on disk before anyone is told the code.
+    const remembered = primed(candidates, nowSeconds, previous ?? undefined);
+    await save(remembered);
+    if (await tellOperators(b, nowSeconds)) await save(remembered);
     const resume = b.tripped ? `; to resume, set RESUME_AFTER_TRIP=${resumeCode(b.tripped)}` : "";
     console.log(`[watch] ${stamp} - PAUSED (${paused}${resume}) - ${candidates.length} active, nothing sent`);
     return;
@@ -96,39 +100,54 @@ async function tick(): Promise<void> {
   }
   if (deferred) console.warn(`[watch] ${deferred} new alert(s) held for the next poll (at most ${limits.maxPerTick} per poll)`);
 
-  // The state is saved without the alerts not handled yet. Whatever stops this loop early, an
-  // alert that was already sent is never sent again (#52).
+  // The state is saved after every alert, without the alerts not handled yet. Whatever stops
+  // this loop early, an alert that was already sent is never sent again (#52).
   const notHandled = new Set(toAnnounce.map((a) => a.id));
   const saveProgress = () => save(without(next, notHandled));
   for (const alert of toAnnounce) {
     if (!allowClaudeCall(b, settings, nowSeconds)) break; // over the limit: the breaker has tripped
     // The call is on record before it is made, so a crash can't hide it. And nothing is spent
     // unless the state file can be written: the next poll must know what this one did.
-    await saveProgress();
+    try {
+      await saveProgress();
+    } catch (err) {
+      claudeCallNotBilled(b, nowSeconds); // the call was never made
+      throw err;
+    }
+    let nothingSent: unknown;
     try {
       await announce(alert, next, b, nowSeconds, async (texts) => {
         if (!allowTexts(b, settings, texts, nowSeconds)) return false;
         // Saved before anything goes out: from here the alert counts as announced and its
         // texts as sent, even if the process dies part-way through sending.
         notHandled.delete(alert.id);
-        await saveProgress();
+        try {
+          await saveProgress();
+        } catch (err) {
+          // Not saved, so not sent: the alert stays new and its texts are not counted.
+          notHandled.add(alert.id);
+          textsNotSent(b, texts, nowSeconds);
+          nothingSent = err;
+          throw err;
+        }
         return true;
       });
     } catch (err) {
+      if (nothingSent) throw err; // the state file can't be written: stop this poll
       // Something may already have gone out, so the alert stays marked as announced.
       console.error(`[watch] ${alert.id} failed part-way; not retrying it:`, err);
     }
     notHandled.delete(alert.id);
     await saveProgress();
   }
+  await saveProgress();
   if (b.tripped) {
     console.error(
       `[breaker] TRIPPED on ${tripTime(b.tripped)}: ${tripReason(b.tripped)}. Nothing more is sent until a person ` +
         `resumes it: set RESUME_AFTER_TRIP=${resumeCode(b.tripped)} (README, "Pausing and resuming")`,
     );
-    await tellOperators(b);
+    if (await tellOperators(b, nowSeconds)) await saveProgress();
   }
-  await saveProgress();
   console.log(`[watch] ${stamp} - ${candidates.length} active, ${toAnnounce.length} new`);
 }
 
@@ -197,18 +216,22 @@ async function announce(
   }
 }
 
-/** Tell the operators, in their private chat, that the breaker tripped. Tried again on later polls until it gets through. */
-async function tellOperators(b: Breaker): Promise<void> {
+/**
+ * Tell the operators, in their private chat, that the breaker tripped. Tried again on later
+ * polls until it gets through. Returns whether it tried, so the caller saves the result.
+ */
+async function tellOperators(b: Breaker, nowSeconds: number): Promise<boolean> {
   const trip = b.tripped;
-  if (!trip || trip.alerted || !adminChat || trip.alertTries >= MAX_ALERT_TRIES) return;
+  if (!trip || !adminChat || !alertDue(trip, nowSeconds)) return false;
   trip.alertTries += 1;
   try {
     await postTripAlert(adminChat, trip);
     trip.alerted = true;
     console.log("[breaker] told the operators in their private Telegram chat");
   } catch (err) {
-    console.error(`[breaker] could not tell the operators (try ${trip.alertTries} of ${MAX_ALERT_TRIES}):`, err);
+    console.error(`[breaker] could not tell the operators (try ${trip.alertTries}; hourly after ${MAX_ALERT_TRIES}):`, err);
   }
+  return true;
 }
 
 async function main(): Promise<void> {
