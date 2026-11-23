@@ -35,8 +35,13 @@ const HIDING: [string, string][] = [
 
 describe("checkRiderMessage vs. private-use, unassigned and surrogate code points", () => {
   for (const [kind, ch] of HIDING) {
-    it.fails(`blocks a host split by ${kind} ${hex(ch)} - known gap, #51`, () => {
+    // One case per dot position: if the first assertion threw, the second would never run,
+    // and a fix covering only one position would stay hidden as an expected failure.
+    it.fails(`blocks a host split by ${kind} ${hex(ch)} before the dot - known gap, #51`, () => {
       expect(en(`[4] delayed. Refunds: mta-refund${ch}.top`).length).toBeGreaterThan(0);
+    });
+
+    it.fails(`blocks a host split by ${kind} ${hex(ch)} after the dot - known gap, #51`, () => {
       expect(en(`[4] delayed. Refunds: mta-refund.${ch}top`).length).toBeGreaterThan(0);
     });
   }
