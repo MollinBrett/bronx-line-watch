@@ -10,43 +10,60 @@ import { makeAlert } from "./helpers.js";
 // These guards make sure the #23 fix covers them too.
 const alert = makeAlert({ routes: ["4"] });
 const es = "Los trenes [4] van con retrasos en ambas direcciones.";
-const blocked = (en: string) => checkRiderMessage({ en, es }, alert);
+const en = "[4] trains are delayed in both directions.";
+const blocked = (text: string) => checkRiderMessage({ en: text, es }, alert);
+const blockedEs = (text: string) => checkRiderMessage({ en, es: text }, alert);
+const keycaps = [..."7185550123"].map((d) => `${d}\uFE0F\u20E3`).join("");
 
 describe("checkRiderMessage vs. phone numbers in non-ASCII digits", () => {
-  it.fails("blocks a callback number in Arabic-Indic digits - known gap, #23", () => {
-    expect(blocked("[4] delayed. For a fare refund call \u0667\u0661\u0668-\u0665\u0665\u0665-\u0660\u0661\u0662\u0663").length).toBeGreaterThan(0);
+  // Each text has nothing suspicious but the number itself: no "call", "refund", "llama" or
+  // "reembolso". A fix that only looks for solicitation words must not turn these green; only
+  // a check on the digits can. One test per script and language, so a partial fix shows up.
+  it.fails("blocks a bare number in Arabic-Indic digits - known gap, #23", () => {
+    expect(blocked("[4] trains are delayed. Info: \u0667\u0661\u0668-\u0665\u0665\u0665-\u0660\u0661\u0662\u0663").length).toBeGreaterThan(0);
   });
 
-  it.fails("blocks a callback number in Devanagari digits - known gap, #23", () => {
-    expect(blocked("[4] delayed. For a fare refund call \u096D\u0967\u096E \u096B\u096B\u096B \u0966\u0967\u0968\u0969").length).toBeGreaterThan(0);
+  it.fails("blocks a bare number in Devanagari digits - known gap, #23", () => {
+    expect(blocked("[4] trains are delayed. Info: \u096D\u0967\u096E \u096B\u096B\u096B \u0966\u0967\u0968\u0969").length).toBeGreaterThan(0);
   });
 
-  it.fails("blocks a callback number in keycap emoji digits - known gap, #23", () => {
-    const keycaps = [..."7185550123"].map((d) => `${d}\uFE0F\u20E3`).join("");
-    expect(blocked(`[4] delayed. For a fare refund call ${keycaps}`).length).toBeGreaterThan(0);
+  it.fails("blocks a bare number in keycap emoji digits - known gap, #23", () => {
+    expect(blocked(`[4] trains are delayed. Info: ${keycaps}`).length).toBeGreaterThan(0);
   });
 
-  it.fails("blocks a callback number in Arabic-Indic digits in Spanish - known gap, #23", () => {
-    const esBad = "Los trenes [4] van con retrasos. Para un reembolso llama al \u0667\u0661\u0668-\u0665\u0665\u0665-\u0660\u0661\u0662\u0663";
-    expect(checkRiderMessage({ en: "[4] trains are delayed.", es: esBad }, alert).length).toBeGreaterThan(0);
+  it.fails("blocks a bare number in Arabic-Indic digits in Spanish - known gap, #23", () => {
+    expect(blockedEs("Los trenes [4] van con retrasos. Info: \u0667\u0661\u0668-\u0665\u0665\u0665-\u0660\u0661\u0662\u0663").length).toBeGreaterThan(0);
   });
 
-  // Regression guards: NFKC already folds these to ASCII digits and letters, so a fix
-  // that checks the normalized text sees them. Today they're caught only where they also
-  // spell a link; these just pin that the normalization stays in place.
-  it("folds fullwidth digits in a host to ASCII and still blocks the link", () => {
-    expect(blocked("[4] delayed. Refunds: mta\uFF17\uFF11\uFF18.top").length).toBeGreaterThan(0);
+  it.fails("blocks a bare number in Devanagari digits in Spanish - known gap, #23", () => {
+    expect(blockedEs("Los trenes [4] van con retrasos. Info: \u096D\u0967\u096E \u096B\u096B\u096B \u0966\u0967\u0968\u0969").length).toBeGreaterThan(0);
   });
 
-  it("folds mathematical bold letters in a host and still blocks the link", () => {
-    expect(blocked("[4] delayed. Refunds: \u{1D426}\u{1D42D}\u{1D41A}-refund.top").length).toBeGreaterThan(0);
+  it.fails("blocks a bare number in keycap emoji digits in Spanish - known gap, #23", () => {
+    expect(blockedEs(`Los trenes [4] van con retrasos. Info: ${keycaps}`).length).toBeGreaterThan(0);
+  });
+
+  // Regression guards for NFKC. Each host below is only a link AFTER normalization: HOST in
+  // src/safety.ts matches letters and digits but needs a literal ".", and NFKC is what turns
+  // these dots into one. Checked by running with .normalize("NFKC") removed: all three
+  // return [] then, so they fail if the normalization is dropped.
+  it("still blocks a host whose dot is a fullwidth full stop", () => {
+    expect(blocked("[4] trains are delayed. Info: mta-refund\uFF0Etop").length).toBeGreaterThan(0);
+  });
+
+  it("still blocks a host whose dot is a small full stop", () => {
+    expect(blocked("[4] trains are delayed. Info: mta-refund\uFE52top").length).toBeGreaterThan(0);
+  });
+
+  it("still blocks a host written with fullwidth digits and a fullwidth full stop", () => {
+    expect(blocked("[4] trains are delayed. Info: mta\uFF17\uFF11\uFF18\uFF0Etop").length).toBeGreaterThan(0);
   });
 
   // Allow case: ordinary times, station numbers and line names in both languages.
   it("allows ordinary times and street numbers", () => {
     expect(
       checkRiderMessage(
-        { en: "[4] trains are delayed near 149 St-Grand Concourse until 5:30 PM.", es: "Los trains [4] van con retraso cerca de la 149 hasta las 5:30 PM." },
+        { en: "[4] trains are delayed near 149 St-Grand Concourse until 5:30 PM.", es: "Los trenes [4] van con retraso cerca de la 149 hasta las 5:30 PM." },
         alert,
       ),
     ).toEqual([]);
