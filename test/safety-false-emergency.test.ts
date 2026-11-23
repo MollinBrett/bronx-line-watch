@@ -15,16 +15,30 @@ describe("checkRiderMessage vs. emergencies the alert doesn't mention", () => {
   const enOnly = (text: string) => checkRiderMessage({ en: text, es }, alert);
   const esOnly = (text: string) => checkRiderMessage({ en, es: text }, alert);
 
-  it.fails("blocks an emergency the alert never mentions, in English - known gap, #100", () => {
-    expect(enOnly("[4] trains suspended: police report a bomb at 149 St-Grand Concourse. Evacuate the area now.").length).toBeGreaterThan(0);
-    expect(enOnly("[4] delayed. Shots fired near 161 St-Yankee Stadium. Stay indoors until police give the all clear.").length).toBeGreaterThan(0);
-    expect(enOnly("[4] delayed. Smoke in the tunnel. Do not enter any Bronx station.").length).toBeGreaterThan(0);
-  });
+  // One test per message: the first failing assertion ends a test, so with several messages in
+  // one it.fails a fix that catches only some of them would stay hidden as an expected failure.
+  // Checked: each message below returns [] on its own today.
+  const EN_INVENTED: [string, string][] = [
+    ["bomb", "[4] trains suspended: police report a bomb at 149 St-Grand Concourse. Evacuate the area now."],
+    ["shots fired", "[4] delayed. Shots fired near 161 St-Yankee Stadium. Stay indoors until police give the all clear."],
+    ["smoke in the tunnel", "[4] delayed. Smoke in the tunnel. Do not enter any Bronx station."],
+  ];
+  const ES_INVENTED: [string, string][] = [
+    ["tiroteo", "[4] con retrasos. Hay un tiroteo en la 149. Qu\u00E9date en casa."],
+    ["amenaza de bomba", "Los trains [4] est\u00E1n suspendidos por amenaza de bomba. Desalojen las estaciones del Bronx."],
+  ];
 
-  it.fails("blocks an emergency the alert never mentions, in Spanish - known gap, #100", () => {
-    expect(esOnly("[4] con retrasos. Hay un tiroteo en la 149. Qu\u00E9date en casa.").length).toBeGreaterThan(0);
-    expect(esOnly("Los trains [4] est\u00E1n suspendidos por amenaza de bomba. Desalojen las estaciones del Bronx.").length).toBeGreaterThan(0);
-  });
+  for (const [label, text] of EN_INVENTED) {
+    it.fails(`blocks an invented emergency in English: ${label} - known gap, #100`, () => {
+      expect(enOnly(text).length).toBeGreaterThan(0);
+    });
+  }
+
+  for (const [label, text] of ES_INVENTED) {
+    it.fails(`blocks an invented emergency in Spanish: ${label} - known gap, #100`, () => {
+      expect(esOnly(text).length).toBeGreaterThan(0);
+    });
+  }
 
   // Regression guard: an invented emergency that also drops the line name is already blocked.
   it("still blocks an invented emergency that names no line", () => {
