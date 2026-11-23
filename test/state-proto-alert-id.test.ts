@@ -11,24 +11,31 @@ import { makeAlert } from "./helpers.js";
 // path as tick(): plan, save to disk, load, plan again.
 const dir = mkdtempSync(join(tmpdir(), "blw-state-"));
 
-async function announcedOnSecondTick(id: string): Promise<number> {
+// Returns how many alerts each tick would announce. The first count matters as much as the
+// second: "0 on the second tick" alone can't tell an alert announced once from one never selected.
+async function announcedOnTicks(id: string): Promise<{ first: number; second: number }> {
   const alerts = [makeAlert({ id })];
   const file = join(dir, `${encodeURIComponent(id)}.json`);
   const first = planAnnouncements(alerts, { announced: {} });
   await saveState(file, first.next);
   const loaded = (await loadState(file)) as State;
-  return planAnnouncements(alerts, loaded).toAnnounce.length;
+  return { first: first.toAnnounce.length, second: planAnnouncements(alerts, loaded).toAnnounce.length };
 }
 
 describe("planAnnouncements vs. alert IDs that are object-property names", () => {
-  it.fails("remembers an alert whose id is __proto__ - known gap, #96", async () => {
-    expect(await announcedOnSecondTick("__proto__")).toBe(0);
+  // Outside it.fails on purpose: a failure here must not be read as the expected failure below.
+  it("selects an alert whose id is __proto__ on the first tick", async () => {
+    expect((await announcedOnTicks("__proto__")).first).toBe(1);
+  });
+
+  it.fails("does not announce an alert whose id is __proto__ again on the next tick - known gap, #96", async () => {
+    expect((await announcedOnTicks("__proto__")).second).toBe(0);
   });
 
   // Regression guards: these already work and must keep working.
   for (const id of ["lmm:alert:12345", "constructor", "toString", "hasOwnProperty", "valueOf"]) {
     it(`announces an alert with id ${id} once, not again on the next tick`, async () => {
-      expect(await announcedOnSecondTick(id)).toBe(0);
+      expect(await announcedOnTicks(id)).toEqual({ first: 1, second: 0 });
     });
   }
 
