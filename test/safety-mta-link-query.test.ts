@@ -42,17 +42,21 @@ describe("checkRiderMessage vs. extra baggage on an allowed MTA link", () => {
     }
   });
 
-  // Known gap. `it.fails` keeps CI green while the gap exists and turns red once it's fixed:
-  // when that happens, change this to plain `it`.
-  it.fails("blocks an MTA link carrying a query, fragment or encoded target - known gap, #80", () => {
-    for (const en of [
-      "[4] delayed. Details: https://new.mta.info/r?u=https%3A%2F%2Fmta-refund%252Etop",
-      "[4] delayed. Details: https://new.mta.info/r?u=aHR0cHM6Ly9tdGEtcmVmdW5kLnRvcA",
-      "[4] delayed. Details: mta.info/out?to=mta-refund%2Etop",
-      "[4] delayed. Details: new.mta.info/#/r/mta-refund%2Etop",
-      "[4] delayed. Details: https://new.mta.info/go/mta-refund%252Etop",
-    ]) {
+  // Known gaps. `it.fails` keeps CI green while a gap exists and turns red once it's fixed:
+  // when that happens, change that case to plain `it`. One test per input: the first failing
+  // assertion ends a test, so with all five in one it.fails a fix that closes only some of
+  // them would stay hidden. Checked: each input returns [] on its own today.
+  const BYPASSES: [string, string][] = [
+    ["a %-encoded URL in a query", "[4] delayed. Details: https://new.mta.info/r?u=https%3A%2F%2Fmta-refund%252Etop"],
+    ["a base64 target in a query", "[4] delayed. Details: https://new.mta.info/r?u=aHR0cHM6Ly9tdGEtcmVmdW5kLnRvcA"],
+    ["an encoded dot in a bare-host query", "[4] delayed. Details: mta.info/out?to=mta-refund%2Etop"],
+    ["an encoded dot in a fragment", "[4] delayed. Details: new.mta.info/#/r/mta-refund%2Etop"],
+    ["a double-encoded dot in the path", "[4] delayed. Details: https://new.mta.info/go/mta-refund%252Etop"],
+  ];
+
+  for (const [label, en] of BYPASSES) {
+    it.fails(`blocks an MTA link carrying ${label} - known gap, #80`, () => {
       expect(blocked(en).length).toBeGreaterThan(0);
-    }
-  });
+    });
+  }
 });
