@@ -43,8 +43,10 @@ describe("checkRiderMessage vs. IDNA-mapped symbols in a host", () => {
   it("blocks a 'digit full stop' character that carries the dot itself", () => {
     // U+2488 renders as "1." in one glyph: "mta-refund\u2488top" reads as mta-refund1.top.
     expect(en("[4] delayed. Refunds: mta-refund\u2488top")).toContainEqual(expect.stringContaining("mta-refund1.top"));
-    // U+249B is "20.": a scheme link whose host is built from it is still checked.
-    expect(en("[4] delayed. Refunds: http://\u249B3.0.113.7/r").length).toBeGreaterThan(0);
+    // U+249B is "20.", so "\u249B3.0.113" is the address 20.3.0.113 only after NFKC. No scheme on
+    // purpose: with "http://" the URL fallback rejects it with or without normalization. The
+    // exact host is asserted, and the raw text is not a host without NFKC.
+    expect(en("[4] delayed. Refunds: \u249B3.0.113")).toContainEqual(expect.stringContaining("20.3.0.113"));
   });
 
   it("blocks the same tricks in the Spanish text", () => {
