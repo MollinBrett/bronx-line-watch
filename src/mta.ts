@@ -8,6 +8,11 @@ export const MTA_ALERTS_URL =
 export interface Alert {
   id: string;
   routes: string[];
+  /**
+   * GTFS stop IDs the alert names, e.g. "626". Empty or missing means the alert
+   * names no stations (a line-wide alert).
+   */
+  stops?: string[];
   /** MTA's own category, e.g. "Delays", "Planned - Stops Skipped". */
   type: string;
   header: string;
@@ -28,7 +33,9 @@ const FeedSchema = z.object({
       id: z.string(),
       alert: z.object({
         active_period: z.array(z.object({ start: z.number(), end: z.number().optional() })).optional(),
-        informed_entity: z.array(z.object({ route_id: z.string().optional() })).optional(),
+        informed_entity: z
+          .array(z.object({ route_id: z.string().optional(), stop_id: z.string().optional() }))
+          .optional(),
         header_text: Translations,
         description_text: Translations,
         "transit_realtime.mercury_alert": z
@@ -48,12 +55,13 @@ export function parseFeed(raw: unknown): Alert[] {
   const feed = FeedSchema.parse(raw);
   return feed.entity.map(({ id, alert }) => {
     const meta = alert["transit_realtime.mercury_alert"];
-    const routes = [
-      ...new Set((alert.informed_entity ?? []).flatMap((e) => (e.route_id ? [e.route_id] : []))),
-    ];
+    const entities = alert.informed_entity ?? [];
+    const routes = [...new Set(entities.flatMap((e) => (e.route_id ? [e.route_id] : [])))];
+    const stops = [...new Set(entities.flatMap((e) => (e.stop_id ? [e.stop_id] : [])))];
     return {
       id,
       routes,
+      stops,
       type: meta?.alert_type ?? "Unknown",
       header: plainText(alert.header_text),
       description: plainText(alert.description_text),

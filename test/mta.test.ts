@@ -28,6 +28,31 @@ describe("parseFeed", () => {
     expect(alert!.routes).toEqual(["4", "5"]);
   });
 
+  it("reads stop IDs from informed entities, deduped", () => {
+    const [alert] = parseFeed({
+      entity: [
+        {
+          id: "x",
+          alert: {
+            informed_entity: [
+              { route_id: "4", stop_id: "413", direction_id: 0 },
+              { route_id: "5", stop_id: "413" },
+              { route_id: "4", stop_id: "412" },
+              { route_id: "6" },
+            ],
+          },
+        },
+      ],
+    });
+    expect(alert!.stops).toEqual(["413", "412"]);
+    expect(alert!.routes).toEqual(["4", "5", "6"]); // routes work as before
+  });
+
+  it("gives an alert with no stop IDs an empty stop list", () => {
+    const [alert] = parseFeed({ entity: [{ id: "x", alert: { informed_entity: [{ route_id: "6" }] } }] });
+    expect(alert!.stops).toEqual([]);
+  });
+
   it("fails loudly if the MTA changes the feed shape", () => {
     expect(() => parseFeed({ entities: [] })).toThrow();
   });

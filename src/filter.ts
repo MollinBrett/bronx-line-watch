@@ -1,13 +1,27 @@
+import { BRONX_STOP_IDS } from "./bronx-stops.js";
 import type { Alert } from "./mta.js";
 
 /**
- * Subway lines that serve the Bronx. Note: an alert on one of these lines may only
- * affect stations in Manhattan or Brooklyn - narrowing to Bronx stations is an open issue.
+ * Subway lines that serve the Bronx. An alert on one of these lines may still be
+ * about stations in Manhattan or Brooklyn only; touchesBronxStop() catches that.
  */
 export const BRONX_LINES = new Set(["2", "4", "5", "6", "6X", "B", "D"]);
 
 export function touchesBronxLine(alert: Alert): boolean {
   return alert.routes.some((r) => BRONX_LINES.has(r));
+}
+
+/**
+ * True if the alert names at least one Bronx station, or names no stations at all.
+ * An alert with no stations is about a whole line (e.g. "[6] trains are delayed"),
+ * and that reaches Bronx riders too, so it's kept. A [6] delay at Astor Pl names
+ * only a Manhattan station, so it's dropped.
+ */
+export function touchesBronxStop(alert: Alert): boolean {
+  const stops = alert.stops ?? [];
+  if (stops.length === 0) return true;
+  // The feed uses parent stations ("626"); a platform ID ("626N") counts as its station.
+  return stops.some((s) => BRONX_STOP_IDS.has(s.replace(/[NS]$/, "")));
 }
 
 /**
@@ -27,5 +41,7 @@ export function isActive(alert: Alert, nowSeconds: number): boolean {
 
 /** The alerts that should trigger a text right now. */
 export function textworthy(alerts: Alert[], nowSeconds: number): Alert[] {
-  return alerts.filter((a) => touchesBronxLine(a) && isRealtime(a) && isActive(a, nowSeconds));
+  return alerts.filter(
+    (a) => touchesBronxLine(a) && touchesBronxStop(a) && isRealtime(a) && isActive(a, nowSeconds),
+  );
 }
