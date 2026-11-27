@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod";
 import type { Alert } from "./mta.js";
+import { plainPunctuation } from "./sms.js";
 
 export const RiderMessage = z.object({
   en: z.string().describe("Plain-English text message for riders"),
@@ -14,7 +15,8 @@ export const SYSTEM_PROMPT = `You turn official MTA subway alerts into short tex
 Write each message the way a helpful neighbor would text it: what is happening, which line, and what the rider should do instead. Lead with the line in brackets, like [4].
 
 Rules:
-- Each message is at most 280 characters. Shorter is better.
+- Keep it short: aim for English at most 150 characters, Spanish at most 130 characters. Texts are billed by length. Cut filler and repetition first, never accents.
+- Never drop an alternative, direction, or station the alert gives just to fit that target. When the alert has several alternatives or detours, go longer instead: up to 300 characters in English and 200 in Spanish.
 - Only use facts in the alert. Never invent times, causes, directions, or alternatives the alert does not give, and never add advice (like which stairway or exit to use). If the alert gives no alternative, just say what is happening and to allow extra time. Keep time windows exactly as the alert says them; never widen "days" or "evenings" to "day and night".
 - Spanish is written for Bronx riders, many of them Dominican, Puerto Rican, or Mexican: use plain words all three groups understand, and say it the way a neighbor would text it, not formal or textbook.
   - Use "tú" and informal commands ("sal con tiempo"). Never use formal phrasing like "se les informa" or "favor de".
@@ -88,5 +90,9 @@ export async function rewriteAlert(
     console.warn(`[rewrite] ${alert.id}: stopped with ${response.stop_reason}`);
     return null;
   }
-  return response.parsed_output ?? null;
+  const msg = response.parsed_output;
+  if (!msg) return null;
+  // Straighten quotes and dashes here, before the safety check sees the text, so the text
+  // that is checked is exactly the text that is sent (#18).
+  return { en: plainPunctuation(msg.en), es: plainPunctuation(msg.es) };
 }

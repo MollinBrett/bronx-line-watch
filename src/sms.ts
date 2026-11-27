@@ -69,6 +69,26 @@ export function smsSegments(text: string): { encoding: "GSM-7" | "UCS-2"; segmen
   return { encoding: "UCS-2", segments: units <= 70 ? 1 : Math.ceil(units / 67) };
 }
 
+/**
+ * Curly quotes and long dashes aren't in GSM-7. One of them switches a whole English text to
+ * UCS-2, which more than doubles its segment count, so a long detour text can go from 2
+ * segments to 5 and be blocked by the safety check (#18). Each one has a plain twin in GSM-7
+ * that reads the same to a rider, swapped one for one, so the length never changes.
+ */
+const PLAIN_PUNCTUATION: Record<string, string> = {
+  "\u2018": "'", // ‘ left single quote
+  "\u2019": "'", // ’ right single quote / curly apostrophe
+  "\u201C": '"', // “ left double quote
+  "\u201D": '"', // ” right double quote
+  "\u2013": "-", // – en dash
+  "\u2014": "-", // — em dash
+};
+
+/** Swap curly quotes and long dashes for their plain GSM-7 versions. */
+export function plainPunctuation(text: string): string {
+  return text.replace(/[\u2018\u2019\u201C\u201D\u2013\u2014]/g, (ch) => PLAIN_PUNCTUATION[ch] ?? ch);
+}
+
 export interface TwilioConfig {
   accountSid: string;
   authToken: string;
