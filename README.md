@@ -23,8 +23,8 @@ MTA alert feed ──(every 60s, free)──> watcher ──(new alert only)─�
   only when an alert is new or changes - a few dozen times a day.
 - **Claude's output is never trusted blindly.** MTA alert text is outside input, so the prompt treats
   it as data, and `src/safety.ts` blocks texts with links, markup, missing line names, or that run long.
-- **The repo maintains itself** with two scheduled Managed Agents - a maintainer and a security guard -
-  that open pull requests and issues. People review and merge. See [docs/agents.md](docs/agents.md).
+- **The repo maintains itself** with three scheduled Managed Agents: a maintainer and a security guard
+  that open pull requests and issues, and a code reviewer that comments on every pull request. People approve and merge. See [docs/agents.md](docs/agents.md).
 
 | Path | What |
 |---|---|

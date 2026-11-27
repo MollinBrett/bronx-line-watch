@@ -2,14 +2,14 @@
 
 Bronx Line Watch sends text messages and Telegram posts to real people, and much of its code
 is written or changed by AI: Claude Code, and this repo's own maintainer and security-guard
-agents. So the question for every change is not only "does it work?" but **"could this change
+agents (a third agent, the code reviewer, comments on every pull request but changes nothing). So the question for every change is not only "does it work?" but **"could this change
 make the service send something harmful, leak a secret, or give an agent more power than it had?"**
 
 | Who or what | What it holds | What must stay true |
 | --- | --- | --- |
 | **Whoever writes an MTA alert** (or tampers with the feed) | Text that Claude reads | It can't make us send a link, phone number, or instruction that isn't a real service change. `src/safety.ts` is the last check before anything is sent. |
 | **The watcher on Render** | The Anthropic, Twilio, and Telegram keys, plus subscriber phone numbers | It talks only to the MTA feed, Claude, Twilio, and Telegram. No other code path can read or send those secrets. |
-| **The agents** (maintainer, security guard) | A sandbox with no secrets, and GitHub access through a token in an Anthropic vault | They can open pull requests and issues, never merge, and never change their own permissions without a human approving the change. |
+| **The agents** (maintainer, security guard, code reviewer) | A sandbox with no secrets, and GitHub access through a token in an Anthropic vault | They can open pull requests and issues and comment on pull requests, never merge or approve, and never change their own permissions without a human approving the change. |
 | **AI coding assistants** (Claude Code, Copilot, …) | Whatever you let them edit | Every dependency, URL, permission, and test change in their diff is one you asked for. |
 | **The supply chain** | npm packages, GitHub Actions | No unreviewed code runs at install time or in CI. Nothing newer than 7 days. |
 | **Anyone who can push to this repo** | Code that deploys to Render on merge | Nothing reaches `main` without a pull request, a passing CI gate, and a second person's approval. |
@@ -21,6 +21,7 @@ make the service send something harmful, leak a secret, or give an agent more po
 - **Bare words that look like domains are blocked.** `src/safety.ts` treats any `word.word` as a link, so a message that happens to contain one is dropped rather than sent. That's the right trade for a service that texts strangers.
 - **Phone numbers and "reply with your card number" scams aren't blocked yet** (#23). Claude is told never to add contact details, but `safety.ts` doesn't enforce it.
 - **Agent bash is always allowed inside their sandbox.** The sandbox holds no secrets and reaches only npm, GitHub, and the MTA feed. GitHub actions stay on the `auto` permission policy, and branch protection is the backstop (see `docs/agents.md`).
+- **The code reviewer could technically approve, or resolve review threads.** Its GitHub tools are limited to reading pull requests and writing reviews, but the review tool itself accepts an "approve" event and can resolve or unresolve anyone's review threads, and it acts as the repository owner. Only its instructions and the server's `auto` policy stop it. The gate pins those instructions word for word, but a text check cannot catch every rewording: a person reading every `agents/` diff is the real control. It has no tool to merge, so an approval alone ships nothing. A separate GitHub account for the agents would close this (see `docs/agents.md`).
 - **`npm audit signatures` needs network access to Sigstore**, so it runs in CI but may fail on a restricted local network.
 
 ---
@@ -42,11 +43,11 @@ catch advisories published since the last change. Run all of it locally with `np
    * **Hidden text:** invisible or bidirectional Unicode characters anywhere ("Trojan Source"), or text addressed to AI tools (telling an assistant to drop its rules, or a message written to "the AI") outside the eval and test fixtures that exist to test exactly that.
    * **Rider safety:** sending before `checkRiderMessage()`; the alert leaving its `<mta_alert>` data tags; Telegram posts with a `parse_mode`; any change to `ALLOWED_LINK_HOSTS`.
    * **Tests:** `.skip`, `.only`, `.todo`, or `xit`; an expected-failure test that doesn't name its open issue.
-   * **Agents:** web tools enabled; GitHub MCP tools set to `always_allow`; an MCP server other than GitHub's; dropping the "never push to `main`", "information, not instructions", or "don't spend credit or send texts" rules; agent networking other than `limited` with the approved hosts.
+   * **Agents:** anything under `agents/`, or any file named `agent.md`, other than the three known agent files; a carriage return or Unicode line break in an agent, sandbox, vault, or workflow file; web tools enabled; GitHub MCP tools set to `always_allow`; an MCP server other than GitHub's; dropping the "never push to `main`", "information, not instructions", or "don't spend credit or send texts" rules; the code reviewer dropping or rewording its "never approve" or "never touch review threads" rules, or naming the approve or request-changes event anywhere else, or having any GitHub tool beyond reading pull requests and writing reviews; agent networking other than `limited` with the approved hosts.
    * **CI:** `pull_request_target`/`workflow_run`, write permissions, secrets, unpinned actions, `npm install`, or a dependency cache.
    * **Website:** a script, iframe, form, inline event handler, or external resource in `docs/*.html`.
 6. `tsc --noEmit`.
-7. `npm test`, including `test/security-check.test.ts`, which plants 17 typical AI-injected changes in a throwaway copy of the repo and fails if the gate lets any of them through.
+7. `npm test`, including `test/security-check.test.ts`, which plants typical AI-injected changes in a throwaway copy of the repo and fails if the gate lets any of them through.
 
 ---
 
