@@ -191,8 +191,8 @@ async function announce(
     console.log(`  ${lang}: ${segments} segment(s), ${encoding}`);
   }
 
-  // They only get it if they asked for one of its lines.
-  const recipients = twilio ? subscribers.filter((sub) => wantsAlert(sub, alert.routes)) : [];
+  // They only get it if they asked for one of its lines, or one of its stations (#49).
+  const recipients = twilio ? subscribers.filter((sub) => wantsAlert(sub, alert)) : [];
   if (!(await maySend(recipients.length))) return;
 
   // Each channel is independent: a failure in one never blocks the other.

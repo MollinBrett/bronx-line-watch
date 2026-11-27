@@ -8,6 +8,11 @@ export const MTA_ALERTS_URL =
 export interface Alert {
   id: string;
   routes: string[];
+  /**
+   * GTFS parent station IDs the alert names ("401", "D05"), in feed order, no repeats.
+   * Empty means the MTA listed no stops: the alert is about the whole line.
+   */
+  stops: string[];
   /** MTA's own category, e.g. "Delays", "Planned - Stops Skipped". */
   type: string;
   header: string;
@@ -28,7 +33,7 @@ const FeedSchema = z.object({
       id: z.string(),
       alert: z.object({
         active_period: z.array(z.object({ start: z.number(), end: z.number().optional() })).optional(),
-        informed_entity: z.array(z.object({ route_id: z.string().optional() })).optional(),
+        informed_entity: z.array(z.object({ route_id: z.string().optional(), stop_id: z.string().optional() })).optional(),
         header_text: Translations,
         description_text: Translations,
         "transit_realtime.mercury_alert": z
@@ -38,6 +43,15 @@ const FeedSchema = z.object({
     }),
   ),
 });
+
+/**
+ * Subway stop IDs are three characters for the station ("401") plus N or S for one
+ * platform ("401N"). Riders pick stations, not platforms, so drop the direction.
+ */
+export function parentStopId(stopId: string): string {
+  const id = stopId.trim().toUpperCase();
+  return /^[A-Z0-9]{3}[NS]$/.test(id) ? id.slice(0, 3) : id;
+}
 
 /** Real ids look like "lmm:alert:12345" or "lmm:planned_work:28103". */
 const ALERT_ID = /^(?!__proto__$)[A-Za-z0-9:._-]{1,200}$/;
@@ -59,9 +73,13 @@ export function parseFeed(raw: unknown): Alert[] {
     const routes = [
       ...new Set((alert.informed_entity ?? []).flatMap((e) => (e.route_id ? [e.route_id] : []))),
     ];
+    const stops = [
+      ...new Set((alert.informed_entity ?? []).flatMap((e) => (e.stop_id ? [parentStopId(e.stop_id)] : []))),
+    ];
     return {
       id,
       routes,
+      stops,
       type: meta?.alert_type ?? "Unknown",
       header: plainText(alert.header_text),
       description: plainText(alert.description_text),

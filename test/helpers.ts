@@ -9,6 +9,7 @@ export function makeAlert(overrides: Partial<Alert> = {}): Alert {
   return {
     id: "test:1",
     routes: ["4"],
+    stops: [],
     type: "Delays",
     header: "[4] trains are running with delays in both directions.",
     description: "",

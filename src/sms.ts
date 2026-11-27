@@ -1,4 +1,6 @@
 import { BRONX_LINES } from "./filter.js";
+import type { Alert } from "./mta.js";
+import { MAX_STATIONS, alertReachesStations, choiceForStop, choicesForStops } from "./stations.js";
 
 export type Lang = "en" | "es";
 
@@ -7,25 +9,49 @@ export interface Subscriber {
   lang: Lang;
   /** The lines this rider wants texts about. Missing means every Bronx line. */
   lines?: string[];
+  /**
+   * The Bronx stations this rider picked, as GTFS parent stop IDs (#49). Missing means no
+   * station filter. Sensitive next to a phone number: never log it.
+   */
+  stations?: string[];
 }
 
 /**
  * Parse "+17185550100:es:4,5,+13475550199:en,+13475550142".
- * Each entry is phone[:language[:lines]]. Language defaults to en; no lines means all Bronx lines.
- * Lines are comma-separated too, so a new entry starts only at a comma followed by "+"
- * (every phone number starts with "+").
+ * Each entry is phone[:language[:lines[:stations]]]. Language defaults to en; no lines means
+ * all Bronx lines. Stations are stop IDs from src/bronx-stops.ts, e.g. "+17185550100:es::405,D05"
+ * (an empty lines field means all lines).
+ * Lines and stations are comma-separated too, so a new entry starts only at a comma followed
+ * by "+" (every phone number starts with "+").
  */
 export function parseSubscribers(raw: string | undefined): Subscriber[] {
   if (!raw?.trim()) return [];
   return raw.split(/,(?=\s*\+)/).map((entry, i) => {
-    const [phone = "", lang = "en", linesField, ...extra] = entry.trim().split(":");
-    if (!/^\+1\d{10}$/.test(phone)) throw new Error(`Bad phone number in SMS_SUBSCRIBERS: ${phone}`);
-    if (lang !== "en" && lang !== "es") throw new Error(`Bad language for ${phone}: ${lang}`);
+    const [phone = "", lang = "en", linesField, stationsField, ...extra] = entry.trim().split(":");
+    // Entry number only, here and below: these messages end up in logs, and neither a phone
+    // number nor anything else typed into the setting belongs there (#24).
+    if (!/^\+1\d{10}$/.test(phone)) throw new Error(`SMS_SUBSCRIBERS entry #${i + 1} has a bad phone number (expected +1 and 10 digits)`);
+    if (lang !== "en" && lang !== "es") throw new Error(`SMS_SUBSCRIBERS entry #${i + 1} has a bad language (expected en or es)`);
     if (extra.length) throw new Error(`SMS_SUBSCRIBERS entry #${i + 1} has too many ":" fields`);
-    if (linesField === undefined) return { phone, lang };
+    const sub: Subscriber = { phone, lang };
+    if (stationsField?.trim()) {
+      const ids = [...new Set(stationsField.split(",").map((s) => s.trim().toUpperCase()))];
+      if (!ids.every((id) => choiceForStop(id))) {
+        throw new Error(
+          `SMS_SUBSCRIBERS entry #${i + 1} lists a station that isn't a Bronx stop ID on a line we cover` +
+            ` (IDs are in src/bronx-stops.ts; lines: ${[...BRONX_LINES].join(", ")})`,
+        );
+      }
+      if (choicesForStops(ids).length > MAX_STATIONS) {
+        throw new Error(`SMS_SUBSCRIBERS entry #${i + 1} lists more than ${MAX_STATIONS} stations`);
+      }
+      sub.stations = ids;
+    }
+    if (linesField === undefined) return sub;
+    // An empty lines field is a typo ("+1...:es:") unless stations follow ("+1...:es::405").
+    if (!linesField.trim() && sub.stations) return sub;
 
     const lines = linesField.split(",").map((l) => l.trim().toUpperCase());
-    // Entry number, not the phone number: error messages end up in logs.
     const bad = lines.filter((l) => !BRONX_LINES.has(l));
     if (bad.length) {
       throw new Error(
@@ -33,14 +59,19 @@ export function parseSubscribers(raw: string | undefined): Subscriber[] {
           ` (allowed: ${[...BRONX_LINES].join(", ")})`,
       );
     }
-    return { phone, lang, lines: [...new Set(lines)] };
+    return { ...sub, lines: [...new Set(lines)] };
   });
 }
 
-/** Should this subscriber get a text about an alert on these routes? */
-export function wantsAlert(sub: Subscriber, routes: string[]): boolean {
+/**
+ * Should this subscriber get a text about this alert?
+ * A rider who picked stations hears about those stations (their line list is not consulted:
+ * the stations already say which lines they ride). Otherwise it's their lines, or everything.
+ */
+export function wantsAlert(sub: Subscriber, alert: Pick<Alert, "routes" | "stops">): boolean {
+  if (sub.stations?.length) return alertReachesStations(alert, sub.stations);
   if (!sub.lines) return true;
-  return routes.some((r) => sub.lines!.includes(r));
+  return alert.routes.some((r) => sub.lines!.includes(r));
 }
 
 // GSM-7: the basic character set that fits 160 characters in one SMS segment.
