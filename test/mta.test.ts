@@ -28,6 +28,11 @@ describe("parseFeed", () => {
     expect(alert!.routes).toEqual(["4", "5"]);
   });
 
+  it("drops an entry whose id is not shaped like an alert id, and keeps the rest (#96)", () => {
+    const entity = ["__proto__", "", "a b", "lmm:alert:1", "lmm:planned_work:2"].map((id) => ({ id, alert: {} }));
+    expect(parseFeed({ entity }).map((a) => a.id)).toEqual(["lmm:alert:1", "lmm:planned_work:2"]);
+  });
+
   it("fails loudly if the MTA changes the feed shape", () => {
     expect(() => parseFeed({ entities: [] })).toThrow();
   });
