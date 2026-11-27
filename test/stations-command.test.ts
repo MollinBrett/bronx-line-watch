@@ -126,8 +126,11 @@ describe("answerStationsCommand (#49)", () => {
         const { reply } = answer(body, current);
         expect(reply.length, reply).toBeLessThanOrEqual(MAX_CHARS);
         expect(smsSegments(reply).segments, reply).toBeLessThanOrEqual(5);
-        // checkRiderMessage also wants the alert's line named; replies name "Bronx Line Watch".
-        const problems = checkRiderMessage({ en: reply, es: reply }, makeAlert({ routes: ["Line"] }));
+        // Every safety rule except one: checkRiderMessage also wants the alert's line named,
+        // and a command reply is not about an alert. How replies are checked before they are
+        // sent is decided with the webhook (#16).
+        const problems = checkRiderMessage({ en: reply, es: reply }, makeAlert({ routes: ["4"] }))
+          .filter((p) => !p.endsWith("doesn't name the affected line"));
         expect(problems, reply).toEqual([]);
       }
     }

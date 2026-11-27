@@ -3,6 +3,8 @@ import type { RiderMessage } from "./rewrite.js";
 
 export const MAX_CHARS = 320;
 const ALLOWED_LINK_HOSTS = ["mta.info", "new.mta.info"];
+/** What a subway line name looks like. Letters and digits only, so it is safe inside a RegExp. */
+export const ROUTE_ID = /^[A-Z0-9]{1,4}$/;
 
 /**
  * Last line of defense before a text reaches real phones. Claude reads outside text
@@ -54,10 +56,14 @@ export function checkRiderMessage(msg: RiderMessage, alert: Alert): string[] {
       problems.push(`${lang}: unexpected letters ${odd.map((c) => "U+" + c.codePointAt(0)!.toString(16).toUpperCase().padStart(4, "0")).join(" ")}`);
     }
 
+    // Route ids come from the feed, so they are never put into a RegExp as-is (#52): only
+    // ids shaped like a real line name ("4", "6X", "SI") are looked for in the text.
     const mentionsLine = alert.routes.some((r) =>
-      new RegExp(`\\[${r}\\]|\\b${r}\\b`).test(text),
+      ROUTE_ID.test(r) && new RegExp(`\\[${r}\\]|\\b${r}\\b`).test(text),
     );
     if (!mentionsLine) problems.push(`${lang}: doesn't name the affected line`);
   }
+  const badRoutes = alert.routes.filter((r) => !ROUTE_ID.test(r));
+  if (badRoutes.length) problems.push(`alert has ${badRoutes.length} malformed route id(s)`);
   return problems;
 }

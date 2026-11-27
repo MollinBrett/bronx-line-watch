@@ -78,6 +78,10 @@ export async function rewriteAlert(
     },
     system: SYSTEM_PROMPT,
     messages: [{ role: "user", content: alertPrompt(alert) }],
+  }, {
+    // No retries inside the SDK: the next poll is the retry, and it goes through the circuit
+    // breaker, which counts one request per call (#56).
+    maxRetries: 0,
   });
 
   if (response.stop_reason === "refusal" || response.stop_reason === "max_tokens") {
