@@ -16,9 +16,9 @@
     "./agents/security-guard/agent.md": {
       "kind": "agent",
       "id": "agent_016SrzsFm382tanVL7E2Cqur",
-      "version": "6",
-      "hash": "111b32ec75ea6dbc5a8319ef95ebae0d",
-      "remote_hash": "f2ddd0450c345883d93cc5fc3c41dc92"
+      "version": "7",
+      "hash": "be332c512cb044cf90108d46249c3f51",
+      "remote_hash": "8288ca7ed48c2fb8ed658393cac82254"
     },
     "./environments/agent-sandbox.yaml": {
       "kind": "environment",
