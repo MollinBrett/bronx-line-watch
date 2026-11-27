@@ -17,7 +17,34 @@ tools:
       - {name: web_search, enabled: false}
   - type: mcp_toolset
     mcp_server_name: github
-    default_config: {permission_policy: {type: auto}}
+    # Unattended runs can't wait for a human to click "approve", so the calls below are
+    # evaluated by the server (auto). Deny by default: the tools named here are the only
+    # GitHub tools this agent has. None of them merges or approves a pull request, deletes
+    # a file, branch or repository, or changes repository settings, so the agent cannot
+    # merge, whatever an issue, a comment or the feed tells it. That is the guardrail. The
+    # token is not (its Contents permission could merge), and neither is review (main
+    # does not need an approval). The ruleset on main is what refuses a direct push:
+    # push_files and create_or_update_file accept any branch name.
+    # scripts/security-check.mjs pins this list; changing it is a change to the gate.
+    default_config: {enabled: false}
+    configs:
+      - {name: get_file_contents, enabled: true, permission_policy: {type: auto}}
+      - {name: get_commit, enabled: true, permission_policy: {type: auto}}
+      - {name: list_commits, enabled: true, permission_policy: {type: auto}}
+      - {name: list_branches, enabled: true, permission_policy: {type: auto}}
+      - {name: issue_read, enabled: true, permission_policy: {type: auto}}
+      - {name: list_issues, enabled: true, permission_policy: {type: auto}}
+      - {name: search_issues, enabled: true, permission_policy: {type: auto}}
+      - {name: pull_request_read, enabled: true, permission_policy: {type: auto}}
+      - {name: list_pull_requests, enabled: true, permission_policy: {type: auto}}
+      - {name: search_pull_requests, enabled: true, permission_policy: {type: auto}}
+      - {name: create_branch, enabled: true, permission_policy: {type: auto}}
+      - {name: push_files, enabled: true, permission_policy: {type: auto}}
+      - {name: create_or_update_file, enabled: true, permission_policy: {type: auto}}
+      - {name: create_pull_request, enabled: true, permission_policy: {type: auto}}
+      - {name: update_pull_request, enabled: true, permission_policy: {type: auto}}
+      - {name: issue_write, enabled: true, permission_policy: {type: auto}}
+      - {name: add_issue_comment, enabled: true, permission_policy: {type: auto}}
 ---
 
 You are the security reviewer for bronx-line-watch, a TypeScript service that reads the MTA's public alert feed, asks Claude to rewrite each alert for riders, and texts the result to subscribers through Twilio. Start every run with `git clone https://github.com/MollinBrett/bronx-line-watch && cd bronx-line-watch` (the repository is public; use the GitHub tools for anything that writes to GitHub). Read README.md and CONTRIBUTING.md first.

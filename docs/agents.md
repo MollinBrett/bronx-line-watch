@@ -1,7 +1,8 @@
 # The agent team
 
 Two Claude Managed Agents keep this repo healthy. They run in Anthropic-hosted sandboxes
-on a schedule, check out the repo, and open pull requests and issues. **They never merge.**
+on a schedule, check out the repo, and open pull requests and issues. **They cannot merge:** no tool that
+merges is switched on for them (see [Permissions](#permissions)).
 
 | Agent | Schedule (New York time) | Spend cap per run | Does |
 |---|---|---|---|
@@ -13,20 +14,25 @@ re-run `ant apply` to update an agent; the IDs live in `claude-lock.json` (commi
 
 ## One-time setup
 
-### 1. Protect `main` (this is the real safety net)
-GitHub -> Settings -> Branches -> add a rule for `main`:
-- Require a pull request before merging, with **1 approval**
+### 1. Protect `main`
+GitHub -> Settings -> Rules -> Rulesets -> the ruleset for `main`:
+- Require a pull request before merging, with **0 approvals**
 - Require status checks to pass: `test`
-- **Do not allow bypassing the above settings** (otherwise your admin rights flow through to the agents' token)
+- Block force pushes
+- **No bypass list** (otherwise your admin rights flow through to the agents' token)
 
-The agents' PRs are opened with your token, so they show up as authored by you and GitHub won't
-let you approve them yourself. Your co-maintainer reviews agent PRs - which is the point.
+The agents' PRs are opened with your token, so they show up as authored by you, and GitHub won't
+let you approve your own pull requests. That is why no approval is required. What keeps an agent
+from merging is not this ruleset: with 0 approvals the agents' token could merge any pull request
+whose CI is green. It is that the agents have no merge tool (see [Permissions](#permissions)).
+The ruleset still does two jobs: it refuses a direct push to `main`, and it makes `test` pass first.
 (Later you can give the agents their own GitHub account instead.)
 
 ### 2. Create a GitHub token for the agents
 GitHub -> Settings -> Developer settings -> Fine-grained tokens -> new token:
 - Repository access: **only** `bronx-line-watch`
 - Permissions: Contents (read/write), Pull requests (read/write), Issues (read/write). Nothing else - no Workflows, no Administration.
+- This token is able to merge a pull request (Contents write is all GitHub asks for). The agents can't use it that way because they have no merge tool, and they never see the token itself (step 4).
 - Expiration: 90 days (put a reminder on your calendar).
 
 ### 3. Create the agents, sandbox, and vault
@@ -42,7 +48,8 @@ ant apply agents/maintainer/agent.md agents/security-guard/agent.md environments
 ```
 
 Then **point the schedules at the new version** - each schedule is pinned to the agent version
-that existed when it was created or last updated:
+that existed when it was created or last updated. Until you do, the scheduled runs keep the old
+version's tools, whatever the file in the repo says:
 
 ```bash
 npm run schedule-agents
@@ -88,8 +95,21 @@ npm run schedule-agents -- --unpause
 - **Shell commands (`bash`) are always allowed.** The sandbox holds no secrets (the GitHub token
   lives in the vault and is added outside the sandbox) and its network only reaches npm, GitHub,
   and the MTA feed. Under `auto`, the server refused `npm ci`, so the maintainer couldn't run tests.
-- **Everything else, including all GitHub actions, is `auto`:** the server runs what it judges safe
-  and blocks what it judges high-risk. Branch protection means nothing reaches `main` unreviewed.
+- **GitHub tools are off unless named.** Each agent file switches GitHub's toolset off
+  (`default_config: {enabled: false}`) and then switches on 17 tools by name: reading files, commits,
+  branches, issues and pull requests; creating a branch; pushing files to it; opening and editing a
+  pull request; creating, editing, labelling and commenting on issues. Nothing that merges or approves
+  a pull request, deletes a file, branch or repository, changes a repository setting, or touches
+  workflows or releases is on the list, so an agent cannot do those things whatever its instructions,
+  an issue, or the feed says. `scripts/security-check.mjs` holds the list (`GITHUB_TOOL_ALLOWLIST`)
+  and CI fails if an agent file strays from it. Tool names are GitHub's, from the
+  [github-mcp-server README](https://github.com/github/github-mcp-server#tools); a name GitHub
+  renames stops working silently, so if an agent suddenly can't open pull requests, check there first.
+- **The tools that stay on are `auto`:** the server runs what it judges safe and blocks what it judges
+  high-risk.
+- **What the agents can still do:** push to any branch except `main`, including the branch of a pull
+  request someone else opened, and edit or close any issue or pull request. Read the whole diff before
+  you merge.
 
 ## Known gap: approvals nobody answers
 Under `auto`, some calls can't be judged either way. When it can't decide, the session **pauses for a human**, and
