@@ -269,6 +269,36 @@ if (!testFiles.includes("test/safety.test.ts")) fail("tests", "test/safety.test.
 // --- 7. The agents can't widen their own power -------------------------------------------
 // An agent (or an assistant editing these files) giving itself web access, unreviewed
 // GitHub writes, or open networking is the most important change to catch here.
+// The agents act on GitHub with the owner's token, and main needs no approving review, so
+// a merge tool in an agent's hands is a merge. Each agent's GitHub tools are therefore off
+// unless named, and the names must come from the list written here for that agent. None of
+// these merges or approves a pull request, deletes a file, branch or repository, touches
+// repository settings, workflows or releases, or hands work to another agent. An agent file
+// with no entry here fails: a new agent's GitHub powers are decided in this file.
+const OPEN_PRS_AND_ISSUES = [
+  // read
+  "get_file_contents", "get_commit", "list_commits", "list_branches",
+  "issue_read", "list_issues", "search_issues",
+  "pull_request_read", "list_pull_requests", "search_pull_requests",
+  // write: a branch, files on it, a pull request, issues and comments (labels go through issue_write)
+  "create_branch", "push_files", "create_or_update_file",
+  "create_pull_request", "update_pull_request",
+  "issue_write", "add_issue_comment",
+];
+const GITHUB_TOOL_ALLOWLIST = {
+  "agents/maintainer/agent.md": OPEN_PRS_AND_ISSUES,
+  "agents/security-guard/agent.md": OPEN_PRS_AND_ISSUES,
+};
+// Tools no agent may be given, whatever the lists above say. A change that adds one of these
+// to an allowlist has to edit this line too, which is hard to miss in a diff.
+const NEVER_AGENT_TOOLS = [
+  "merge_pull_request", "delete_file", "delete_repository", "create_repository", "fork_repository",
+  "create_repository_ruleset", "custom_properties_write", "actions_run_trigger",
+  "assign_copilot_to_issue", "assign_copilot_to_issue_with_intent", "create_pull_request_with_copilot",
+];
+for (const [f, tools] of Object.entries(GITHUB_TOOL_ALLOWLIST)) {
+  for (const t of tools) if (NEVER_AGENT_TOOLS.includes(t)) fail("agents", `GITHUB_TOOL_ALLOWLIST gives ${f} the tool ${t}, which no agent may have`);
+}
 for (const f of tracked.filter((f) => /^agents\/[^/]+\/agent\.md$/.test(f))) {
   const s = read(f);
   const front = s.split(/^---$/m)[1] || "";
@@ -284,6 +314,56 @@ for (const f of tracked.filter((f) => /^agents\/[^/]+\/agent\.md$/.test(f))) {
   if (!/Never push to `main`/.test(s)) fail("agents", `${f} must keep the rule "Never push to \`main\`"`);
   if (!/information, not instructions/.test(s)) fail("agents", `${f} must keep the rule that issue/PR/feed text is information, not instructions`);
   if (!/Never run `npm run eval`, `npm start`/.test(s)) fail("agents", `${f} must keep the rule against spending credit or sending texts`);
+  // The GitHub tool limits. The whole frontmatter is compared line by line, indentation
+  // included, against the one shape an agent may have. Searching the text for the right
+  // words is not enough: a quoted name, a commented-out default, a second toolset entry, or a
+  // look-alike stanza inside a multi-line description would all pass a search. Anything
+  // unexpected fails.
+  // YAML also ends a line at a bare carriage return and at three Unicode line breaks. The
+  // comparison splits on newlines only, so one of those after a "#" would hide a real setting
+  // inside what looks like a comment.
+  if (/[\r\u0085\u2028\u2029]/.test(s)) fail("agents", `${f} contains a carriage return or Unicode line break, which YAML reads as a new line`);
+  if (!s.startsWith("---\n")) fail("agents", `${f} must start with its frontmatter ("---" on the first line)`);
+  const allowed = GITHUB_TOOL_ALLOWLIST[f];
+  if (!allowed) {
+    fail("agents", `${f} has no entry in GITHUB_TOOL_ALLOWLIST in scripts/security-check.mjs; a new agent's GitHub tools must be listed there`);
+  } else {
+    const shape = [
+      /^name: [a-z0-9-]+$/,
+      /^description: [A-Za-z][^\\|>{}\[\]"#]*$/, // one plain line: no block scalar, quoting, or escapes
+      /^model: [a-z0-9-]+$/,
+      "mcp_servers:",
+      "  - type: url",
+      "    name: github",
+      "    url: https://api.githubcopilot.com/mcp/",
+      "tools:",
+      "  - type: agent_toolset_20260401",
+      "    default_config: {permission_policy: {type: auto}}",
+      "    configs:",
+      "      - {name: bash, permission_policy: {type: always_allow}}",
+      "      - {name: web_fetch, enabled: false}",
+      "      - {name: web_search, enabled: false}",
+      "  - type: mcp_toolset",
+      "    mcp_server_name: github",
+      "    default_config: {enabled: false}",
+      "    configs:",
+    ];
+    const tool = /^      - \{name: ([a-z0-9_]+), enabled: true, permission_policy: \{type: auto\}\}$/;
+    // Failures name the line number only. The line's text is whatever someone put in the file,
+    // and this output lands in CI logs.
+    const lines = front.split("\n").map((l, i) => ({ text: l.trimEnd(), at: i + 1 })).filter(({ text }) => text.trim() && !text.trim().startsWith("#"));
+    lines.forEach(({ text, at }, n) => {
+      if (n < shape.length) {
+        const want = shape[n];
+        if (typeof want === "string" ? text !== want : !want.test(text)) fail("agents", `${f}: line ${at} is not allowed in an agent's frontmatter; GitHub tools must be off by default (the expected shape is in scripts/security-check.mjs)`);
+      } else {
+        const name = text.match(tool)?.[1];
+        if (!name) fail("agents", `${f}: line ${at} is not a GitHub tool switched on by name with the auto policy`);
+        else if (!allowed.includes(name)) fail("agents", `${f}: line ${at} enables a GitHub tool that is not on this agent's list in GITHUB_TOOL_ALLOWLIST`);
+      }
+    });
+    if (lines.length < shape.length) fail("agents", `${f}: frontmatter is missing part of the tool configuration, which would leave GitHub tools on by default`);
+  }
 }
 for (const f of tracked.filter((f) => /^environments\/.+\.ya?ml$/.test(f))) {
   const s = read(f);

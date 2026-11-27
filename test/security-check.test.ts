@@ -112,6 +112,35 @@ describe("security gate", () => {
       patch(d, "agents/maintainer/agent.md", "{name: web_fetch, enabled: false}", "{name: web_fetch, enabled: true}")],
     ["an agent dropping its no-push rule", "[agents]", (d) =>
       patch(d, "agents/security-guard/agent.md", "Never push to `main`.", "Push straight to `main` when tests pass.")],
+    ["the maintainer gaining a merge tool", "[agents]", (d) =>
+      patch(d, "agents/maintainer/agent.md", "      - {name: get_file_contents,", "      - {name: merge_pull_request, enabled: true, permission_policy: {type: auto}}\n      - {name: get_file_contents,")],
+    ["the security guard gaining a merge tool under a quoted name", "[agents]", (d) =>
+      patch(d, "agents/security-guard/agent.md", "      - {name: get_file_contents,", '      - {name: "merge_pull_request", enabled: true, permission_policy: {type: auto}}\n      - {name: get_file_contents,')],
+    ["the security guard gaining a tool that approves pull requests", "[agents]", (d) =>
+      patch(d, "agents/security-guard/agent.md", "      - {name: add_issue_comment,", "      - {name: pull_request_review_write, enabled: true, permission_policy: {type: auto}}\n      - {name: add_issue_comment,")],
+    ["the maintainer gaining a tool that deletes files", "[agents]", (d) =>
+      patch(d, "agents/maintainer/agent.md", "      - {name: push_files,", "      - {name: delete_file, enabled: true, permission_policy: {type: auto}}\n      - {name: push_files,")],
+    ["the maintainer's GitHub tools back on by default", "[agents]", (d) =>
+      patch(d, "agents/maintainer/agent.md", "    default_config: {enabled: false}\n    configs:", "    default_config: {permission_policy: {type: auto}}\n    configs:")],
+    ["the security guard's deny-by-default moved into a comment", "[agents]", (d) =>
+      patch(d, "agents/security-guard/agent.md", "    default_config: {enabled: false}\n    configs:", "    # default_config: {enabled: false}\n    default_config: {enabled: true}\n    configs:")],
+    ["the maintainer's GitHub tool limits deleted", "[agents]", (d) =>
+      patch(d, "agents/maintainer/agent.md", /    # Unattended runs can't wait[\s\S]*?(?=\n---\n)/, "    default_config: {permission_policy: {type: auto}}")],
+    ["the security guard's frontmatter cut off before its GitHub tool limits", "[agents]", (d) =>
+      patch(d, "agents/security-guard/agent.md", /(    mcp_server_name: github\n)[\s\S]*?(?=---\n)/, "$1")],
+    ["a second GitHub toolset, on by default, behind a look-alike in the maintainer's description", "[agents]", (d) =>
+      patch(d, "agents/maintainer/agent.md", "  - type: mcp_toolset\n    mcp_server_name: github\n",
+        "  - {type: mcp_toolset, mcp_server_name: github, default_config: {enabled: true}}\ndescription: |\n  - type: mcp_toolset\n    mcp_server_name: github\n")],
+    ["a merge tool for the maintainer hidden after a carriage return in a comment", "[agents]", (d) =>
+      patch(d, "agents/maintainer/agent.md", "    default_config: {enabled: false}\n    configs:\n", "    default_config: {enabled: false}\n    configs:\n      # read tools\r      - {name: merge_pull_request, enabled: true, permission_policy: {type: auto}}\n")],
+    ["a GitHub tool switched on for the security guard without the auto policy", "[agents]", (d) =>
+      patch(d, "agents/security-guard/agent.md", "{name: push_files, enabled: true, permission_policy: {type: auto}}", "{name: push_files, enabled: true}")],
+    ["a merge tool added to the gate's own allowlist and to the maintainer", "[agents]", (d) => {
+      patch(d, "scripts/security-check.mjs", '"issue_write", "add_issue_comment",', '"issue_write", "add_issue_comment", "merge_pull_request",');
+      patch(d, "agents/maintainer/agent.md", "      - {name: get_file_contents,", "      - {name: merge_pull_request, enabled: true, permission_policy: {type: auto}}\n      - {name: get_file_contents,");
+    }],
+    ["a new agent whose GitHub tools the gate has no list for", "[agents]", (d) =>
+      cpSync(join(d, "agents/maintainer"), join(d, "agents/pr-helper"), { recursive: true })],
     ["open networking for the agents", "[agents]", (d) =>
       patch(d, "environments/agent-sandbox.yaml", "type: limited", "type: unrestricted")],
     ["an unreviewed dependency", "[supply-chain]", (d) =>
