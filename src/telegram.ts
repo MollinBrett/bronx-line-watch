@@ -1,3 +1,4 @@
+import { tripMessage, type Trip } from "./breaker.js";
 import type { RiderMessage } from "./rewrite.js";
 
 /**
@@ -31,9 +32,45 @@ export function telegramPosts(cfg: TelegramConfig, msg: RiderMessage): { chatId:
   ];
 }
 
+/** The operators' private chat, where the watcher says that it has paused itself (#56). */
+export interface AdminChat {
+  botToken: string;
+  chatId: string;
+}
+
+/**
+ * TELEGRAM_CHANNEL_ADMIN, posted to by the same bot. It must be a numeric chat id: a public
+ * channel is set by its @name, and this alert must never go to the public channels.
+ */
+export function adminChatFromEnv(env = process.env): AdminChat | null {
+  const { TELEGRAM_BOT_TOKEN, TELEGRAM_CHANNEL_ADMIN, TELEGRAM_CHANNEL_EN, TELEGRAM_CHANNEL_ES } = env;
+  const chatId = TELEGRAM_CHANNEL_ADMIN?.trim();
+  if (!chatId) return null;
+  if (!/^-?\d+$/.test(chatId)) {
+    throw new Error("TELEGRAM_CHANNEL_ADMIN must be a numeric chat id (a private channel's starts with -100), not an @name");
+  }
+  if (chatId === TELEGRAM_CHANNEL_EN?.trim() || chatId === TELEGRAM_CHANNEL_ES?.trim()) {
+    throw new Error("TELEGRAM_CHANNEL_ADMIN must not be one of the public channels");
+  }
+  if (!TELEGRAM_BOT_TOKEN) throw new Error("TELEGRAM_CHANNEL_ADMIN is set, but there is no bot to post with");
+  return { botToken: TELEGRAM_BOT_TOKEN, chatId };
+}
+
+/**
+ * Tell the operators that the breaker tripped. It takes the trip, not a text, so the only thing
+ * it can ever post is the fixed message built from that trip's numbers.
+ */
+export async function postTripAlert(chat: AdminChat, trip: Trip): Promise<void> {
+  await send(chat.botToken, chat.chatId, tripMessage(trip));
+}
+
 export async function postToTelegram(cfg: TelegramConfig, chatId: string, text: string): Promise<void> {
+  await send(cfg.botToken, chatId, text);
+}
+
+async function send(botToken: string, chatId: string, text: string): Promise<void> {
   // Plain text on purpose (no parse_mode): Claude's output can never be read as Markdown/HTML links.
-  const res = await fetch(`https://api.telegram.org/bot${cfg.botToken}/sendMessage`, {
+  const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ chat_id: chatId, text, link_preview_options: { is_disabled: true } }),

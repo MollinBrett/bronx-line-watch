@@ -16,6 +16,9 @@ export interface State {
   lastSent?: Record<string, number>;
 }
 
+/** What is in the state file: the state, plus the circuit breaker's memory (src/breaker.ts, #56). */
+export type SavedState = State & { breaker?: unknown };
+
 /** Limits on how much one poll may send (#40). */
 export interface Limits {
   /** At most this many alerts are announced per poll; the rest wait for the next one. */
@@ -63,13 +66,19 @@ function carry(to: Required<State>, from: State, id: string, seen: number): void
   if (sent !== undefined) to.lastSent[id] = sent;
 }
 
-/** Everything in the feed marked as already announced, for the first run. */
-export function primed(candidates: Alert[], nowSeconds: number): State {
+/**
+ * Everything in the feed marked as already announced, and nothing to send: for the first run,
+ * and for every poll while the watcher is paused (#56). Given the `previous` state, what it
+ * remembers is kept, so an alert announced before a pause is not announced again after it.
+ */
+export function primed(candidates: Alert[], nowSeconds: number, previous?: State, limits: Limits = DEFAULT_LIMITS): State {
   const next = emptyState();
   for (const alert of candidates) {
+    if (previous) carry(next, previous, alert.id, nowSeconds);
     next.announced[alert.id] = fingerprint(alert);
     next.lastSeen[alert.id] = nowSeconds;
   }
+  if (previous) carryVanished(next, previous, nowSeconds, limits.rememberSeconds);
   return next;
 }
 
@@ -143,16 +152,16 @@ export function without(state: State, ids: Iterable<string>): State {
 }
 
 /** Returns null when there is no state file yet (first run). */
-export async function loadState(path: string): Promise<State | null> {
+export async function loadState(path: string): Promise<SavedState | null> {
   try {
-    return JSON.parse(await readFile(path, "utf8")) as State;
+    return JSON.parse(await readFile(path, "utf8")) as SavedState;
   } catch (err) {
     if ((err as NodeJS.ErrnoException).code === "ENOENT") return null;
     throw err;
   }
 }
 
-export async function saveState(path: string, state: State): Promise<void> {
+export async function saveState(path: string, state: SavedState): Promise<void> {
   await mkdir(dirname(path), { recursive: true });
   const tmp = `${path}.tmp`;
   await writeFile(tmp, JSON.stringify(state, null, 2));
