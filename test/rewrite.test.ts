@@ -22,6 +22,25 @@ describe("rewriteAlert", () => {
     expect(params.fallbacks).toBe("default");
   });
 
+  it("asks Claude for exactly the two-field en/es schema", async () => {
+    // The SDK turns our zod schema into the JSON schema Claude must follow. Pin it, so an SDK
+    // upgrade that changes what Claude is asked for shows up here instead of only in production.
+    // (@anthropic-ai/sdk before 1.9.0 also sent a junk description: '{$schema: "https://..."}'.)
+    const { client, parse } = fakeClient({ stop_reason: "end_turn", parsed_output: { en: "x", es: "x" } });
+    await rewriteAlert(client, makeAlert());
+    const format = parse.mock.calls[0]![0].output_config.format;
+    expect(format.type).toBe("json_schema");
+    expect(format.schema).toEqual({
+      type: "object",
+      properties: {
+        en: { type: "string", description: "Plain-English text message for riders" },
+        es: { type: "string", description: "The same message in natural New York Spanish" },
+      },
+      additionalProperties: false,
+      required: ["en", "es"],
+    });
+  });
+
   it("returns null when Claude declines", async () => {
     const { client } = fakeClient({ stop_reason: "refusal", parsed_output: null });
     expect(await rewriteAlert(client, makeAlert())).toBeNull();
